@@ -36,4 +36,13 @@ public class WindowUtils {
 
         return outSize.x;
     }
+
+    public static int dip2pixels(final Context context, final float dipValue) {
+        if (context == null) {
+            return 0;
+        }
+
+        float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
+    }
 }

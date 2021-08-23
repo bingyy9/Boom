@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 
 import android.Manifest;
+import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,21 +16,32 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.boom.android.permission.PermissionManager;
+import com.boom.android.service.FloatingVideoService;
 import com.boom.android.service.MediaRecordService;
+import com.boom.android.util.BoomHelper;
+import com.boom.android.util.NotificationUtil;
 import com.boom.android.util.WindowUtils;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int RECORD_REQUEST_CODE  = 101;
+    private static final int OVERLAY_REQUEST_CODE  = 102;
 
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
@@ -85,6 +97,15 @@ public class MainActivity extends AppCompatActivity {
             recordService.setMediaProject(mediaProjection);
             recordService.startRecord();
             startBtn.setText(R.string.stop_record);
+
+            startFloatingVideoService();
+        } else if(requestCode == OVERLAY_REQUEST_CODE){
+            if (BoomHelper.ensureDrawOverlayPermission(this)) {
+                NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
+            } else {
+//                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
+                startService(new Intent(MainActivity.this, FloatingVideoService.class));
+            }
         }
     }
 
@@ -115,4 +136,16 @@ public class MainActivity extends AppCompatActivity {
     };
 
     public native String stringFromJNI();
+
+    private void startFloatingVideoService() {
+        if (FloatingVideoService.isStarted) {
+            return;
+        }
+        if (!BoomHelper.ensureDrawOverlayPermission(this)) {
+            NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_request_tip));
+            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
+        } else {
+            startService(new Intent(MainActivity.this, FloatingVideoService.class));
+        }
+    }
 }
