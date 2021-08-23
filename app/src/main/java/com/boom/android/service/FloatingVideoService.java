@@ -6,9 +6,9 @@ import android.graphics.PixelFormat;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,18 +19,15 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.boom.android.R;
+import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
 
 import java.io.IOException;
 
 import androidx.annotation.Nullable;
 
-/**
- * Created by admin on 2018/5/30.
- */
-
 public class FloatingVideoService extends Service {
-    public static boolean isStarted = false;
+    public boolean isStarted = false;
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
@@ -63,12 +60,20 @@ public class FloatingVideoService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        Dogger.i(Dogger.BOOM, "", "FloatingVideoService", "onBind");
+        showFloatingWindow();
+        return new MsgBinder();
+    }
+
+    public class MsgBinder extends Binder {
+        public FloatingVideoService getService(){
+            return FloatingVideoService.this;
+        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        showFloatingWindow();
+        Dogger.i(Dogger.BOOM, "", "FloatingVideoService", "onStartCommand");
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -83,6 +88,7 @@ public class FloatingVideoService extends Service {
             surfaceHolder.addCallback(new SurfaceHolder.Callback() {
                 @Override
                 public void surfaceCreated(SurfaceHolder holder) {
+                    Dogger.i(Dogger.BOOM, "", "FloatingVideoService", "surfaceCreated");
                     mediaPlayer.setDisplay(surfaceHolder);
                 }
 
@@ -113,6 +119,17 @@ public class FloatingVideoService extends Service {
         }
     }
 
+    public void stopFloatingWindow(){
+        Dogger.i(Dogger.BOOM, "", "FloatingVideoService", "stopFloatingWindow");
+        isStarted = false;
+        if(mediaPlayer != null){
+            if(mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+        }
+    }
+
     private class FloatingOnTouchListener implements View.OnTouchListener {
         private int x;
         private int y;
@@ -140,5 +157,11 @@ public class FloatingVideoService extends Service {
             }
             return true;
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopFloatingWindow();
     }
 }

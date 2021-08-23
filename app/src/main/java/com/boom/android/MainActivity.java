@@ -1,42 +1,28 @@
 package com.boom.android;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import butterknife.BindView;
 
-import android.Manifest;
-import android.app.AppOpsManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
-import android.os.Binder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
 
+import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.FloatingVideoService;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtil;
-import com.boom.android.util.WindowUtils;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
     private MediaRecordService recordService;
+    private FloatingVideoService floatingVideoService;
 
     @BindView(R.id.start_record)
     Button startBtn;
@@ -66,12 +53,11 @@ public class MainActivity extends AppCompatActivity {
         startBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (recordService.isRunning()) {
-                    recordService.stopRecord();
+                if (recordService != null && recordService.isRunning()) {
                     startBtn.setText(R.string.start_record);
+                    stopRecording();
                 } else {
-                    Intent captureIntent = projectionManager.createScreenCaptureIntent();
-                    startActivityForResult(captureIntent, RECORD_REQUEST_CODE);
+                    startRecording();
                 }
             }
         });
@@ -80,13 +66,25 @@ public class MainActivity extends AppCompatActivity {
         PermissionManager.requestAllPermission(this);
 
         Intent intent = new Intent(this, MediaRecordService.class);
-        bindService(intent, connection, BIND_AUTO_CREATE);
+        bindService(intent, recordServiceConnection, BIND_AUTO_CREATE);
+    }
+
+    private void startRecording(){
+        Intent captureIntent = projectionManager.createScreenCaptureIntent();
+        startActivityForResult(captureIntent, RECORD_REQUEST_CODE);
+    }
+
+    private void stopRecording(){
+        if(recordService != null){
+            recordService.stopRecord();
+        }
+        stopFloatingVideoService();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(connection);
+        unbindService(recordServiceConnection);
     }
 
     @Override
@@ -119,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private ServiceConnection recordServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             DisplayMetrics metrics = new DisplayMetrics();
@@ -135,17 +133,42 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName arg0) {}
     };
 
+    private ServiceConnection floatWindowServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceConnected");
+            floatingVideoService = ((FloatingVideoService.MsgBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceDisconnected");
+            floatingVideoService = null;
+        }
+    };
+
     public native String stringFromJNI();
 
     private void startFloatingVideoService() {
-        if (FloatingVideoService.isStarted) {
+        if (floatingVideoService != null && floatingVideoService.isStarted) {
+            Dogger.i(Dogger.BOOM, "ignore", "MainActivity", "startFloatingVideoService");
             return;
         }
         if (!BoomHelper.ensureDrawOverlayPermission(this)) {
+            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingVideoService");
             NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_request_tip));
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
         } else {
-            startService(new Intent(MainActivity.this, FloatingVideoService.class));
+            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingVideoService");
+            Intent intent = new Intent(this, FloatingVideoService.class);
+            bindService(intent, floatWindowServiceConnection, BIND_AUTO_CREATE);
         }
     }
+
+    private void stopFloatingVideoService(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingVideoService");
+        unbindService(floatWindowServiceConnection);
+        floatingVideoService = null;
+    }
+
 }
