@@ -1,3 +1,4 @@
+include ':utils'
 include ':model'
 include ':app'
 rootProject.name = "My Application"

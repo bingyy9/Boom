@@ -35,7 +35,7 @@ public class MediaRecordService extends Service {
     private int height = 1080;
     private int dpi;
 
-    
+
 
     @Override
     public IBinder onBind(Intent intent) {

@@ -23,14 +23,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.WindowUtils;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int RECORD_REQUEST_CODE  = 101;
-    private static final int STORAGE_REQUEST_CODE = 102;
-    private static final int AUDIO_REQUEST_CODE   = 103;
 
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
@@ -65,17 +64,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_REQUEST_CODE);
-        }
 
-        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.RECORD_AUDIO}, AUDIO_REQUEST_CODE);
-        }
+        PermissionManager.requestAllPermission(this);
 
         Intent intent = new Intent(this, MediaRecordService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
@@ -101,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == STORAGE_REQUEST_CODE || requestCode == AUDIO_REQUEST_CODE) {
+        if (requestCode == PermissionManager.STORAGE_REQUEST_CODE || requestCode == PermissionManager.AUDIO_REQUEST_CODE) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
                 finish();
             }
