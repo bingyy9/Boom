@@ -19,7 +19,7 @@ import android.widget.Button;
 
 import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
-import com.boom.android.service.FloatingVideoService;
+import com.boom.android.service.FloatingCameraService;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtil;
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
     private MediaRecordService recordService;
-    private FloatingVideoService floatingVideoService;
+    private FloatingCameraService floatingCameraService;
 
     @BindView(R.id.start_record)
     Button startBtn;
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         if(recordService != null){
             recordService.stopRecord();
         }
-        stopFloatingVideoService();
+        stopFloatingCameraService();
     }
 
     @Override
@@ -96,13 +96,13 @@ public class MainActivity extends AppCompatActivity {
             recordService.startRecord();
             startBtn.setText(R.string.stop_record);
 
-            startFloatingVideoService();
+            startFloatingCameraService();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
             if (BoomHelper.ensureDrawOverlayPermission(this)) {
                 NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
             } else {
 //                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
-                startService(new Intent(MainActivity.this, FloatingVideoService.class));
+                startService(new Intent(MainActivity.this, FloatingCameraService.class));
             }
         }
     }
@@ -137,38 +137,38 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceConnected");
-            floatingVideoService = ((FloatingVideoService.MsgBinder)service).getService();
+            floatingCameraService = ((FloatingCameraService.MsgBinder)service).getService();
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceDisconnected");
-            floatingVideoService = null;
+            floatingCameraService = null;
         }
     };
 
     public native String stringFromJNI();
 
-    private void startFloatingVideoService() {
-        if (floatingVideoService != null && floatingVideoService.isStarted) {
-            Dogger.i(Dogger.BOOM, "ignore", "MainActivity", "startFloatingVideoService");
+    private void startFloatingCameraService() {
+        if (floatingCameraService != null && floatingCameraService.isStarted) {
+            Dogger.i(Dogger.BOOM, "ignore", "MainActivity", "startFloatingCameraService");
             return;
         }
         if (!BoomHelper.ensureDrawOverlayPermission(this)) {
-            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingVideoService");
+            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCameraService");
             NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_request_tip));
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
         } else {
-            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingVideoService");
-            Intent intent = new Intent(this, FloatingVideoService.class);
+            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingCameraService");
+            Intent intent = new Intent(this, FloatingCameraService.class);
             bindService(intent, floatWindowServiceConnection, BIND_AUTO_CREATE);
         }
     }
 
-    private void stopFloatingVideoService(){
-        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingVideoService");
+    private void stopFloatingCameraService(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingCameraService");
         unbindService(floatWindowServiceConnection);
-        floatingVideoService = null;
+        floatingCameraService = null;
     }
 
 }
