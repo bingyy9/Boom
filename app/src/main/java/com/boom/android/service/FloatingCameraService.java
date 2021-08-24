@@ -3,6 +3,7 @@ package com.boom.android.service;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.hardware.Camera;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
@@ -12,6 +13,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import com.boom.android.R;
@@ -25,6 +27,7 @@ public class FloatingCameraService extends Service {
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
+    private boolean toggleDragLog = true;
 
     private View rootView;
     private CameraView cameraView;
@@ -44,10 +47,10 @@ public class FloatingCameraService extends Service {
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        layoutParams.width = 800;
+        layoutParams.width = 450;
         layoutParams.height = 450;
-        layoutParams.x = 300;
-        layoutParams.y = 300;
+        layoutParams.x = 0;
+        layoutParams.y = 100;
     }
 
     @Nullable
@@ -76,7 +79,7 @@ public class FloatingCameraService extends Service {
             rootView = layoutInflater.inflate(R.layout.video_display, null);
             rootView.setOnTouchListener(new FloatingOnTouchListener());
             cameraView = rootView.findViewById(R.id.video_display_surfaceview);
-            cameraView.init(0, CameraView.LayoutMode.FitToParent);
+            cameraView.init(Camera.CameraInfo.CAMERA_FACING_FRONT, CameraView.LayoutMode.FitToParent);
             surfaceHolder = cameraView.getHolder();
             surfaceHolder.setKeepScreenOn(true);
             windowManager.addView(rootView, layoutParams);
@@ -93,26 +96,40 @@ public class FloatingCameraService extends Service {
     }
 
     private class FloatingOnTouchListener implements View.OnTouchListener {
-        private int x;
-        private int y;
+        private int initialX;
+        private int initialY;
+        private float initialTouchX;
+        private float initialTouchY;
 
         @Override
         public boolean onTouch(View view, MotionEvent event) {
+            int x = (int) event.getX();
+            int y = (int) event.getY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    x = (int) event.getRawX();
-                    y = (int) event.getRawY();
+                    initialX = layoutParams.x;
+                    initialY = layoutParams.y;
+
+                    initialTouchX = event.getRawX();
+                    initialTouchY = event.getRawY();
+                    if(toggleDragLog) {
+//                        Dogger.i(Dogger.BOOM, "toggleDragLog DOWN x: " + x + " y: " + y, "FloatingOnTouchListener", "onTouch");
+                    }
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    int nowX = (int) event.getRawX();
-                    int nowY = (int) event.getRawY();
-                    int movedX = nowX - x;
-                    int movedY = nowY - y;
-                    x = nowX;
-                    y = nowY;
-                    layoutParams.x = layoutParams.x + movedX;
-                    layoutParams.y = layoutParams.y + movedY;
-                    windowManager.updateViewLayout(view, layoutParams);
+                    layoutParams.x = initialX
+                            + (int) (event.getRawX() - initialTouchX);
+                    layoutParams.y = initialY
+                            + (int) (event.getRawY() - initialTouchY);
+                    if(toggleDragLog) {
+//                        Dogger.i(Dogger.BOOM, "toggleDragLog MOVE nowX: " + nowX + " nowY: " + nowY
+//                                + " layoutParams.x: " + layoutParams.x + " layoutParams.y: " + layoutParams.y, "FloatingOnTouchListener", "onTouch");
+                    }
+                    windowManager.updateViewLayout(view, FloatingCameraService.this.layoutParams);
+                    break;
+                case MotionEvent.ACTION_UP:
+//                    int Xdiff = (int) (event.getRawX() - initialTouchX);
+//                    int Ydiff = (int) (event.getRawY() - initialTouchY);
                     break;
                 default:
                     break;
