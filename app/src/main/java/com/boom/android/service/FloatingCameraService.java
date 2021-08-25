@@ -61,8 +61,8 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        layoutParams.width = 450;
-        layoutParams.height = 450;
+        layoutParams.width = 500;
+        layoutParams.height = 500;
         layoutParams.x = 0;
         layoutParams.y = 100;
     }
@@ -179,31 +179,29 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
 
         @Override
         public boolean onTouch(View view, MotionEvent event) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    addRoundBorder();
                     initialX = layoutParams.x;
                     initialY = layoutParams.y;
 
                     initialTouchX = event.getRawX();
                     initialTouchY = event.getRawY();
                     if(toggleDragLog) {
-//                        Dogger.i(Dogger.BOOM, "toggleDragLog DOWN x: " + x + " y: " + y, "FloatingOnTouchListener", "onTouch");
+                        Dogger.i(Dogger.BOOM, "toggleDragLog DOWN x: " + initialTouchX + " y: " + initialTouchX, "FloatingOnTouchListener", "onTouch");
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    layoutParams.x = initialX
-                            + (int) (event.getRawX() - initialTouchX);
-                    layoutParams.y = initialY
-                            + (int) (event.getRawY() - initialTouchY);
-                    if(toggleDragLog) {
+                    layoutParams.x = initialX + (int) (event.getRawX() - initialTouchX);
+                    layoutParams.y = initialY + (int) (event.getRawY() - initialTouchY);
+//                    if(toggleDragLog) {
 //                        Dogger.i(Dogger.BOOM, "toggleDragLog MOVE nowX: " + nowX + " nowY: " + nowY
 //                                + " layoutParams.x: " + layoutParams.x + " layoutParams.y: " + layoutParams.y, "FloatingOnTouchListener", "onTouch");
-                    }
+//                    }
                     windowManager.updateViewLayout(view, FloatingCameraService.this.layoutParams);
                     break;
                 case MotionEvent.ACTION_UP:
+                    removeRoundBorder();
 //                    int Xdiff = (int) (event.getRawX() - initialTouchX);
 //                    int Ydiff = (int) (event.getRawY() - initialTouchY);
                     break;
@@ -211,6 +209,24 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
                     break;
             }
             return true;
+        }
+    }
+
+    private void addRoundBorder(){
+        if(roundBorderView == null) {
+            roundBorderView = new RoundBorderView(FloatingCameraService.this);
+        }
+        roundBorderView.setRadius(Math.min(cameraView.getWidth(), cameraView.getHeight()) >> 1);
+        roundBorderView.turnRound();
+        ((FrameLayout) cameraView.getParent()).addView(roundBorderView, cameraView.getLayoutParams());
+
+
+
+    }
+
+    private void removeRoundBorder(){
+        if(roundBorderView != null) {
+            ((FrameLayout) cameraView.getParent()).removeView(roundBorderView);
         }
     }
 
