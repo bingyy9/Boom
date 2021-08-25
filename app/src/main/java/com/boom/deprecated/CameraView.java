@@ -1,4 +1,4 @@
-package com.boom.android.service;
+package com.boom.deprecated;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.boom.android.BoomApplication;
 
+//deprecated
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private static boolean DEBUGGING = true;
     private static final String LOG_TAG = "CameraPreviewSample";
