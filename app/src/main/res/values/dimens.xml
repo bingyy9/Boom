@@ -30,4 +30,7 @@
     <dimen name="text_size_13">13sp</dimen>
     <dimen name="text_size_12">12sp</dimen>
     <dimen name="text_size_10">10sp</dimen>
+
+    <dimen name="video_preview_width">150dp</dimen>
+    <dimen name="video_preview_height">150dp</dimen>
 </resources>

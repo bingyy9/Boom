@@ -67,7 +67,7 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.x = 0;
-        layoutParams.y = 100;
+        layoutParams.y = 150;
     }
 
     @Nullable
