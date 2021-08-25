@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -46,6 +47,8 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
     private RoundBorderView roundBorderView;
     private static final int CAMERA_ID = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera.Size previewSize;
+    private GestureDetector mGestureDetector;
+    private boolean isMove;
 
     @Override
     public void onCreate() {
@@ -61,8 +64,8 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        layoutParams.width = 500;
-        layoutParams.height = 500;
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.x = 0;
         layoutParams.y = 100;
     }
@@ -168,6 +171,7 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
             cameraView = rootView.findViewById(R.id.texture_preview);
             cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
             windowManager.addView(rootView, layoutParams);
+            mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
         }
     }
 
@@ -202,6 +206,9 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
                     break;
                 case MotionEvent.ACTION_UP:
                     removeRoundBorder();
+//                    if(Math.abs(mStartX - mStopX) >= 1 || Math.abs(mStartY - mStopY) >= 1){
+//                        isMove = true;
+//                    }
 //                    int Xdiff = (int) (event.getRawX() - initialTouchX);
 //                    int Ydiff = (int) (event.getRawY() - initialTouchY);
                     break;
@@ -237,6 +244,19 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
         if(cameraHelper != null){
 //            cameraHelper.stop();
             cameraHelper.release();
+        }
+
+        if(windowManager != null){
+            windowManager.removeView(rootView);
+        }
+    }
+
+    class MyOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (!isMove) {
+            }
+            return super.onSingleTapConfirmed(e);
         }
     }
 }

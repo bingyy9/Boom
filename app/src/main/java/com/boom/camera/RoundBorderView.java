@@ -40,7 +40,7 @@ public class RoundBorderView extends View {
                     new int[]{Color.GREEN, Color.CYAN, Color.BLUE, Color.CYAN, Color.GREEN}, null);
             paint.setShader(sweepGradient);
         }
-        drawBorder(canvas, 6);
+        drawBorder(canvas, 3);
     }
 
 
