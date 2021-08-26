@@ -5,6 +5,8 @@ import android.content.Context;
 
 import com.boom.android.log.FactoryMgr;
 import com.boom.android.util.AndroidFactory;
+import com.boom.model.interf.impl.ModelBuilderImpl;
+import com.boom.model.interf.impl.ModelBuilderManager;
 
 public class BoomApplication extends Application {
 
@@ -19,6 +21,7 @@ public class BoomApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        ModelBuilderManager.setModelBuilder(new ModelBuilderImpl());
         FactoryMgr.iPlatformFactory = new AndroidFactory(this);
     }
 
