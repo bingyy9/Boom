@@ -102,7 +102,7 @@ public class RecordModel implements IRecordModel {
         }
 
         Disposable disposable = recordRepo.getRecordingSubject().getObservable().subscribe(
-                isInterpreterStarted -> {
+                recording -> {
                     if (mEvtListeners != null) {
                         Object[] listeners = mEvtListeners.getListeners();
                         for (int i = listeners.length - 1; i >= 0; i -= 1) {
@@ -136,7 +136,7 @@ public class RecordModel implements IRecordModel {
 
     @Override
     public boolean isRecordCamera(){
-        return recordRepo != null? false: recordRepo.isRecordCamera();
+        return recordRepo == null? false: recordRepo.isRecordCamera();
     }
 
 }

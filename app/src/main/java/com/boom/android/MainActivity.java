@@ -29,6 +29,9 @@ import com.boom.android.service.MediaRecordService;
 import com.boom.android.ui.videotab.MyVideoFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtil;
+import com.boom.android.util.RecordHelper;
+import com.boom.model.interf.IRecordModel;
+import com.boom.model.repo.RecordEvent;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.tabs.TabLayout;
@@ -36,7 +39,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements IRecordModel.RecordEvtListener {
 
     private static final int RECORD_REQUEST_CODE  = 101;
     private static final int OVERLAY_REQUEST_CODE  = 102;
@@ -46,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private MediaRecordService recordService;
     private FloatingCameraService floatingCameraService;
 
-    Button startBtn;
     TabLayout tabLayout;
     ViewPager viewPager;
     FloatingActionMenu floatingMenu;
@@ -73,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView(){
-        startBtn = this.findViewById(R.id.start_record);
         tabLayout = this.findViewById(R.id.tab_layout);
         viewPager = this.findViewById(R.id.view_pager);
         floatingMenu = this.findViewById(R.id.floating_menu);
@@ -82,9 +83,6 @@ public class MainActivity extends AppCompatActivity {
         stopRecord = this.findViewById(R.id.fab_stop_record);
 
         //        startBtn.setText(stringFromJNI());
-        startBtn.setText(getResources().getString(R.string.start_record));
-        startBtn.setEnabled(false);
-        startBtn.setOnClickListener(clickListener);
 
         for (int i = 0; i < tabs.length; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(tabs[i]));
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         floatingMenu.setClosedOnTouchOutside(true);
         recordScreenOnly.setOnClickListener(clickListener);
         recordScreenWithCamera.setOnClickListener(clickListener);
-        recordScreenWithCamera.setOnClickListener(clickListener);
+        stopRecord.setOnClickListener(clickListener);
     }
 
     private void initService(){
@@ -132,7 +130,22 @@ public class MainActivity extends AppCompatActivity {
         if(recordService != null){
             recordService.stopRecord();
         }
-        stopFloatingCameraService();
+        if(RecordHelper.isRecordCamera()) {
+            stopFloatingCameraService();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        RecordHelper.registerRecordEventListner(this);
+        updateRecordingView();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        RecordHelper.unregisterRecordEventListener(this);
     }
 
     @Override
@@ -148,15 +161,13 @@ public class MainActivity extends AppCompatActivity {
             mediaProjection = projectionManager.getMediaProjection(resultCode, data);
             recordService.setMediaProject(mediaProjection);
             recordService.startRecord();
-            startBtn.setText(R.string.stop_record);
-
             startFloatingCameraService();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
             if (BoomHelper.ensureDrawOverlayPermission(this)) {
                 NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
             } else {
-//                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
-                startService(new Intent(MainActivity.this, FloatingCameraService.class));
+                startFloatingCameraService();
+//                startService(new Intent(MainActivity.this, FloatingCameraService.class));
             }
         }
     }
@@ -179,8 +190,7 @@ public class MainActivity extends AppCompatActivity {
             MediaRecordService.RecordBinder binder = (MediaRecordService.RecordBinder) service;
             recordService = binder.getRecordService();
             recordService.setConfig(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi);
-            startBtn.setEnabled(true);
-            startBtn.setText(recordService.isRunning() ? R.string.stop_record : R.string.start_record);
+            updateRecordingView();
         }
 
         @Override
@@ -204,6 +214,9 @@ public class MainActivity extends AppCompatActivity {
     public native String stringFromJNI();
 
     private void startFloatingCameraService() {
+        if(!RecordHelper.isRecordCamera()){
+            return;
+        }
         if (floatingCameraService != null && floatingCameraService.isStarted) {
             Dogger.i(Dogger.BOOM, "ignore", "MainActivity", "startFloatingCameraService");
             return;
@@ -233,9 +246,6 @@ public class MainActivity extends AppCompatActivity {
             case R.id.record_screen_with_camera:
                 onClickRecordScreenWithCamera();
                 break;
-            case R.id.start_record:
-                onClickStartRecordingBtn();
-                break;
             case R.id.fab_stop_record:
                 onClickStopRecord();
                 break;
@@ -243,8 +253,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void onClickStartRecordingBtn(){
-        if (recordService != null && recordService.isRunning()) {
-            startBtn.setText(R.string.start_record);
+        if (RecordHelper.isRecording()) {
             stopRecording();
         } else {
             startRecording();
@@ -253,26 +262,54 @@ public class MainActivity extends AppCompatActivity {
 
     private void onClickRecordScreenOnly(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
-        if (recordService != null && recordService.isRunning()) {
+        if (RecordHelper.isRecording()) {
             Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
             return;
-        } else {
-            startRecording();
         }
+
+        RecordHelper.setRecordCamera(false);
+        startRecording();
     }
 
     private void onClickRecordScreenWithCamera(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
-        if (recordService != null && recordService.isRunning()) {
+        if (RecordHelper.isRecording()) {
             Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
             return;
-        } else {
-            startRecording();
         }
+
+        RecordHelper.setRecordCamera(true);
+        startRecording();
     }
 
     private void onClickStopRecord(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickStopRecord");
+        stopRecording();
+    }
 
+    @Override
+    public void onRecordEvt(RecordEvent evt) {
+        if(evt == null){
+            return;
+        }
+
+        runOnUiThread(()->{
+            switch (evt.getType()) {
+                case RecordEvent.RECORD_STATUS_UPDATE:
+                    updateRecordingView();
+                    break;
+            }
+        });
+    }
+
+    private void updateRecordingView(){
+        floatingMenu.close(false);
+        if(RecordHelper.isRecording()){
+            stopRecord.setVisibility(View.VISIBLE);
+            floatingMenu.setVisibility(View.GONE);
+        } else {
+            stopRecord.setVisibility(View.GONE);
+            floatingMenu.setVisibility(View.VISIBLE);
+        }
     }
 }

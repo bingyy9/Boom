@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.boom.android.MainActivity;
 import com.boom.android.R;
+import com.boom.android.util.RecordHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,6 @@ public class MediaRecordService extends Service {
     private MediaRecorder mediaRecorder;
     private VirtualDisplay virtualDisplay;
 
-    private boolean running;
     private int width = 720;
     private int height = 1080;
     private int dpi;
@@ -54,7 +54,7 @@ public class MediaRecordService extends Service {
         HandlerThread serviceThread = new HandlerThread("service_thread",
                 android.os.Process.THREAD_PRIORITY_BACKGROUND);
         serviceThread.start();
-        running = false;
+        RecordHelper.setRecording(false);
         mediaRecorder = new MediaRecorder();
     }
 
@@ -67,10 +67,6 @@ public class MediaRecordService extends Service {
         mediaProjection = project;
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
     public void setConfig(int width, int height, int dpi) {
         this.width = width;
         this.height = height;
@@ -78,27 +74,26 @@ public class MediaRecordService extends Service {
     }
 
     public boolean startRecord() {
-        if (mediaProjection == null || running) {
+        if (mediaProjection == null || RecordHelper.isRecording()) {
             return false;
         }
 
         initRecorder();
         createVirtualDisplay();
         mediaRecorder.start();
-        running = true;
+        RecordHelper.setRecording(true);
         return true;
     }
 
     public boolean stopRecord() {
-        if (!running) {
+        if (!RecordHelper.isRecording()) {
             return false;
         }
-        running = false;
+        RecordHelper.setRecording(false);
         mediaRecorder.stop();
         mediaRecorder.reset();
         virtualDisplay.release();
         mediaProjection.stop();
-
         return true;
     }
 
