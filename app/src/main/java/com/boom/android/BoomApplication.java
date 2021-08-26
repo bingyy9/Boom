@@ -22,6 +22,7 @@ public class BoomApplication extends Application {
     public void onCreate() {
         super.onCreate();
         ModelBuilderManager.setModelBuilder(new ModelBuilderImpl());
+        ModelBuilderManager.initModel();
         FactoryMgr.iPlatformFactory = new AndroidFactory(this);
     }
 

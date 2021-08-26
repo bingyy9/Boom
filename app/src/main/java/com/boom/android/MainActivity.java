@@ -253,11 +253,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void onClickRecordScreenOnly(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
+        if (recordService != null && recordService.isRunning()) {
+            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
+            return;
+        } else {
+            startRecording();
+        }
     }
 
     private void onClickRecordScreenWithCamera(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
-
+        if (recordService != null && recordService.isRunning()) {
+            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
+            return;
+        } else {
+            startRecording();
+        }
     }
 
     private void onClickStopRecord(){

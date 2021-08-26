@@ -86,6 +86,7 @@
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:src="@android:drawable/stat_notify_voicemail"
-        app:fab_elevationCompat="4dp" />
+        app:fab_elevationCompat="4dp"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
