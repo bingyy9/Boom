@@ -1,6 +1,11 @@
 package com.boom.android;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 
 import android.content.ComponentName;
@@ -21,8 +26,15 @@ import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.FloatingCameraService;
 import com.boom.android.service.MediaRecordService;
+import com.boom.android.ui.videotab.MyVideoFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtil;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.material.tabs.TabLayout;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,8 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private MediaRecordService recordService;
     private FloatingCameraService floatingCameraService;
 
-    @BindView(R.id.start_record)
     Button startBtn;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    FloatingActionMenu floatingMenu;
+    FloatingActionButton recordScreenOnly;
+    FloatingActionButton recordScreenWithCamera;
+    FloatingActionButton stopRecord;
+
+    private String[] tabs = {"My Videos", "Recent Videos"};
+    private List<MyVideoFragment> tabFragmentList = new ArrayList<>();
 
     static {
         System.loadLibrary("native-lib");
@@ -45,26 +65,60 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
 
-        startBtn = findViewById(R.id.start_record);
-        startBtn.setText(stringFromJNI());
+        PermissionManager.requestAllPermission(this);
+        projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        initView();
+        initService();
+    }
+
+    private void initView(){
+        startBtn = this.findViewById(R.id.start_record);
+        tabLayout = this.findViewById(R.id.tab_layout);
+        viewPager = this.findViewById(R.id.view_pager);
+        floatingMenu = this.findViewById(R.id.floating_menu);
+        recordScreenOnly = this.findViewById(R.id.record_screen);
+        recordScreenWithCamera = this.findViewById(R.id.record_screen_with_camera);
+        stopRecord = this.findViewById(R.id.fab_stop_record);
+
+        //        startBtn.setText(stringFromJNI());
+        startBtn.setText(getResources().getString(R.string.start_record));
         startBtn.setEnabled(false);
-        startBtn.setOnClickListener(new View.OnClickListener() {
+        startBtn.setOnClickListener(clickListener);
+
+        for (int i = 0; i < tabs.length; i++) {
+            tabLayout.addTab(tabLayout.newTab().setText(tabs[i]));
+            tabFragmentList.add(MyVideoFragment.newInstance(tabs[i]));
+        }
+
+        viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+            @NonNull
             @Override
-            public void onClick(View v) {
-                if (recordService != null && recordService.isRunning()) {
-                    startBtn.setText(R.string.start_record);
-                    stopRecording();
-                } else {
-                    startRecording();
-                }
+            public Fragment getItem(int position) {
+                return tabFragmentList.get(position);
+            }
+
+            @Override
+            public int getCount() {
+                return tabFragmentList.size();
+            }
+
+            @Nullable
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return tabs[position];
             }
         });
 
+        tabLayout.setupWithViewPager(viewPager, false);
 
-        PermissionManager.requestAllPermission(this);
+        floatingMenu.setClosedOnTouchOutside(true);
+        recordScreenOnly.setOnClickListener(clickListener);
+        recordScreenWithCamera.setOnClickListener(clickListener);
+        recordScreenWithCamera.setOnClickListener(clickListener);
+    }
 
+    private void initService(){
         Intent intent = new Intent(this, MediaRecordService.class);
         bindService(intent, recordServiceConnection, BIND_AUTO_CREATE);
     }
@@ -171,4 +225,43 @@ public class MainActivity extends AppCompatActivity {
         floatingCameraService = null;
     }
 
+    private View.OnClickListener clickListener = v -> {
+        switch (v.getId()) {
+            case R.id.record_screen:
+                onClickRecordScreenOnly();
+                break;
+            case R.id.record_screen_with_camera:
+                onClickRecordScreenWithCamera();
+                break;
+            case R.id.start_record:
+                onClickStartRecordingBtn();
+                break;
+            case R.id.fab_stop_record:
+                onClickStopRecord();
+                break;
+        }
+    };
+
+    private void onClickStartRecordingBtn(){
+        if (recordService != null && recordService.isRunning()) {
+            startBtn.setText(R.string.start_record);
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
+
+    private void onClickRecordScreenOnly(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
+    }
+
+    private void onClickRecordScreenWithCamera(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
+
+    }
+
+    private void onClickStopRecord(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickStopRecord");
+
+    }
 }

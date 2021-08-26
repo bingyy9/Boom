@@ -1,5 +1,5 @@
 package com.boom.android.log;
 
 public interface IDoggerConst {
-    String BOOM = "W_BOOM";
+    public String BOOM = "W_BOOM";
 }

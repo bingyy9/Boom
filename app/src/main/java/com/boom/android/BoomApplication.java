@@ -3,6 +3,9 @@ package com.boom.android;
 import android.app.Application;
 import android.content.Context;
 
+import com.boom.android.log.FactoryMgr;
+import com.boom.android.util.AndroidFactory;
+
 public class BoomApplication extends Application {
 
     private static BoomApplication application;
@@ -16,8 +19,7 @@ public class BoomApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
-//        startService(new Intent(this, MediaRecordService.class));
+        FactoryMgr.iPlatformFactory = new AndroidFactory(this);
     }
 
     public static BoomApplication getInstance() {
