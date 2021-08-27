@@ -8,6 +8,10 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -20,6 +24,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 
 import com.boom.android.log.Dogger;
@@ -114,6 +119,36 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         recordScreenOnly.setOnClickListener(clickListener);
         recordScreenWithCamera.setOnClickListener(clickListener);
         stopRecord.setOnClickListener(clickListener);
+        createCustomAnimation4FloatingMenu();
+    }
+
+    private void createCustomAnimation4FloatingMenu() {
+        AnimatorSet set = new AnimatorSet();
+
+        ObjectAnimator scaleOutX = ObjectAnimator.ofFloat(floatingMenu.getMenuIconView(), "scaleX", 1.0f, 0.2f);
+        ObjectAnimator scaleOutY = ObjectAnimator.ofFloat(floatingMenu.getMenuIconView(), "scaleY", 1.0f, 0.2f);
+
+        ObjectAnimator scaleInX = ObjectAnimator.ofFloat(floatingMenu.getMenuIconView(), "scaleX", 0.2f, 1.0f);
+        ObjectAnimator scaleInY = ObjectAnimator.ofFloat(floatingMenu.getMenuIconView(), "scaleY", 0.2f, 1.0f);
+
+        scaleOutX.setDuration(50);
+        scaleOutY.setDuration(50);
+
+        scaleInX.setDuration(150);
+        scaleInY.setDuration(150);
+
+        scaleInX.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                floatingMenu.getMenuIconView().setImageResource(floatingMenu.isOpened()
+                        ? R.drawable.ic_x : R.drawable.ic_record);
+            }
+        });
+
+        set.play(scaleOutX).with(scaleOutY);
+        set.play(scaleInX).with(scaleInY).after(scaleOutX);
+        set.setInterpolator(new OvershootInterpolator(2));
+        floatingMenu.setIconToggleAnimatorSet(set);
     }
 
     private void initService(){
@@ -146,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     protected void onPause() {
         super.onPause();
         RecordHelper.unregisterRecordEventListener(this);
+        if(floatingMenu != null) {
+            floatingMenu.close(false);
+        }
     }
 
     @Override
