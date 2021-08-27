@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import butterknife.BindView;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -25,18 +24,19 @@ import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
-import android.widget.Button;
 
 import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.FloatingCameraService;
 import com.boom.android.service.MediaRecordService;
-import com.boom.android.ui.videotab.MyVideoFragment;
+import com.boom.android.ui.videos.MyVideosFragment;
+import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtil;
 import com.boom.android.util.RecordHelper;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
+import com.boom.utils.StringUtils;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.tabs.TabLayout;
@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     FloatingActionButton recordScreenWithCamera;
     FloatingActionButton stopRecord;
 
-    private String[] tabs = {"My Videos", "Recent Videos"};
-    private List<MyVideoFragment> tabFragmentList = new ArrayList<>();
+    private String[] tabs;
+    private List<Fragment> tabFragmentList = new ArrayList<>();
 
     static {
         System.loadLibrary("native-lib");
@@ -89,9 +89,14 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
         //        startBtn.setText(stringFromJNI());
 
+        tabs = new String[]{this.getResources().getString(R.string.my_videos), this.getResources().getString(R.string.recent_videos)};
         for (int i = 0; i < tabs.length; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(tabs[i]));
-            tabFragmentList.add(MyVideoFragment.newInstance(tabs[i]));
+            if(StringUtils.contentEquals(tabs[i], getString(R.string.my_videos))){
+                tabFragmentList.add(MyVideosFragment.newInstance(tabs[i]));
+            } else if(StringUtils.contentEquals(tabs[i], this.getResources().getString(R.string.recent_videos))){
+                tabFragmentList.add(RecentVideosFragment.newInstance(tabs[i]));
+            }
         }
 
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

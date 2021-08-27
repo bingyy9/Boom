@@ -1,6 +1,5 @@
-package com.boom.android.ui.videotab;
+package com.boom.android.ui.videos;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class MyVideoFragment extends Fragment {
-    public static MyVideoFragment newInstance(String label) {
+public class MyVideosFragment extends Fragment {
+    public static MyVideosFragment newInstance(String label) {
         Bundle args = new Bundle();
         args.putString("label", label);
-        MyVideoFragment fragment = new MyVideoFragment();
+        MyVideosFragment fragment = new MyVideosFragment();
         fragment.setArguments(args);
         return fragment;
     }
