@@ -5,4 +5,4 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:paddingTop="100dp"
-/>
+    />

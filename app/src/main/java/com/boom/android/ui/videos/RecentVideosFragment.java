@@ -11,8 +11,15 @@ import com.boom.android.R;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import butterknife.BindView;
 
 public class RecentVideosFragment extends Fragment {
+
+    private View root;
+    @BindView(R.id.video_list)
+    RecyclerView videoListView;
+
     public static RecentVideosFragment newInstance(String label) {
         Bundle args = new Bundle();
         args.putString("label", label);
@@ -20,11 +27,14 @@ public class RecentVideosFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
+
+
+
     @Nullable
     @Override
-
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.my_video_tab, container, false);
+        root = inflater.inflate(R.layout.recent_videos_tab, container, false);
+        return root;
     }
 
     @Override
