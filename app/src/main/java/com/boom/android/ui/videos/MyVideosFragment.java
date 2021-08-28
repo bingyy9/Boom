@@ -101,8 +101,8 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     }
 
     @Override
-    public void onRecycleItemSelected(String code) {
-
+    public void onRecycleItemSelected(String name) {
+        Dogger.i(Dogger.BOOM, "name: " + name, "MyVideosFragment", "onRecycleItemSelected");
     }
 
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,7 +36,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public interface AdapterListener {
-        void onRecycleItemSelected(String code);
+        void onRecycleItemSelected(String name);
     }
 
     public void setDataList(ArrayList<VideoItemInfo> items){
@@ -61,8 +62,13 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             return;
         }
 
-        ItemVH userHolder = (ItemVH) holder;
-        userHolder.tvName.setText(videoItem.name);
+        ItemVH viewHolder = (ItemVH) holder;
+        viewHolder.tvName.setText(videoItem.name);
+        viewHolder.cardView.setOnClickListener((View v)->{
+            if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {
+                adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString());
+            }
+        });
 //        userHolder.tvLastModifiedTime.setText(videoItem.lastModifiedDate);
 //        userHolder.iFrame.setImageBitmap();
 
@@ -79,6 +85,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         } else {
 
         }
+
     }
 
     @Override
@@ -87,6 +94,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     protected class ItemVH extends RecyclerView.ViewHolder{
+        @BindView(R.id.card_view)
+        CardView cardView;
         @BindView(R.id.tv_last_modified_time)
         TextView tvLastModifiedTime;
         @BindView(R.id.tv_name)
