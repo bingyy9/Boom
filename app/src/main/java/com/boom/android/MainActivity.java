@@ -28,6 +28,7 @@ import android.view.animation.OvershootInterpolator;
 import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.FloatingCameraService;
+import com.boom.android.service.FloatingCounterService;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private MediaProjection mediaProjection;
     private MediaRecordService recordService;
     private FloatingCameraService floatingCameraService;
+    private FloatingCounterService floatingCounterService;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -86,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         recordScreenOnly = this.findViewById(R.id.record_screen);
         recordScreenWithCamera = this.findViewById(R.id.record_screen_with_camera);
         stopRecord = this.findViewById(R.id.fab_stop_record);
-
-        //        startBtn.setText(stringFromJNI());
 
         tabs = new String[]{this.getResources().getString(R.string.my_videos), this.getResources().getString(R.string.recent_videos)};
         for (int i = 0; i < tabs.length; i++) {
@@ -211,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                 NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
             } else {
                 startFloatingCameraService();
-//                startService(new Intent(MainActivity.this, FloatingCameraService.class));
             }
         }
     }
@@ -255,6 +254,20 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         }
     };
 
+    private ServiceConnection floatCounterServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Dogger.i(Dogger.BOOM, "", "MainActivity", "floatCounterServiceConnection onServiceConnected");
+            floatingCounterService = ((FloatingCounterService.MsgBinder)service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Dogger.i(Dogger.BOOM, "", "MainActivity", "floatCounterServiceConnection onServiceDisconnected");
+            floatingCounterService = null;
+        }
+    };
+
     public native String stringFromJNI();
 
     private void startFloatingCameraService() {
@@ -280,6 +293,27 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingCameraService");
         unbindService(floatWindowServiceConnection);
         floatingCameraService = null;
+    }
+
+    private void startFloatingCounterService() {
+        if(!RecordHelper.isRecordCamera()){
+            return;
+        }
+        if (!BoomHelper.ensureDrawOverlayPermission(this)) {
+            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCounterService");
+            NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_request_tip));
+            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
+        } else {
+            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingCounterService");
+            Intent intent = new Intent(this, FloatingCounterService.class);
+            bindService(intent, floatCounterServiceConnection, BIND_AUTO_CREATE);
+        }
+    }
+
+    private void stopFloatingCounterService(){
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingCounterService");
+        unbindService(floatCounterServiceConnection);
+        floatingCounterService = null;
     }
 
     private View.OnClickListener clickListener = v -> {

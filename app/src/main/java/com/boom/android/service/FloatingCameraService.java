@@ -226,9 +226,6 @@ public class FloatingCameraService extends Service implements ViewTreeObserver.O
         roundBorderView.setRadius(Math.min(cameraView.getWidth(), cameraView.getHeight()) >> 1);
         roundBorderView.turnRound();
         ((FrameLayout) cameraView.getParent()).addView(roundBorderView, cameraView.getLayoutParams());
-
-
-
     }
 
     private void removeRoundBorder(){

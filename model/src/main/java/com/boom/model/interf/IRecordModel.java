@@ -4,8 +4,6 @@ import com.boom.model.repo.RecordEvent;
 
 public interface IRecordModel extends IModel{
 
-    void setRecordingStop(boolean b);
-
     interface RecordEvtListener extends EventListener {
         void onRecordEvt(RecordEvent evt);
     };
@@ -19,5 +17,7 @@ public interface IRecordModel extends IModel{
     void setRecording(boolean b);
     void recordCamera(boolean b);
     boolean isRecordCamera();
+    void setRecordingStop(boolean b);
+    void setRecordingToRecord(boolean b);
 
 }

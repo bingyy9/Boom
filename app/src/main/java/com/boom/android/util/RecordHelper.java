@@ -35,6 +35,13 @@ public class RecordHelper {
         }
     }
 
+    public static void setRecordingToRecord(boolean b){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        if(recordModel != null){
+            recordModel.setRecordingToRecord(b);
+        }
+    }
+
     public static void registerRecordEventListner(IRecordModel.RecordEvtListener listener){
         IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
         if(recordModel != null){

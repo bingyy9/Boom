@@ -36,6 +36,7 @@ public class RecordModel implements IRecordModel {
 
         observeRecordingStatus();
         observeRecordingStop();
+        observeReadyToRecord();
     }
 
     @Override
@@ -140,6 +141,30 @@ public class RecordModel implements IRecordModel {
         compositeDisposableVM.add(disposable);
     }
 
+    public void observeReadyToRecord() {
+        Dogger.d(Dogger.BOOM, "", "RecordModel", "observeReadyToRecord");
+        if(compositeDisposableVM == null){
+            return;
+        }
+
+        if(recordRepo == null || recordRepo.getRecordingToRecordSubject() == null){
+            return;
+        }
+
+        Disposable disposable = recordRepo.getRecordingToRecordSubject().getObservable().subscribe(
+                recording -> {
+                    if (mEvtListeners != null) {
+                        Object[] listeners = mEvtListeners.getListeners();
+                        for (int i = listeners.length - 1; i >= 0; i -= 1) {
+                            ((RecordEvtListener) listeners[i]).onRecordEvt(new RecordEvent(RecordEvent.RECORD_READY_TO_RECORD));
+                        }
+                    }
+                }
+        );
+
+        compositeDisposableVM.add(disposable);
+    }
+
     @Override
     public boolean isRecording(){
         return recordRepo == null? false: recordRepo.isRecording();
@@ -168,6 +193,13 @@ public class RecordModel implements IRecordModel {
     public void setRecordingStop(boolean b){
         if(recordRepo != null){
             recordRepo.setRecordingStop(true);
+        }
+    }
+
+    @Override
+    public void setRecordingToRecord(boolean b){
+        if(recordRepo != null){
+            recordRepo.setReadyToRecord(true);
         }
     }
 
