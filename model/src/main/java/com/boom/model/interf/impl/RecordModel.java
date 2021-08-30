@@ -35,6 +35,7 @@ public class RecordModel implements IRecordModel {
         compositeDisposableVM = new CompositeDisposable();
 
         observeRecordingStatus();
+        observeRecordingStop();
     }
 
     @Override
@@ -115,6 +116,30 @@ public class RecordModel implements IRecordModel {
         compositeDisposableVM.add(disposable);
     }
 
+    public void observeRecordingStop() {
+        Dogger.d(Dogger.BOOM, "", "RecordModel", "observeRecordingStop");
+        if(compositeDisposableVM == null){
+            return;
+        }
+
+        if(recordRepo == null || recordRepo.getRecordingStopSubject() == null){
+            return;
+        }
+
+        Disposable disposable = recordRepo.getRecordingStopSubject().getObservable().subscribe(
+                recording -> {
+                    if (mEvtListeners != null) {
+                        Object[] listeners = mEvtListeners.getListeners();
+                        for (int i = listeners.length - 1; i >= 0; i -= 1) {
+                            ((RecordEvtListener) listeners[i]).onRecordEvt(new RecordEvent(RecordEvent.RECORD_STATUS_UPDATE));
+                        }
+                    }
+                }
+        );
+
+        compositeDisposableVM.add(disposable);
+    }
+
     @Override
     public boolean isRecording(){
         return recordRepo == null? false: recordRepo.isRecording();
@@ -137,6 +162,13 @@ public class RecordModel implements IRecordModel {
     @Override
     public boolean isRecordCamera(){
         return recordRepo == null? false: recordRepo.isRecordCamera();
+    }
+
+    @Override
+    public void setRecordingStop(boolean b){
+        if(recordRepo != null){
+            recordRepo.setRecordingStop(true);
+        }
     }
 
 }

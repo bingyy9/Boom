@@ -1,15 +1,16 @@
 package com.boom.android.util;
 
-import com.boom.android.ui.videos.bean.VideoItemInfo;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class FileUtil {
+public class FileUtils {
     public static List<File> getFiles(String realpath, List<File> files) {
         File realFile = new File(realpath);
         if (realFile != null && realFile.isDirectory()) {
@@ -26,9 +27,9 @@ public class FileUtil {
         return files;
     }
 
-    public static List<File> getMp4Files(String realpath, List<File> files){
+    public static List<File> getMp4Files(String realpath, List<File> files) {
         FilenameFilter filenameFilter = (dir, filename) -> {
-            if(filename.endsWith(".mp4")) return true;
+            if (filename.endsWith(".mp4")) return true;
             return false;
         };
 
@@ -78,5 +79,37 @@ public class FileUtil {
             });
         }
         return list;
+    }
+
+    public String getFileSize(String fpath) {
+        File path = new File(fpath);
+        if (path.exists()) {
+            DecimalFormat df = new DecimalFormat("#.00");
+            String sizeStr = "";
+            long size = 0;
+            try {
+                FileInputStream fis = new FileInputStream(path);
+                size = fis.available();
+                fis.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return "未知大小";
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "未知大小";
+            }
+            if (size < 1024) {
+                sizeStr = size + "B";
+            } else if (size < 1048576) {
+                sizeStr = df.format(size / (double) 1024) + "KB";
+            } else if (size < 1073741824) {
+                sizeStr = df.format(size / (double) 1048576) + "MB";
+            } else {
+                sizeStr = df.format(size / (double) 1073741824) + "GB";
+            }
+            return sizeStr;
+        } else {
+            return "未知大小";
+        }
     }
 }

@@ -28,6 +28,13 @@ public class RecordHelper {
         return recordModel == null? false: recordModel.isRecordCamera();
     }
 
+    public static void setRecordingStop(boolean b){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        if(recordModel != null){
+            recordModel.setRecordingStop(b);
+        }
+    }
+
     public static void registerRecordEventListner(IRecordModel.RecordEvtListener listener){
         IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
         if(recordModel != null){

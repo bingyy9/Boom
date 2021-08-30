@@ -4,6 +4,8 @@ import com.boom.model.repo.RecordEvent;
 
 public interface IRecordModel extends IModel{
 
+    void setRecordingStop(boolean b);
+
     interface RecordEvtListener extends EventListener {
         void onRecordEvt(RecordEvent evt);
     };

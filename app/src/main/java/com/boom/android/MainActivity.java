@@ -32,7 +32,7 @@ import com.boom.android.service.MediaRecordService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
-import com.boom.android.util.NotificationUtil;
+import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.RecordHelper;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private void stopRecording(){
         if(recordService != null){
             recordService.stopRecord();
+            RecordHelper.setRecordingStop(true);
         }
         if(RecordHelper.isRecordCamera()) {
             stopFloatingCameraService();
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             startFloatingCameraService();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
             if (BoomHelper.ensureDrawOverlayPermission(this)) {
-                NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
+                NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
             } else {
                 startFloatingCameraService();
 //                startService(new Intent(MainActivity.this, FloatingCameraService.class));
@@ -266,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         }
         if (!BoomHelper.ensureDrawOverlayPermission(this)) {
             Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCameraService");
-            NotificationUtil.showToast(this, getString(R.string.display_over_other_apps_request_tip));
+            NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_request_tip));
             startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
         } else {
             Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingCameraService");

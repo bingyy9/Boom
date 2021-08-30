@@ -1,6 +1,7 @@
 package com.boom.android.ui.videos;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,9 @@ import android.widget.TextView;
 
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
-import com.boom.android.ui.videos.bean.VideoItemInfo;
+import com.boom.android.ui.videos.bean.VideoItem;
+import com.boom.android.util.DataUtils;
+import com.boom.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +23,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.MODIFIED_TIME_UPDATED;
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.NAME_UPDATED;
+
 public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private Context mContext;
     private AdapterListener adapterListener;
-    private List<VideoItemInfo> mDataList ;
+    private List<VideoItem> mDataList ;
     public void setListener(AdapterListener listener){
         adapterListener = listener;
     }
@@ -38,11 +44,11 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         void onRecycleItemSelected(String name);
     }
 
-    public void setDataList(ArrayList<VideoItemInfo> items){
+    public void setDataList(ArrayList<VideoItem> items){
         this.mDataList = items;
     }
 
-    public List<VideoItemInfo> getDataList(){
+    public List<VideoItem> getDataList(){
         return this.mDataList;
     }
 
@@ -55,7 +61,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        VideoItemInfo videoItem = mDataList.get(position);
+        VideoItem videoItem = mDataList.get(position);
         if(!(holder instanceof ItemVH)){
             Dogger.i(Dogger.BOOM, "onBindUser not Item!!!", "VideoListAdapter", "onBindViewHolder");
             return;
@@ -63,27 +69,50 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         ItemVH viewHolder = (ItemVH) holder;
         viewHolder.tvName.setText(videoItem.name);
-        viewHolder.tvLastModified.setText(videoItem.lastModified);
+        if(!StringUtils.isEmpty(videoItem.lastModified)){
+            viewHolder.tvLastModified.setText(videoItem.lastModified);
+        }
+
+        if(videoItem.iFrame != null){
+            viewHolder.iFrame.setVisibility(View.VISIBLE);
+            viewHolder.iFrame.setImageBitmap(videoItem.iFrame);
+        } else {
+            viewHolder.iFrame.setVisibility(View.GONE);
+        }
+
         viewHolder.cardView.setOnClickListener((View v)->{
             if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {
                 adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString());
             }
         });
-//        userHolder.tvLastModifiedTime.setText(videoItem.lastModifiedDate);
-//        userHolder.iFrame.setImageBitmap();
-
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
-//        super.onBindViewHolder(holder, position, payloads);
         if(holder == null){
             return;
         }
         if (payloads == null || payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         } else {
-
+            ItemVH viewHolder = (ItemVH) holder;
+            if(payloads.get(0) != null && payloads.get(0) instanceof Bundle){
+                Bundle bundle = (Bundle) payloads.get(0);
+                if(bundle != null) {
+                    for(String key: bundle.keySet()){
+                        switch (key){
+                            case NAME_UPDATED:
+                                String name = bundle.getString(NAME_UPDATED);
+                                viewHolder.tvName.setText(name);
+                                break;
+                            case MODIFIED_TIME_UPDATED:
+                                long time = bundle.getLong(MODIFIED_TIME_UPDATED);
+                                viewHolder.tvLastModified.setText(DataUtils.formatDate(time));
+                                break;
+                        }
+                    }
+                }
+            }
         }
 
     }

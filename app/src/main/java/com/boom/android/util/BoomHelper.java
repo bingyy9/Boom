@@ -10,7 +10,6 @@ import android.provider.Settings;
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
-import com.boom.android.ui.videos.bean.VideoItemInfo;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -98,8 +97,4 @@ public class BoomHelper {
         return true;
     }
 
-    public static String formatDate(long time){
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return formatter == null? null: formatter.format(time);
-    }
 }

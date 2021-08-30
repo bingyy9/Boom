@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
 
-public class NotificationUtil {
+public class NotificationUtils {
     private static Toast mToast = null;
 
     public static void showToast(Context context, String msg) {
