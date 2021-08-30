@@ -1,7 +1,6 @@
 package com.boom.android.ui.videos;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +63,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         ItemVH viewHolder = (ItemVH) holder;
         viewHolder.tvName.setText(videoItem.name);
+        viewHolder.tvLastModified.setText(videoItem.lastModified);
         viewHolder.cardView.setOnClickListener((View v)->{
             if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {
                 adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString());
@@ -97,7 +97,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         @BindView(R.id.card_view)
         CardView cardView;
         @BindView(R.id.tv_last_modified_time)
-        TextView tvLastModifiedTime;
+        TextView tvLastModified;
         @BindView(R.id.tv_name)
         TextView tvName;
         @BindView(R.id.i_frame)

@@ -4,12 +4,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItemInfo;
+import com.boom.android.util.BoomHelper;
+import com.boom.android.util.FileUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,10 +74,18 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 
     private List<VideoItemInfo> buildVideoItems(){
         List<VideoItemInfo> items = new ArrayList<>();
-        items.add(new VideoItemInfo("a"));
-        items.add(new VideoItemInfo("b"));
-        items.add(new VideoItemInfo("c"));
-        items.add(new VideoItemInfo("d"));
+
+        List<File> files = FileUtil.listMp4FileSortByModifyTime(BoomHelper.getRecordDirectory());
+        for(File file: files){
+            if(!file.exists()){
+                continue;
+            }
+            items.add(new VideoItemInfo(file.getName())
+                    .setLastModified(BoomHelper.formatDate(file.lastModified())));
+        }
+
+
+
         return items;
     }
 

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.boom.android.MainActivity;
 import com.boom.android.R;
+import com.boom.android.util.BoomHelper;
 import com.boom.android.util.RecordHelper;
 
 import java.io.File;
@@ -106,7 +107,7 @@ public class MediaRecordService extends Service {
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setOutputFile(getsaveDirectory() + System.currentTimeMillis() + ".mp4");
+        mediaRecorder.setOutputFile(BoomHelper.getRecordDirectory() + System.currentTimeMillis() + ".mp4");
         mediaRecorder.setVideoSize(width, height);
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -116,25 +117,6 @@ public class MediaRecordService extends Service {
             mediaRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    public String getsaveDirectory() {
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "ScreenRecord" + "/";
-
-            File file = new File(rootDir);
-            if (!file.exists()) {
-                if (!file.mkdirs()) {
-                    return null;
-                }
-            }
-
-            Toast.makeText(getApplicationContext(), rootDir, Toast.LENGTH_SHORT).show();
-
-            return rootDir;
-        } else {
-            return null;
         }
     }
 

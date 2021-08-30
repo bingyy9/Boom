@@ -4,12 +4,18 @@ import android.app.AppOpsManager;
 import android.content.Context;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.Settings;
 
+import com.boom.android.BoomApplication;
+import com.boom.android.R;
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.videos.bean.VideoItemInfo;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 
 public class BoomHelper {
     public static boolean ensureDrawOverlayPermission(Context context) {
@@ -57,5 +63,43 @@ public class BoomHelper {
                 return ensureOverlay;
             }
         }
+    }
+
+    public static String getApplicationName(){
+        return BoomApplication.getInstance().getApplicationContext().getResources().getString(R.string.app_name);
+    }
+
+    public static String getRecordDirectory(){
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + "/"
+                    + BoomHelper.getApplicationName()
+                    + "/"
+                    + "Record" + "/";
+
+            if(ensureFileExist(rootDir)){
+                return rootDir;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean ensureFileExist(String rootDir){
+        File file = new File(rootDir);
+        if (!file.exists()) {
+            if (!file.mkdirs()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static String formatDate(long time){
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return formatter == null? null: formatter.format(time);
     }
 }
