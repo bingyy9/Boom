@@ -12,10 +12,13 @@ import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.util.DataUtils;
+import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -44,7 +47,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         void onRecycleItemSelected(String name);
     }
 
-    public void setDataList(ArrayList<VideoItem> items){
+    public void setDataList(List<VideoItem> items){
         this.mDataList = items;
     }
 
@@ -73,12 +76,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewHolder.tvLastModified.setText(videoItem.lastModified);
         }
 
-        if(videoItem.iFrame != null){
-            viewHolder.iFrame.setVisibility(View.VISIBLE);
-            viewHolder.iFrame.setImageBitmap(videoItem.iFrame);
-        } else {
-            viewHolder.iFrame.setVisibility(View.GONE);
-        }
+        BitmapCacheUtils.getInstance().display(viewHolder.iFrame, videoItem.absolutePath);
 
         viewHolder.cardView.setOnClickListener((View v)->{
             if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {

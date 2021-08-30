@@ -131,7 +131,7 @@ public class RecordModel implements IRecordModel {
                     if (mEvtListeners != null) {
                         Object[] listeners = mEvtListeners.getListeners();
                         for (int i = listeners.length - 1; i >= 0; i -= 1) {
-                            ((RecordEvtListener) listeners[i]).onRecordEvt(new RecordEvent(RecordEvent.RECORD_STATUS_UPDATE));
+                            ((RecordEvtListener) listeners[i]).onRecordEvt(new RecordEvent(RecordEvent.RECORD_STOPPED));
                         }
                     }
                 }

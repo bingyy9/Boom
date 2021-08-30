@@ -8,7 +8,7 @@ public class VideoItem {
     public long lastModifyTime;
     public String name;
     public String lastModified;
-    public Bitmap iFrame;
+    public String absolutePath;
 
     public VideoItem(String name) {
         this.name = name;
@@ -19,13 +19,13 @@ public class VideoItem {
         return this;
     }
 
-    public VideoItem setiFrame(Bitmap iFrame) {
-        this.iFrame = iFrame;
+    public VideoItem setLastModifyTime(long lastModifyTime) {
+        this.lastModifyTime = lastModifyTime;
         return this;
     }
 
-    public VideoItem setLastModifyTime(long lastModifyTime) {
-        this.lastModifyTime = lastModifyTime;
+    public VideoItem setAbsolutePath(String absolutePath) {
+        this.absolutePath = absolutePath;
         return this;
     }
 
@@ -34,14 +34,11 @@ public class VideoItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VideoItem videoItem = (VideoItem) o;
-        return lastModifyTime == videoItem.lastModifyTime
-                && Objects.equals(name, videoItem.name)
-                && Objects.equals(lastModified, videoItem.lastModified)
-                && Objects.equals(iFrame, videoItem.iFrame);
+        return lastModifyTime == videoItem.lastModifyTime && Objects.equals(name, videoItem.name) && Objects.equals(lastModified, videoItem.lastModified) && Objects.equals(absolutePath, videoItem.absolutePath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lastModifyTime, name, lastModified, iFrame);
+        return Objects.hash(lastModifyTime, name, lastModified, absolutePath);
     }
 }

@@ -33,7 +33,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:scaleType="centerCrop"
-                android:layout_margin="8dp"/>
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_placeholder"
+                />
 
             <TextView
                 android:id="@+id/tv_name"

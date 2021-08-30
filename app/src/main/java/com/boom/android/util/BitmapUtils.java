@@ -2,13 +2,17 @@ package com.boom.android.util;
 
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.widget.ImageView;
+
+import com.boom.android.R;
+import com.boom.android.log.Dogger;
+import com.boom.android.util.cache.LocalCacheUtils;
+import com.boom.android.util.cache.MemoryCacheUtils;
+import com.boom.android.util.cache.NetCacheUtils;
 
 import java.util.Hashtable;
 
 public class BitmapUtils {
-
-
-
     public static Bitmap createVideoThumbnail(String filePath) {
         Bitmap bitmap = null;
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();

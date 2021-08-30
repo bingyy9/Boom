@@ -3,6 +3,8 @@ package com.boom.android.ui.videos.bean;
 import android.os.Bundle;
 import com.boom.utils.StringUtils;
 import java.util.List;
+import java.util.Map;
+
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 
