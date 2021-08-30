@@ -12,6 +12,7 @@
     <color name="bg_color1">#3B3B3B</color>
     <color name="color2">#767676</color>
     <color name="color3">#20000000</color>
+    <color name="color4">#E6E6EA</color>
 
     <color name="blue_normal">#1565C0</color>
     <color name="blue_pressed">#2272CD</color>
@@ -20,6 +21,7 @@
     <color name="green_normal">#43A047</color>
     <color name="green_pressed">#2E7D32</color>
     <color name="green_colorRipple">#1B5E20</color>
+
 
 
 </resources>

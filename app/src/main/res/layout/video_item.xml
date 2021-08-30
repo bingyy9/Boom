@@ -30,11 +30,12 @@
 
             <ImageView
                 android:id="@+id/i_frame"
-                android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
+                android:layout_width="wrap_content"
+                android:layout_height="250dp"
+                android:scaleType="centerInside"
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_placeholder"
+                android:background="@color/color4"
                 />
 
             <TextView
