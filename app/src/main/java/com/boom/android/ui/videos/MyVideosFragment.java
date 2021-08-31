@@ -3,10 +3,12 @@ package com.boom.android.ui.videos;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
@@ -25,10 +27,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -135,6 +139,20 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     @Override
     public void onRecycleItemSelected(String name) {
         Dogger.i(Dogger.BOOM, "name: " + name, "MyVideosFragment", "onRecycleItemSelected");
+        if(getActivity() == null){
+            return;
+        }
+
+        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
+        if(supportFragmentManager == null){
+            return;
+        }
+
+        Fragment fragment =  supportFragmentManager.findFragmentByTag(VideoDetailFragment.TAG);
+        if(fragment != null) {
+            return;
+        }
+        VideoDetailFragment.newInstance(name).show(supportFragmentManager,VideoDetailFragment.TAG);
     }
 
 

@@ -78,7 +78,7 @@ public class FloatingCounterService extends Service {
             layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
 
             LayoutInflater layoutInflater = LayoutInflater.from(this);
-            rootView = layoutInflater.inflate(R.layout.counter_display, null);
+            rootView = layoutInflater.inflate(R.layout.floating_display, null);
             counterView = rootView.findViewById(R.id.iv_counter);
             windowManager.addView(rootView, layoutParams);
             mCounter = 3;

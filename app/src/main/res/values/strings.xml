@@ -8,6 +8,8 @@
     <string name="recent_videos">Recent Videos</string>
     <string name="recording_in_progress">Recording in progress...</string>
 
+    <string name="share_your_video">Share your video</string>
+
 
     <string name="display_over_other_apps_request_tip">Not enabled display over other apps.</string>
     <string name="display_over_other_apps_fail_tip">Display over other apps request fail.</string>

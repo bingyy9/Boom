@@ -26,7 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.boom.android.MainActivity;
@@ -45,8 +44,6 @@ import com.boom.model.repo.RecordEvent;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
@@ -106,7 +103,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
         LayoutInflater layoutInflater = LayoutInflater.from(this);
-        rootView = layoutInflater.inflate(R.layout.counter_display, null);
+        rootView = layoutInflater.inflate(R.layout.floating_display, null);
         rootView.setOnTouchListener(new FloatingOnTouchListener());
         counterView = rootView.findViewById(R.id.iv_counter);
         cameraView = rootView.findViewById(R.id.texture_preview);
