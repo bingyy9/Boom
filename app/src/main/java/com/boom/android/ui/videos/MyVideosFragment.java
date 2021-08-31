@@ -145,13 +145,17 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         }
 
         if(evt.getType() == RecordEvent.RECORD_STOPPED){
-            mHandler.post(()->{
+            mHandler.postDelayed(()->{
                 switch (evt.getType()) {
                     case RecordEvent.RECORD_STOPPED:
-                        updateLatestVideo();
+                        updateView();
+                        if(videoListView != null) {
+                            videoListView.scrollToPosition(0);
+                        }
+//                        updateLatestVideo();
                         break;
                 }
-            });
+            }, 1000);
         }
     }
 

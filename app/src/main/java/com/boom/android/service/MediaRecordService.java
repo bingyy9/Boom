@@ -133,11 +133,18 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         if (mediaProjection == null || RecordHelper.isRecording()) {
             return false;
         }
+        RecordHelper.setRecording(true);
+
+        //updateView
+        if(RecordHelper.isRecordCamera()){
+            showCameraFloatingWindow();
+        } else {
+            updateView();
+        }
 
         initRecorder();
         createVirtualDisplay();
         mediaRecorder.start();
-        RecordHelper.setRecording(true);
         return true;
     }
 
@@ -280,7 +287,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                     } else {
                         mCounter = INIT_COUNT_DOWN;
                         stopTimer();
-                        realStartRecord();
+                        startRecord();
                     }
                 }
             }, 1000, 1000);
@@ -444,7 +451,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     public void onGlobalLayout() {
         cameraView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         ViewGroup.LayoutParams layoutParams = cameraView.getLayoutParams();
-        int sideLength = Math.min(cameraView.getWidth(), cameraView.getHeight()) * 3 / 4;
+        int sideLength = Math.min(cameraView.getWidth(), cameraView.getHeight());
         layoutParams.width = sideLength;
         layoutParams.height = sideLength;
         cameraView.setLayoutParams(layoutParams);
@@ -486,15 +493,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                 break;
             case RecordEvent.RECORD_READY_TO_RECORD:
                 break;
-        }
-    }
-
-    private void realStartRecord(){
-        startRecord();
-        if(RecordHelper.isRecordCamera()){
-            showCameraFloatingWindow();
-        } else {
-            updateView();
         }
     }
 }
