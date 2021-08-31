@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
     private MediaRecordService recordService;
-    private FloatingCameraService floatingCameraService;
-    private FloatingCounterService floatingCounterService;
     private RecordViewModel recordViewModel;
 
     TabLayout tabLayout;
@@ -180,11 +178,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private void stopRecording(){
         if(recordService != null){
             recordService.stopRecord();
-            RecordHelper.setRecordingStop(true);
         }
-        if(RecordHelper.isRecordCamera()) {
-            stopFloatingCameraService();
-        }
+        RecordHelper.setRecordingStop(true);
     }
 
     @Override
@@ -227,23 +222,18 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         if (requestCode == RECORD_REQUEST_CODE && resultCode == RESULT_OK) {
             mediaProjection = projectionManager.getMediaProjection(resultCode, data);
             recordService.setMediaProject(mediaProjection);
-            startFloatingCounterService();
-//            recordService.startRecord();
-//            startFloatingCameraService();
+            showCounterFloatingWindow();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
-            if (!BoomHelper.ensureDrawOverlayPermission(this)) {
-                NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
-            } else {
-                startFloatingCounterService();
-            }
+            showCounterFloatingWindow();
         }
     }
 
-    private void realStartRecord(){
-        if(recordService != null) {
-            recordService.startRecord();
+    private void showCounterFloatingWindow(){
+        if (!BoomHelper.ensureDrawOverlayPermission(this)) {
+            NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
+        } else {
+            recordService.showCounterFloatingWindow();
         }
-        startFloatingCameraService();
     }
 
     @Override
@@ -271,85 +261,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         public void onServiceDisconnected(ComponentName arg0) {}
     };
 
-    private ServiceConnection floatWindowServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceConnected");
-            floatingCameraService = ((FloatingCameraService.MsgBinder)service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Dogger.i(Dogger.BOOM, "", "MainActivity", "onServiceDisconnected");
-            floatingCameraService = null;
-        }
-    };
-
-    private ServiceConnection floatCounterServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Dogger.i(Dogger.BOOM, "", "MainActivity", "floatCounterServiceConnection onServiceConnected");
-            floatingCounterService = ((FloatingCounterService.MsgBinder)service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Dogger.i(Dogger.BOOM, "", "MainActivity", "floatCounterServiceConnection onServiceDisconnected");
-            floatingCounterService = null;
-        }
-    };
-
     public native String stringFromJNI();
-
-    private void startFloatingCameraService() {
-        if(!RecordHelper.isRecordCamera()){
-            Dogger.i(Dogger.BOOM, "not record with camera", "MainActivity", "startFloatingCameraService");
-            return;
-        }
-        if (floatingCameraService != null && floatingCameraService.isStarted) {
-            Dogger.i(Dogger.BOOM, "ignore", "MainActivity", "startFloatingCameraService");
-            return;
-        }
-        if (!BoomHelper.ensureDrawOverlayPermission(this)) {
-            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCameraService");
-            NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_request_tip));
-            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
-        } else {
-            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingCameraService");
-            Intent intent = new Intent(this, FloatingCameraService.class);
-            bindService(intent, floatWindowServiceConnection, BIND_AUTO_CREATE);
-        }
-    }
-
-    private void stopFloatingCameraService(){
-        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingCameraService");
-        unbindService(floatWindowServiceConnection);
-        floatingCameraService = null;
-    }
-
-    private void startFloatingCounterService() {
-        if (RecordHelper.isRecording() || RecordHelper.isCountDowning()) {
-            NotificationUtils.showToast(this, getResources().getString(R.string.recording_in_progress));
-            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "startFloatingCounterService");
-            return;
-        }
-
-        if (!BoomHelper.ensureDrawOverlayPermission(this)) {
-            Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCounterService");
-            NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_request_tip));
-            startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), OVERLAY_REQUEST_CODE);
-        } else {
-            Dogger.i(Dogger.BOOM, "start overlay service", "MainActivity", "startFloatingCounterService");
-            Intent intent = new Intent(this, FloatingCounterService.class);
-            bindService(intent, floatCounterServiceConnection, BIND_AUTO_CREATE);
-        }
-    }
-
-    private void stopFloatingCounterService(){
-        Dogger.i(Dogger.BOOM, "", "MainActivity", "stopFloatingCounterService");
-        unbindService(floatCounterServiceConnection);
-        floatingCounterService = null;
-    }
 
     private View.OnClickListener clickListener = v -> {
         switch (v.getId()) {
@@ -364,14 +276,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                 break;
         }
     };
-
-    private void onClickStartRecordingBtn(){
-        if (RecordHelper.isRecording()) {
-            stopRecording();
-        } else {
-            startRecording();
-        }
-    }
 
     private void onClickRecordScreenOnly(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
@@ -397,14 +301,11 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         }
 
         runOnUiThread(()->{
-            Dogger.i(Dogger.BOOM, "evt.getType: " + evt.getType(), "MainActivity", "onRecordEvt");
             switch (evt.getType()) {
                 case RecordEvent.RECORD_STATUS_UPDATE:
                     updateRecordingView();
                     break;
                 case RecordEvent.RECORD_READY_TO_RECORD:
-                    stopFloatingCounterService();
-                    realStartRecord();
                     break;
             }
         });
