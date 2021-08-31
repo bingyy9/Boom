@@ -103,6 +103,7 @@ public class FloatingCounterService extends Service {
 
     @Override
     public void onDestroy() {
+        Dogger.i(Dogger.BOOM, "", "FloatingCounterService", "onDestroy");
         super.onDestroy();
         if(windowManager != null){
             windowManager.removeView(rootView);

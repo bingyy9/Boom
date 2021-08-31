@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
 import android.animation.Animator;
@@ -35,6 +36,7 @@ import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.RecordHelper;
+import com.boom.android.viewmodel.RecordViewModel;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
 import com.boom.utils.StringUtils;
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private MediaRecordService recordService;
     private FloatingCameraService floatingCameraService;
     private FloatingCounterService floatingCounterService;
+    private RecordViewModel recordViewModel;
 
     TabLayout tabLayout;
     ViewPager viewPager;
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     }
 
     private void initView(){
+        recordViewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory((this).getApplication()))
+                .get(RecordViewModel.class);
         tabLayout = this.findViewById(R.id.tab_layout);
         viewPager = this.findViewById(R.id.view_pager);
         floatingMenu = this.findViewById(R.id.floating_menu);
@@ -183,19 +188,31 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        RecordHelper.registerRecordEventListner(this);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        RecordHelper.registerRecordEventListner(this);
         updateRecordingView();
     }
 
     @Override
     protected void onPause() {
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "onPause");
         super.onPause();
-        RecordHelper.unregisterRecordEventListener(this);
         if(floatingMenu != null) {
             floatingMenu.close(false);
         }
+    }
+
+    @Override
+    protected void onStop() {
+        Dogger.i(Dogger.BOOM, "", "MainActivity", "onStop");
+        super.onStop();
+        RecordHelper.unregisterRecordEventListener(this);
     }
 
     @Override
@@ -380,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         }
 
         runOnUiThread(()->{
+            Dogger.i(Dogger.BOOM, "evt.getType: " + evt.getType(), "MainActivity", "onRecordEvt");
             switch (evt.getType()) {
                 case RecordEvent.RECORD_STATUS_UPDATE:
                     updateRecordingView();
