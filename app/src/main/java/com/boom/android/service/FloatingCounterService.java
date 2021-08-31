@@ -123,13 +123,14 @@ public class FloatingCounterService extends Service {
             mCounterTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                  if(mCounter > 0){
+                  if(mCounter > 1){
                       mCounter--;
                       updateCounterView();
                   } else {
                       mCounter = 3;
                       stopTimer();
                       RecordHelper.setReadyToRecord(true);
+                      stopSelf();
                   }
                 }
             }, 1000, 1000);
