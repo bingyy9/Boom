@@ -16,7 +16,6 @@ import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.view.GestureDetector;
@@ -29,7 +28,6 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.boom.android.MainActivity;
 import com.boom.android.R;
@@ -43,10 +41,11 @@ import com.boom.camera.RoundTextureView;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
@@ -62,13 +61,12 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
-    private View counterRootView;
+    private View rootView;
     private final int INIT_COUNT_DOWN = 3;
     private ImageView counterView;
     private Timer mCounterTimer;
     private int mCounter = INIT_COUNT_DOWN;
 
-    private View cameraRootView;
     private RoundTextureView cameraView;
     private CameraHelper cameraHelper;
     private RoundBorderView roundBorderView;
@@ -97,6 +95,20 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         RecordHelper.setRecording(false);
         mediaRecorder = new MediaRecorder();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        layoutParams = new WindowManager.LayoutParams();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        layoutParams.format = PixelFormat.RGBA_8888;
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+
+        LayoutInflater layoutInflater = LayoutInflater.from(this);
+        rootView = layoutInflater.inflate(R.layout.counter_display, null);
+        rootView.setOnTouchListener(new FloatingOnTouchListener());
+        counterView = rootView.findViewById(R.id.iv_counter);
+        cameraView = rootView.findViewById(R.id.texture_preview);
     }
 
     @Override
@@ -145,8 +157,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             cameraHelper.release();
         }
 
-        removeView(counterRootView);
-        removeView(cameraRootView);
+        if(windowManager != null){
+            windowManager.removeView(rootView);
+        }
     }
 
     private void createVirtualDisplay() {
@@ -206,17 +219,48 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
 
-    private void updateCounterView(){
-        if(counterView == null){
+    private void updateView(){
+        if(rootView == null){
             return;
         }
-        if(mCounter == 3){
-            counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
-        } else if(mCounter == 2){
-            counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
-        } else if(mCounter == 1){
-            counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
-        }
+        rootView.post(()->{
+            if(RecordHelper.isCountDowning()) {
+                if (counterView == null) {
+                    return;
+                }
+                counterView.setVisibility(View.VISIBLE);
+                cameraView.setVisibility(View.GONE);
+                if (mCounter == 3) {
+                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
+                } else if (mCounter == 2) {
+                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
+                } else if (mCounter == 1) {
+                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
+                }
+
+                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+                layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+                layoutParams.gravity = Gravity.CENTER;
+                windowManager.updateViewLayout(rootView, layoutParams);
+            } else if(RecordHelper.isRecording()){
+                counterView.setVisibility(View.GONE);
+                if(RecordHelper.isRecordCamera()){
+                    cameraView.setVisibility(View.VISIBLE);
+                } else {
+                    cameraView.setVisibility(View.GONE);
+                }
+
+                layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+                layoutParams.x = 0;
+                layoutParams.y = 150;
+                windowManager.updateViewLayout(rootView, layoutParams);
+            } else {
+                counterView.setVisibility(View.GONE);
+                cameraView.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void stopTimer(){
@@ -235,23 +279,14 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                 public void run() {
                     if(mCounter > 1){
                         mCounter--;
-                        updateCounterView();
+                        updateView();
                     } else {
                         mCounter = INIT_COUNT_DOWN;
                         stopTimer();
-                        removeView(counterRootView);
-                        RecordHelper.setReadyToRecord(true);
                         realStartRecord();
                     }
                 }
             }, 1000, 1000);
-        }
-    }
-
-    private void removeView(View view){
-        if(view != null && windowManager != null){
-            windowManager.removeView(view);
-            view = null;
         }
     }
 
@@ -263,52 +298,23 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             }
             RecordHelper.setCountDowning(true);
 
-            layoutParams = new WindowManager.LayoutParams();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            } else {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-            }
-            layoutParams.format = PixelFormat.RGBA_8888;
             layoutParams.gravity = Gravity.CENTER;
-            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-            LayoutInflater layoutInflater = LayoutInflater.from(this);
-            counterRootView = layoutInflater.inflate(R.layout.counter_display, null);
-            counterView = counterRootView.findViewById(R.id.iv_counter);
-            windowManager.addView(counterRootView, layoutParams);
+            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+            windowManager.addView(rootView, layoutParams);
             mCounter = INIT_COUNT_DOWN;
-            updateCounterView();
             startTimer();
+            updateView();
         }
     }
 
     public void showCameraFloatingWindow() {
-        if (BoomHelper.ensureDrawOverlayPermission(this)) {
-            windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-            layoutParams = new WindowManager.LayoutParams();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-            } else {
-                layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
-            }
-            layoutParams.format = PixelFormat.RGBA_8888;
-            layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
-            layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-            layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            layoutParams.x = 0;
-            layoutParams.y = 150;
-
-            LayoutInflater layoutInflater = LayoutInflater.from(this);
-            cameraRootView = layoutInflater.inflate(R.layout.video_display, null);
-            cameraRootView.setOnTouchListener(new MediaRecordService.FloatingOnTouchListener());
-            cameraView = cameraRootView.findViewById(R.id.texture_preview);
-            cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
-            windowManager.addView(cameraRootView, layoutParams);
-            mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
+        if (rootView != null && BoomHelper.ensureDrawOverlayPermission(this)) {
+            rootView.post(()->{
+                updateView();
+                cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+                mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
+            });
         }
     }
 
@@ -350,17 +356,19 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     private void addRoundBorder(){
-        if(roundBorderView == null) {
-            roundBorderView = new RoundBorderView(MediaRecordService.this);
+        if(RecordHelper.isRecording() && cameraView.getVisibility() == View.VISIBLE) {
+            if (roundBorderView == null) {
+                roundBorderView = new RoundBorderView(MediaRecordService.this);
+            }
+            roundBorderView.setRadius(Math.min(cameraView.getWidth(), cameraView.getHeight()) >> 1);
+            roundBorderView.turnRound();
+            ((ViewGroup) cameraView.getParent()).addView(roundBorderView, cameraView.getLayoutParams());
         }
-        roundBorderView.setRadius(Math.min(cameraView.getWidth(), cameraView.getHeight()) >> 1);
-        roundBorderView.turnRound();
-        ((FrameLayout) cameraView.getParent()).addView(roundBorderView, cameraView.getLayoutParams());
     }
 
     private void removeRoundBorder(){
         if(roundBorderView != null) {
-            ((FrameLayout) cameraView.getParent()).removeView(roundBorderView);
+            ((ViewGroup) cameraView.getParent()).removeView(roundBorderView);
         }
     }
 
@@ -462,6 +470,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         startRecord();
         if(RecordHelper.isRecordCamera()){
             showCameraFloatingWindow();
+        } else {
+            updateView();
         }
     }
 }
