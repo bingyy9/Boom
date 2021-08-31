@@ -34,6 +34,7 @@ import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.RecordHelper;
+import com.boom.android.util.WindowUtils;
 import com.boom.camera.CameraHelper;
 import com.boom.camera.CameraListener;
 import com.boom.camera.RoundBorderView;
@@ -238,9 +239,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                     counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
                 }
 
-                layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-                layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
-                layoutParams.gravity = Gravity.CENTER;
+//                updateLayoutParamsToCounterView();
                 windowManager.updateViewLayout(rootView, layoutParams);
             } else if(RecordHelper.isRecording()){
                 counterView.setVisibility(View.GONE);
@@ -250,12 +249,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                     cameraView.setVisibility(View.GONE);
                 }
 
-                layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
-                layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
-                layoutParams.x = 0;
-                layoutParams.y = 150;
-                windowManager.updateViewLayout(rootView, layoutParams);
+                updateLayoutParamsToCameraView();
+                rootView.post(()->{
+                    windowManager.updateViewLayout(rootView, layoutParams);
+                });
             } else {
                 counterView.setVisibility(View.GONE);
                 cameraView.setVisibility(View.GONE);
@@ -298,14 +295,36 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             }
             RecordHelper.setCountDowning(true);
 
-            layoutParams.gravity = Gravity.CENTER;
-            layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-            layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT;
+            updateLayoutParamsToCounterView();
             windowManager.addView(rootView, layoutParams);
             mCounter = INIT_COUNT_DOWN;
             startTimer();
             updateView();
         }
+    }
+
+    private void updateLayoutParamsToCounterView(){
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.x = (width >> 1) - WindowUtils.dp2px(this, 75);
+        layoutParams.y = (height >> 1) - WindowUtils.dp2px(this, 75);
+        layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+    }
+
+    private void updateLayoutParamsToCameraView(){
+        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+        layoutParams.x = 0;
+        layoutParams.y = 150;
+    }
+
+    private float getCounterHeight(){
+        return this.getResources().getDimension(R.dimen.counter_height);
+    }
+
+    private float getCounterWidth(){
+        return this.getResources().getDimension(R.dimen.counter_width);
     }
 
     public void showCameraFloatingWindow() {
@@ -326,6 +345,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
         @Override
         public boolean onTouch(View view, MotionEvent event) {
+            if(!RecordHelper.isRecording() || cameraView.getVisibility() != View.VISIBLE) {
+                return true;
+            }
+
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     addRoundBorder();

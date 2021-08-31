@@ -45,4 +45,9 @@ public class WindowUtils {
         float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dipValue * scale + 0.5f);
     }
+
+    public static int dp2px(Context context, float dpValue){
+        float scale=context.getResources().getDisplayMetrics().density;
+        return (int)(dpValue*scale+0.5f);
+    }
 }
