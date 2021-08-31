@@ -1,6 +1,7 @@
 package com.boom.model.interf;
 
 import com.boom.model.repo.RecordEvent;
+import com.boom.model.repo.RecordRepo;
 
 public interface IRecordModel extends IModel{
 
@@ -18,6 +19,10 @@ public interface IRecordModel extends IModel{
     void recordCamera(boolean b);
     boolean isRecordCamera();
     void setRecordingStop(boolean b);
-    void setRecordingToRecord(boolean b);
+    void setReadyToRecord(boolean b);
+    RecordRepo getRecordRepo();
+    void startCounter();
+    void setCountDowning(boolean b);
+    boolean isCountDowning();
 
 }

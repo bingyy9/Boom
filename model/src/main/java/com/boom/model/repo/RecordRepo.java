@@ -2,12 +2,20 @@ package com.boom.model.repo;
 
 import com.boom.model.component.rxsubject.WbxSubject;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class RecordRepo {
     private WbxSubject<Boolean> isRecording = new WbxSubject<Boolean>(false);
 
     private WbxSubject<Boolean> readyToRecord = new WbxSubject<Boolean>(false);
 
     private WbxSubject<Boolean> recordingStop = new WbxSubject<Boolean>(false);
+    
+    private final int INIT_COUNT_DOWN = 3;
+    private Timer mCounterTimer;
+    private int mCounterDown = INIT_COUNT_DOWN;
+    private boolean isCountDowning = false;
 
     private boolean recordCamera;
 
@@ -17,12 +25,14 @@ public class RecordRepo {
         recordingStop.setAlwaysEmit(true);
         readyToRecord = new WbxSubject<>(true);
         readyToRecord.setAlwaysEmit(true);
+        mCounterDown = 3;
     }
 
     public void cleanup() {
         isRecording = null;
         recordingStop = null;
         readyToRecord = null;
+        mCounterDown = INIT_COUNT_DOWN;
     }
 
     public WbxSubject<Boolean> getRecordingSubject(){
@@ -34,6 +44,7 @@ public class RecordRepo {
     }
 
     public void setRecording(boolean b){
+        isCountDowning = false;
         if(isRecording != null){
             isRecording.setVal(b);
         }
@@ -53,10 +64,9 @@ public class RecordRepo {
         return readyToRecord;
     }
 
-    public void setReadyToRecord(boolean b){
-        if(readyToRecord != null){
-            readyToRecord.setVal(b);
-        }
+    public void startCounter(){
+        isCountDowning = true;
+        startTimer();
     }
 
     public void recordCamera(boolean b) {
@@ -65,5 +75,50 @@ public class RecordRepo {
 
     public boolean isRecordCamera(){
         return recordCamera;
+    }
+
+    public void stopTimer(){
+        if (mCounterTimer != null) {
+            mCounterTimer.cancel();
+            mCounterTimer = null;
+        }
+    }
+    
+    public void setReadyToRecord(boolean b){
+        if(readyToRecord != null){
+            readyToRecord.setVal(b);
+        }
+    }
+
+    public int getCounterDown() {
+        return mCounterDown;
+    }
+
+    public void setCountDowning(boolean countDowning) {
+        isCountDowning = countDowning;
+    }
+
+    public boolean isCountDowning() {
+        return isCountDowning;
+    }
+
+    public void startTimer(){
+        stopTimer();
+        if (mCounterTimer == null) {
+            mCounterTimer = new Timer();
+            mCounterTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    
+                    if(mCounterDown > 0){
+                        mCounterDown--;
+                    } else {
+                        mCounterDown = INIT_COUNT_DOWN;
+                        stopTimer();
+                        setReadyToRecord(true);
+                    }
+                }
+            }, 0, 1000);
+        }
     }
 }

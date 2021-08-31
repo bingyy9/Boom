@@ -162,6 +162,12 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     }
 
     private void startRecording(){
+        if (RecordHelper.isRecording() || RecordHelper.isCountDowning()) {
+            NotificationUtils.showToast(this, getResources().getString(R.string.recording_in_progress));
+            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "startRecording");
+            return;
+        }
+
         Intent captureIntent = projectionManager.createScreenCaptureIntent();
         startActivityForResult(captureIntent, RECORD_REQUEST_CODE);
     }
@@ -204,15 +210,23 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         if (requestCode == RECORD_REQUEST_CODE && resultCode == RESULT_OK) {
             mediaProjection = projectionManager.getMediaProjection(resultCode, data);
             recordService.setMediaProject(mediaProjection);
-            recordService.startRecord();
-            startFloatingCameraService();
+            startFloatingCounterService();
+//            recordService.startRecord();
+//            startFloatingCameraService();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
-            if (BoomHelper.ensureDrawOverlayPermission(this)) {
+            if (!BoomHelper.ensureDrawOverlayPermission(this)) {
                 NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
             } else {
-                startFloatingCameraService();
+                startFloatingCounterService();
             }
         }
+    }
+
+    private void realStartRecord(){
+        if(recordService != null) {
+            recordService.startRecord();
+        }
+        startFloatingCameraService();
     }
 
     @Override
@@ -272,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private void startFloatingCameraService() {
         if(!RecordHelper.isRecordCamera()){
+            Dogger.i(Dogger.BOOM, "not record with camera", "MainActivity", "startFloatingCameraService");
             return;
         }
         if (floatingCameraService != null && floatingCameraService.isStarted) {
@@ -296,9 +311,12 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     }
 
     private void startFloatingCounterService() {
-        if(!RecordHelper.isRecordCamera()){
+        if (RecordHelper.isRecording() || RecordHelper.isCountDowning()) {
+            NotificationUtils.showToast(this, getResources().getString(R.string.recording_in_progress));
+            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "startFloatingCounterService");
             return;
         }
+
         if (!BoomHelper.ensureDrawOverlayPermission(this)) {
             Dogger.i(Dogger.BOOM, "ask overlay permission", "MainActivity", "startFloatingCounterService");
             NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_request_tip));
@@ -340,22 +358,12 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private void onClickRecordScreenOnly(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
-        if (RecordHelper.isRecording()) {
-            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
-            return;
-        }
-
         RecordHelper.setRecordCamera(false);
         startRecording();
     }
 
     private void onClickRecordScreenWithCamera(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
-        if (RecordHelper.isRecording()) {
-            Dogger.w(Dogger.BOOM, "recording is in progress, ignore!", "MainActivity", "onClickRecordScreenOnly");
-            return;
-        }
-
         RecordHelper.setRecordCamera(true);
         startRecording();
     }
@@ -375,6 +383,10 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             switch (evt.getType()) {
                 case RecordEvent.RECORD_STATUS_UPDATE:
                     updateRecordingView();
+                    break;
+                case RecordEvent.RECORD_READY_TO_RECORD:
+                    stopFloatingCounterService();
+                    realStartRecord();
                     break;
             }
         });

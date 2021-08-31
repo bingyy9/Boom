@@ -47,20 +47,20 @@ public class BoomHelper {
                 return false;
             }
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                AppOpsManager appOpsMgr = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-                if (appOpsMgr == null)
-                    return false;
-                int mode = appOpsMgr.checkOpNoThrow("android:system_alert_window", android.os.Process.myUid(), context
-                        .getPackageName());
-                ensureOverlay = (mode == AppOpsManager.MODE_ALLOWED || mode == AppOpsManager.MODE_IGNORED);
-                Dogger.i(Dogger.BOOM, "ensureOverlay: " + ensureOverlay, "BoomHelper", "ensureDrawOverlayPermission");
-                return ensureOverlay;
-            } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                AppOpsManager appOpsMgr = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+//                if (appOpsMgr == null)
+//                    return false;
+//                int mode = appOpsMgr.checkOpNoThrow("android:system_alert_window", android.os.Process.myUid(), context
+//                        .getPackageName());
+//                ensureOverlay = (mode == AppOpsManager.MODE_ALLOWED || mode == AppOpsManager.MODE_IGNORED);
+//                Dogger.i(Dogger.BOOM, "ensureOverlay: " + ensureOverlay, "BoomHelper", "ensureDrawOverlayPermission");
+//                return ensureOverlay;
+//            } else {
                 ensureOverlay = Settings.canDrawOverlays(context);
                 Dogger.i(Dogger.BOOM, "ensureOverlay: " + ensureOverlay, "BoomHelper", "ensureDrawOverlayPermission");
                 return ensureOverlay;
-            }
+//            }
         }
     }
 

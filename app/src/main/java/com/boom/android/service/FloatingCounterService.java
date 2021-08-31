@@ -13,7 +13,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.boom.android.R;
+import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
+import com.boom.android.util.RecordHelper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,9 +26,10 @@ public class FloatingCounterService extends Service {
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
     private View rootView;
+    private final int INIT_COUNT_DOWN = 3;
     private ImageView counterView;
     private Timer mCounterTimer;
-    private int mCounter = 3;
+    private int mCounter = INIT_COUNT_DOWN;
 
     @Override
     public void onCreate() {
@@ -37,6 +40,7 @@ public class FloatingCounterService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Dogger.i(Dogger.BOOM, "", "FloatingCounterService", "onBind");
         showFloatingWindow();
         return new MsgBinder();
     }
@@ -55,6 +59,12 @@ public class FloatingCounterService extends Service {
 
     private void showFloatingWindow() {
         if (BoomHelper.ensureDrawOverlayPermission(this)) {
+            if(RecordHelper.isCountDowning()){
+                Dogger.i(Dogger.BOOM, "isCountingDown, ignore", "FloatingCounterService", "showFloatingWindow");
+                return;
+            }
+            RecordHelper.setCountDowning(true);
+
             layoutParams = new WindowManager.LayoutParams();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
@@ -69,7 +79,7 @@ public class FloatingCounterService extends Service {
 
             LayoutInflater layoutInflater = LayoutInflater.from(this);
             rootView = layoutInflater.inflate(R.layout.counter_display, null);
-            counterView = rootView.findViewById(R.id.texture_preview);
+            counterView = rootView.findViewById(R.id.iv_counter);
             windowManager.addView(rootView, layoutParams);
             mCounter = 3;
             updateCounterView();
@@ -78,6 +88,9 @@ public class FloatingCounterService extends Service {
     }
 
     private void updateCounterView(){
+        if(counterView == null){
+            return;
+        }
         if(mCounter == 3){
             counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
         } else if(mCounter == 2){
@@ -103,8 +116,6 @@ public class FloatingCounterService extends Service {
         }
     }
 
-
-
     public void startTimer(){
         stopTimer();
         if (mCounterTimer == null) {
@@ -118,9 +129,10 @@ public class FloatingCounterService extends Service {
                   } else {
                       mCounter = 3;
                       stopTimer();
+                      RecordHelper.setReadyToRecord(true);
                   }
                 }
-            }, 0, 1000);
+            }, 1000, 1000);
         }
     }
 }

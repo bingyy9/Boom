@@ -27,7 +27,7 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaProjection"></service>
-        <service android:name=".service.FloatingVideoService" />
+        <service android:name=".service.FloatingCounterService" />
         <service android:name=".service.FloatingCameraService" />
 
         <activity android:name=".MainActivity">

@@ -2,6 +2,7 @@ package com.boom.android.util;
 
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.interf.impl.ModelBuilderManager;
+import com.boom.model.repo.RecordRepo;
 
 public class RecordHelper {
     public static void setRecording(boolean b){
@@ -35,11 +36,35 @@ public class RecordHelper {
         }
     }
 
-    public static void setRecordingToRecord(boolean b){
+    public static void setReadyToRecord(boolean b){
         IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
         if(recordModel != null){
-            recordModel.setRecordingToRecord(b);
+            recordModel.setReadyToRecord(b);
         }
+    }
+
+    public static void startCounter(){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        if(recordModel != null){
+            recordModel.startCounter();
+        }
+    }
+
+    public static RecordRepo getRecordRepo(){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        return recordModel == null? null : recordModel.getRecordRepo();
+    }
+
+    public static void setCountDowning(boolean b){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        if(recordModel != null){
+            recordModel.setCountDowning(b);
+        }
+    }
+
+    public static boolean isCountDowning(){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        return recordModel == null? false: recordModel.isCountDowning();
     }
 
     public static void registerRecordEventListner(IRecordModel.RecordEvtListener listener){

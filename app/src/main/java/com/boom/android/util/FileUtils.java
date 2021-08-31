@@ -36,6 +36,10 @@ public class FileUtils {
         File realFile = new File(realpath);
         if (realFile != null && realFile.isDirectory()) {
             File[] subfiles = realFile.listFiles(filenameFilter);
+            if(subfiles == null) {
+                return files;
+            }
+
             for (File file : subfiles) {
                 if (file.isDirectory()) {
                     continue;

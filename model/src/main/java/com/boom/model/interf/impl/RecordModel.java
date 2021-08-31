@@ -197,9 +197,33 @@ public class RecordModel implements IRecordModel {
     }
 
     @Override
-    public void setRecordingToRecord(boolean b){
+    public void setReadyToRecord(boolean b){
         if(recordRepo != null){
-            recordRepo.setReadyToRecord(true);
+            recordRepo.setReadyToRecord(b);
+        }
+    }
+
+    @Override
+    public void startCounter(){
+        if(recordRepo != null){
+            recordRepo.startCounter();
+        }
+    }
+
+    @Override
+    public RecordRepo getRecordRepo(){
+        return recordRepo;
+    }
+
+    @Override
+    public boolean isCountDowning(){
+        return recordRepo == null? false: recordRepo.isCountDowning();
+    }
+
+    @Override
+    public void setCountDowning(boolean b){
+        if(recordRepo != null){
+            recordRepo.setCountDowning(b);
         }
     }
 
