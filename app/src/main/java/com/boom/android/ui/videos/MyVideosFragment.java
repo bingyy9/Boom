@@ -1,5 +1,6 @@
 package com.boom.android.ui.videos;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
+import com.boom.android.VideoDetailActivity;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.ui.videos.bean.VideoItemDiffCallback;
@@ -143,16 +145,18 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             return;
         }
 
-        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
-        if(supportFragmentManager == null){
-            return;
-        }
+        VideoDetailActivity.start(getActivity(), name);
 
-        Fragment fragment =  supportFragmentManager.findFragmentByTag(VideoDetailFragment.TAG);
-        if(fragment != null) {
-            return;
-        }
-        VideoDetailFragment.newInstance(name).show(supportFragmentManager,VideoDetailFragment.TAG);
+//        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
+//        if(supportFragmentManager == null){
+//            return;
+//        }
+//
+//        Fragment fragment =  supportFragmentManager.findFragmentByTag(VideoDetailFragment.TAG);
+//        if(fragment != null) {
+//            return;
+//        }
+//        VideoDetailFragment.newInstance(name).show(supportFragmentManager,VideoDetailFragment.TAG);
     }
 
 

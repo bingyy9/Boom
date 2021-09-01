@@ -28,6 +28,7 @@
             android:exported="true"
             android:foregroundServiceType="mediaProjection"></service>
         <service android:name=".service.FloatingCounterService" />
+
         <service android:name=".service.FloatingCameraService" />
 
         <activity android:name=".MainActivity">
@@ -36,6 +37,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".VideoDetailActivity"
+            android:label="@string/video"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

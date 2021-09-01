@@ -7,6 +7,9 @@
     <string name="my_videos">My Videos</string>
     <string name="recent_videos">Recent Videos</string>
     <string name="recording_in_progress">Recording in progress...</string>
+    <string name="video">Video</string>
+    <string name="edit_title">Edit Title</string>
+    <string name="delete">Delete</string>
 
     <string name="share_your_video">Share your video</string>
 
