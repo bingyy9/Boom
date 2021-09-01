@@ -1,4 +1,4 @@
-package com.boom.android.service;
+package com.boom.deprecated;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,20 +8,15 @@ import android.hardware.Camera;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
 
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
@@ -32,7 +27,6 @@ import com.boom.camera.RoundBorderView;
 import com.boom.camera.RoundTextureView;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 
 public class FloatingCameraService extends Service implements ViewTreeObserver.OnGlobalLayoutListener, CameraListener{
     public boolean isStarted = false;

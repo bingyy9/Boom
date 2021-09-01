@@ -9,12 +9,14 @@ import android.media.ThumbnailUtils;
 import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boom.android.log.Dogger;
@@ -42,7 +44,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
 
     View root;
     @BindView(R.id.tv_name)
-    TextView tvName;
+    EditText tvName;
     @BindView(R.id.tv_last_modified_time)
     TextView tvLastModified;
     @BindView(R.id.share_video)
@@ -90,12 +92,23 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             return;
         }
         tvName.setText(file.getName());
+        editTextEnable(false, tvName);
         tvLastModified.setText(DataUtils.formatDate(file.lastModified()));
         filePath = file.getAbsolutePath();
 
         mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
         mVideoView.setVideoViewCallback(this);
+    }
+
+    private void editTextEnable(boolean enable, EditText editText){
+        if(editText == null){
+            return;
+        }
+        editText.setFocusable(enable);
+        editText.setFocusableInTouchMode(enable);
+        editText.setLongClickable(enable);
+        editText.setInputType(enable? InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
     }
 
     private void setVideoAreaSize() {

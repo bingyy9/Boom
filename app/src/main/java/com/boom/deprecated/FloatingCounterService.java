@@ -1,4 +1,4 @@
-package com.boom.android.service;
+package com.boom.deprecated;
 
 import android.app.Service;
 import android.content.Intent;

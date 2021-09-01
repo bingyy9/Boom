@@ -18,18 +18,14 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
 import com.boom.android.log.Dogger;
 import com.boom.android.permission.PermissionManager;
-import com.boom.android.service.FloatingCameraService;
-import com.boom.android.service.FloatingCounterService;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;

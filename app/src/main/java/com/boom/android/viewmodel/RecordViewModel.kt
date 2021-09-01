@@ -1,8 +1,8 @@
 package com.boom.android.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.boom.android.service.FloatingCameraService
-import com.boom.android.service.FloatingCounterService
+import com.boom.deprecated.FloatingCameraService
+import com.boom.deprecated.FloatingCounterService
 import com.boom.android.service.MediaRecordService
 import com.boom.model.interf.IRecordModel
 import com.boom.model.interf.impl.ModelBuilderManager

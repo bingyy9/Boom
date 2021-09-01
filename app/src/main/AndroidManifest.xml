@@ -27,9 +27,9 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaProjection"></service>
-        <service android:name=".service.FloatingCounterService" />
+        <service android:name="com.boom.deprecated.FloatingCounterService" />
 
-        <service android:name=".service.FloatingCameraService" />
+        <service android:name="com.boom.deprecated.FloatingCameraService" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
