@@ -62,6 +62,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation 'com.google.android.material:material:1.2.+'
     implementation 'com.github.clans:fab:1.6.4'
+    implementation 'com.linsea:universalvideoview:1.1.0@aar'
 
     implementation (name:'rxandroid-2.0.1', ext: 'aar')
 
