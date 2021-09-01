@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -32,6 +34,7 @@ import java.io.File;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -114,6 +117,10 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
         mVideoView.setVideoViewCallback(this);
+
+        shareVideo.setOnClickListener((v)->{
+            shareFile();
+        });
     }
 
     private void updateEditTextEnable(boolean enable){
@@ -129,10 +136,6 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             editName.requestFocus();
             editName.selectAll();
             KeybordUtils.toggleSoftInput(editName);
-//            InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
-//            if(imm != null) {
-//                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_NOT_ALWAYS);
-//            }
         } else {
             editName.setFocusable(enable);
             editName.setFocusableInTouchMode(enable);
@@ -144,21 +147,18 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     }
 
     private void setVideoAreaSize() {
-        mVideoLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                int width = mVideoLayout.getWidth();
-                cachedHeight = (int) (width * 405f / 720f);
+        mVideoLayout.post(() -> {
+            int width = mVideoLayout.getWidth();
+            cachedHeight = (int) (width * 405f / 720f);
 //                cachedHeight = (int) (width * 3f / 4f);
 //                cachedHeight = (int) (width * 9f / 16f);
-                ViewGroup.LayoutParams videoLayoutParams = mVideoLayout.getLayoutParams();
-                videoLayoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                videoLayoutParams.height = cachedHeight;
-                mVideoLayout.setLayoutParams(videoLayoutParams);
-                mVideoView.setVideoPath(filePath);
-                mVideoView.requestFocus();
-                mVideoView.seekTo(100);
-            }
+            ViewGroup.LayoutParams videoLayoutParams = mVideoLayout.getLayoutParams();
+            videoLayoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            videoLayoutParams.height = cachedHeight;
+            mVideoLayout.setLayoutParams(videoLayoutParams);
+            mVideoView.setVideoPath(filePath);
+            mVideoView.requestFocus();
+            mVideoView.seekTo(100);
         });
     }
 
@@ -281,5 +281,24 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         } else {
             super.onBackPressed();
         }
+    }
+
+    private void shareFile(){
+//        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+//        shareIntent.putExtra(Intent.EXTRA_STREAM,
+//        Uri.fromFile(new File(filePath)));
+//        shareIntent.setType("video/*");//此处可发送多种文件
+//        startActivity(Intent.createChooser(shareIntent, this.getResources().getString(R.string.share_to)));
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(BoomApplication.getInstance().getApplicationContext()
+                    , BuildConfig.APPLICATION_ID + ".fileProvider", file);
+            intent.setDataAndType(contentUri, "video/mp4");
+        } else {
+            intent.setDataAndType(Uri.fromFile(file), "video/mp4");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        startActivity(intent);
     }
 }
