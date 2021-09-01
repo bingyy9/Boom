@@ -2,13 +2,9 @@ package com.boom.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
-import android.opengl.Visibility;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +12,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -23,6 +21,7 @@ import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.VideoDetailFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
+import com.boom.android.util.KeybordUtils;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.interf.impl.ModelBuilderManager;
 import com.boom.utils.StringUtils;
@@ -43,8 +42,8 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     private IRecordModel recordModel;
 
     View root;
-    @BindView(R.id.tv_name)
-    EditText tvName;
+    @BindView(R.id.ed_name)
+    EditText editName;
     @BindView(R.id.tv_last_modified_time)
     TextView tvLastModified;
     @BindView(R.id.share_video)
@@ -58,9 +57,12 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
 
     private String fileName;
     private String filePath;
+    private File file;
     private int mSeekPosition;
     private int cachedHeight;
     private boolean isFullscreen;
+    private Drawable editTextBackground;
+
 
     public static void start(Context context, String filename) {
         Intent intent = new Intent(context, VideoDetailActivity.class);
@@ -85,14 +87,27 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             finish();
             return;
         }
-        File file = new File(BoomHelper.getRecordDirectory() + fileName);
+        file = new File(BoomHelper.getRecordDirectory() + fileName);
         if (file == null) {
             Dogger.i(Dogger.BOOM, "file is not exist", "VideoDetailActivity", "initView");
             finish();
             return;
         }
-        tvName.setText(file.getName());
-        editTextEnable(false, tvName);
+        editName.setText(file.getName().replace(BoomHelper.filePostfix, ""));
+        editTextBackground = editName.getBackground();
+        updateEditTextEnable(false);
+        editName.setOnEditorActionListener((v, actionId, event) -> {
+            Dogger.i(Dogger.BOOM, "actionid" + actionId, "VideoDetailActivity", "initView");
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                File newFile = new File(BoomHelper.getRecordDirectory() + editName.getText() + BoomHelper.filePostfix);
+                if(file != null && newFile != null){
+                    file.renameTo(newFile);
+                }
+                updateEditTextEnable(false);
+            }
+            return true;
+        });
+
         tvLastModified.setText(DataUtils.formatDate(file.lastModified()));
         filePath = file.getAbsolutePath();
 
@@ -101,14 +116,31 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         mVideoView.setVideoViewCallback(this);
     }
 
-    private void editTextEnable(boolean enable, EditText editText){
-        if(editText == null){
+    private void updateEditTextEnable(boolean enable){
+        if(editName == null){
             return;
         }
-        editText.setFocusable(enable);
-        editText.setFocusableInTouchMode(enable);
-        editText.setLongClickable(enable);
-        editText.setInputType(enable? InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+        if(enable){
+            editName.setFocusable(enable);
+            editName.setFocusableInTouchMode(enable);
+            editName.setLongClickable(enable);
+            editName.setBackground(editTextBackground);
+            editName.setInputType(enable? InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+            editName.requestFocus();
+            editName.selectAll();
+            KeybordUtils.toggleSoftInput(editName);
+//            InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+//            if(imm != null) {
+//                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_NOT_ALWAYS);
+//            }
+        } else {
+            editName.setFocusable(enable);
+            editName.setFocusableInTouchMode(enable);
+            editName.setLongClickable(enable);
+            editName.setBackground(null);
+            editName.setInputType(enable? InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+            KeybordUtils.hideKeyboard(editName);
+        }
     }
 
     private void setVideoAreaSize() {
@@ -142,8 +174,13 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         switch (item.getItemId()) {
             case R.id.edit_title:
                 Dogger.i(Dogger.BOOM, "edit title", "VideoDetailActivity", "onOptionsItemSelected");
+                updateEditTextEnable(true);
                 break;
             case R.id.delete:
+                if(file != null) {
+                    file.delete();
+                }
+                finish();
                 break;
             case android.R.id.home:
                 finish();
@@ -200,7 +237,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     private void updateFullScreenView(){
         ActionBar supportActionBar = getSupportActionBar();
         if(isFullscreen){
-            tvName.setVisibility(View.GONE);
+            editName.setVisibility(View.GONE);
             tvLastModified.setVisibility(View.GONE);
             shareVideo.setVisibility(View.GONE);
 
@@ -208,7 +245,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
                 supportActionBar.hide();
             }
         } else {
-            tvName.setVisibility(View.VISIBLE);
+            editName.setVisibility(View.VISIBLE);
             tvLastModified.setVisibility(View.VISIBLE);
             shareVideo.setVisibility(View.VISIBLE);
             if(supportActionBar != null){

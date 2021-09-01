@@ -145,7 +145,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             return;
         }
 
-        VideoDetailActivity.start(getActivity(), name);
+        VideoDetailActivity.start(getActivity(), name + BoomHelper.filePostfix);
 
 //        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
 //        if(supportFragmentManager == null){

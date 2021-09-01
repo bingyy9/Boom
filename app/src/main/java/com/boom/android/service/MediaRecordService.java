@@ -241,6 +241,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                     counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
                 } else if (mCounter == 1) {
                     counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
+                } else {
+                    counterView.setVisibility(View.GONE);
                 }
 
 //                updateLayoutParamsToCounterView();
@@ -282,6 +284,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                         mCounter--;
                         updateView();
                     } else {
+                        updateView();
                         mCounter = INIT_COUNT_DOWN;
                         stopTimer();
                         startRecord();

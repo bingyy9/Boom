@@ -31,7 +31,7 @@
     </FrameLayout>
 
     <EditText
-        android:id="@+id/tv_name"
+        android:id="@+id/ed_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -39,16 +39,18 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/video_layout" />
+        app:layout_constraintTop_toBottomOf="@id/video_layout"
+        android:hint="@string/file_name"/>
 
     <TextView
         android:id="@+id/tv_last_modified_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:textSize="18sp"
+        android:layout_marginTop="10dp"
+        android:textSize="15sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_name" />
+        app:layout_constraintTop_toBottomOf="@id/ed_name"
+        android:layout_marginLeft="5dp"/>
 
     <Button
         android:id="@+id/share_video"

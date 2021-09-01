@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 
 public class BoomHelper {
+    public static final String filePostfix = ".mp4";
+
     public static boolean ensureDrawOverlayPermission(Context context) {
         boolean ensureOverlay;
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {

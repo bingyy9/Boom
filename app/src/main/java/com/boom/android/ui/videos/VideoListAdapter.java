@@ -11,14 +11,13 @@ import android.widget.TextView;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
+import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -71,7 +70,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         ItemVH viewHolder = (ItemVH) holder;
-        viewHolder.tvName.setText(videoItem.name);
+        viewHolder.tvName.setText(videoItem.name.replace(BoomHelper.filePostfix, ""));
         if(!StringUtils.isEmpty(videoItem.lastModified)){
             viewHolder.tvLastModified.setText(videoItem.lastModified);
         }
