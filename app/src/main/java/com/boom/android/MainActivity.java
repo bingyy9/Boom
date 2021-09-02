@@ -8,6 +8,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -15,7 +16,6 @@ import android.animation.ObjectAnimator;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.PackageManager;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
 import com.boom.android.log.Dogger;
-import com.boom.android.permission.PermissionManager;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
@@ -39,6 +38,10 @@ import com.boom.utils.StringUtils;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.material.tabs.TabLayout;
+import com.qw.soul.permission.SoulPermission;
+import com.qw.soul.permission.bean.Permission;
+import com.qw.soul.permission.bean.Permissions;
+import com.qw.soul.permission.callbcak.CheckRequestPermissionsListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,9 +74,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        PermissionManager.requestAllPermission(this);
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+        initPermission();
         initView();
         initService();
     }
@@ -232,15 +234,15 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PermissionManager.STORAGE_REQUEST_CODE || requestCode == PermissionManager.AUDIO_REQUEST_CODE) {
-            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                finish();
-            }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == PermissionManager.STORAGE_REQUEST_CODE || requestCode == PermissionManager.AUDIO_REQUEST_CODE) {
+//            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+//                finish();
+//            }
+//        }
+//    }
 
     private ServiceConnection recordServiceConnection = new ServiceConnection() {
         @Override
@@ -262,10 +264,38 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private View.OnClickListener clickListener = v -> {
         switch (v.getId()) {
             case R.id.record_screen:
-                onClickRecordScreenOnly();
+                SoulPermission.getInstance().checkAndRequestPermissions(
+                        Permissions.build(Manifest.permission.CAMERA
+                                , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                , Manifest.permission.RECORD_AUDIO),
+                        new CheckRequestPermissionsListener() {
+                            @Override
+                            public void onAllPermissionOk(Permission[] allPermissions) {
+                                onClickRecordScreenOnly();
+                            }
+
+                            @Override
+                            public void onPermissionDenied(Permission[] refusedPermissions) {
+                                NotificationUtils.showToast(MainActivity.this, getResources().getString(R.string.no_permission_to_record));
+                            }
+                        });
                 break;
             case R.id.record_screen_with_camera:
-                onClickRecordScreenWithCamera();
+                SoulPermission.getInstance().checkAndRequestPermissions(
+                        Permissions.build(Manifest.permission.CAMERA
+                                , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                , Manifest.permission.RECORD_AUDIO),
+                        new CheckRequestPermissionsListener() {
+                            @Override
+                            public void onAllPermissionOk(Permission[] allPermissions) {
+                                onClickRecordScreenWithCamera();
+                            }
+
+                            @Override
+                            public void onPermissionDenied(Permission[] refusedPermissions) {
+                                NotificationUtils.showToast(MainActivity.this, getResources().getString(R.string.no_permission_to_record));
+                            }
+                        });
                 break;
             case R.id.fab_stop_record:
                 onClickStopRecord();
@@ -316,5 +346,21 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             stopRecord.setVisibility(View.GONE);
             floatingMenu.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void initPermission(){
+        SoulPermission.getInstance().checkAndRequestPermissions(
+                Permissions.build(Manifest.permission.READ_EXTERNAL_STORAGE),
+                    //if you want do noting or no need all the callbacks you may use SimplePermissionsAdapter instead
+                new CheckRequestPermissionsListener() {
+                    @Override
+                    public void onAllPermissionOk(Permission[] allPermissions) {
+                    }
+
+                    @Override
+                    public void onPermissionDenied(Permission[] refusedPermissions) {
+                    }
+                });
+
     }
 }

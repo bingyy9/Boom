@@ -54,6 +54,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         return this.mDataList;
     }
 
+    public int getSize(){
+        return this.mDataList == null? 0: mDataList.size();
+    }
+
 
     @NonNull
     @Override

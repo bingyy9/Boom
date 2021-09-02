@@ -89,4 +89,6 @@ dependencies {
         exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
     }
     implementation ('androidx.recyclerview:recyclerview:1.2.0-alpha06')
+    implementation 'com.github.soulqw:SoulPermission:1.3.1'
+
 }

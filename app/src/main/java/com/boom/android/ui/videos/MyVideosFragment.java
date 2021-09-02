@@ -1,5 +1,6 @@
 package com.boom.android.ui.videos;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
@@ -40,6 +42,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.internal.Utils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -49,6 +52,8 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     View root;
     @BindView(R.id.video_list)
     RecyclerView videoListView;
+    @BindView(R.id.tv_tip)
+    TextView tvTip;
     VideoListAdapter videoListAdapter;
 
     Handler mHandler = new Handler();
@@ -70,7 +75,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         initView();
         return root;
     }
-
+    
     private void initView(){
         videoListAdapter = new VideoListAdapter(getActivity());
         videoListAdapter.setListener(this);
@@ -91,6 +96,13 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         }).observeOn(AndroidSchedulers.mainThread()).
                 subscribeOn(Schedulers.computation()).subscribe(result -> {
             ((DiffUtil.DiffResult)result).dispatchUpdatesTo(videoListAdapter);
+            if(videoListAdapter != null && videoListAdapter.getSize() > 0){
+                tvTip.setVisibility(View.GONE);
+                videoListView.setVisibility(View.VISIBLE);
+            } else {
+                tvTip.setVisibility(View.VISIBLE);
+                videoListView.setVisibility(View.GONE);
+            }
         }));
     }
 

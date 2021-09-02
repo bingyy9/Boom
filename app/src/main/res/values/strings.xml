@@ -18,4 +18,7 @@
 
     <string name="display_over_other_apps_request_tip">Not enabled display over other apps.</string>
     <string name="display_over_other_apps_fail_tip">Display over other apps request fail.</string>
+    <string name="no_permission_to_record">No permission to record.</string>
+    <string name="no_permission_to_list_record">No permission to list record.</string>
+    <string name="no_records">No records.</string>
 </resources>
