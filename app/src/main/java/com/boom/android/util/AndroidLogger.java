@@ -3,12 +3,17 @@ package com.boom.android.util;
 
 import android.util.Log;
 
+import com.boom.android.BuildConfig;
 import com.boom.android.log.Dogger;
 import com.boom.android.log.ILog;
 
 public class AndroidLogger implements ILog {
     @Override
     public void dump(int level, String tag, String msg, Throwable throwable) {
+        if(!BuildConfig.DEBUG){
+            //release version not log to logcat
+            return;
+        }
         switch (level) {
             case Dogger.DEBUG:
                 Log.d(tag, msg, throwable);
