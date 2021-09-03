@@ -5,13 +5,18 @@ import android.widget.ImageView;
 
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
+import com.jakewharton.disklrucache.DiskLruCache;
+
+import java.io.File;
+import java.io.IOException;
 
 public class BitmapCacheUtils {
     private static BitmapCacheUtils mInstance;
 
     private NetCacheUtils mNetCacheUtils;
-    private LocalCacheUtils mLocalCacheUtils;
+//    private LocalCacheUtils mLocalCacheUtils;
     private MemoryCacheUtils mMemoryCacheUtils;
+    private DiskLruCacheUtil mDiskLruCacheUtil;
 
     public static BitmapCacheUtils getInstance(){
         if(mInstance == null){
@@ -22,8 +27,9 @@ public class BitmapCacheUtils {
 
     public BitmapCacheUtils(){
         mMemoryCacheUtils=new MemoryCacheUtils();
-        mLocalCacheUtils=new LocalCacheUtils();
-        mNetCacheUtils=new NetCacheUtils(mLocalCacheUtils,mMemoryCacheUtils);
+//        mLocalCacheUtils=new LocalCacheUtils();
+        mDiskLruCacheUtil = new DiskLruCacheUtil();
+        mNetCacheUtils=new NetCacheUtils(mDiskLruCacheUtil,mMemoryCacheUtils);
     }
 
     public void display(ImageView ivPic, String url) {
@@ -38,7 +44,7 @@ public class BitmapCacheUtils {
         }
 
         //本地缓存
-        bitmap = mLocalCacheUtils.getBitmapFromLocal(url);
+        bitmap = mDiskLruCacheUtil.getBitmapFromLocal(url);
         if(bitmap !=null){
             ivPic.setImageBitmap(bitmap);
             Dogger.i(Dogger.BOOM, "Get bitmap from local cache", "BitmapUtils", "disPlay");

@@ -10,11 +10,14 @@ import android.provider.Settings;
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
+import java.util.logging.Logger;
 
 public class BoomHelper {
     public static final String filePostfix = ".mp4";
@@ -46,6 +49,7 @@ public class BoomHelper {
                 Dogger.i(Dogger.BOOM, "ensureOverlay: " + ensureOverlay, "BoomHelper", "ensureDrawOverlayPermission");
                 return ensureOverlay;
             } catch (Exception e) {
+                Dogger.e(Dogger.BOOM, "", "BoomHelper", "ensureDrawOverlayPermission", e);
                 return false;
             }
         } else {
@@ -101,6 +105,17 @@ public class BoomHelper {
         }
 
         return true;
+    }
+
+    public static boolean enableGoogleService(){
+        int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(BoomApplication.getInstance());
+        if(resultCode != ConnectionResult.SUCCESS) {
+            Dogger.i(Dogger.BOOM, "google service: " + false, "BoomHelper", "validGoogleService");
+            return false;
+        } else {
+            Dogger.i(Dogger.BOOM, "google service: " + true, "BoomHelper", "validGoogleService");
+            return true;
+        }
     }
 
 }

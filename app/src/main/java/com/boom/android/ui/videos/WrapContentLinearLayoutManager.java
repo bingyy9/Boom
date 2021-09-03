@@ -29,7 +29,7 @@ public class WrapContentLinearLayoutManager extends LinearLayoutManager {
         try {
             super.onLayoutChildren(recycler, state);
         } catch (Exception e) {
-            Dogger.i(Dogger.BOOM, "" + e.getMessage(), "WrapContentLinearLayoutManager", "onLayoutChildren");
+            Dogger.e(Dogger.BOOM, "", "WrapContentLinearLayoutManager", "onLayoutChildren", e);
         }
     }
 }

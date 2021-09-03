@@ -15,11 +15,12 @@ import java.net.URL;
 import java.util.Hashtable;
 
 public class NetCacheUtils {
-    private LocalCacheUtils mLocalCacheUtils;
+//    private LocalCacheUtils mLocalCacheUtils;
     private MemoryCacheUtils mMemoryCacheUtils;
+    private DiskLruCacheUtil mDiskLruCacheUtil;
 
-    public NetCacheUtils(LocalCacheUtils localCacheUtils, MemoryCacheUtils memoryCacheUtils) {
-        mLocalCacheUtils = localCacheUtils;
+    public NetCacheUtils(DiskLruCacheUtil diskLruCacheUtil, MemoryCacheUtils memoryCacheUtils) {
+        mDiskLruCacheUtil = diskLruCacheUtil;
         mMemoryCacheUtils = memoryCacheUtils;
     }
 
@@ -50,7 +51,7 @@ public class NetCacheUtils {
                 Dogger.i(Dogger.BOOM, "Get bitmap from network", "BitmapTask", "onPostExecute");
 
                 //从网络获取图片后,保存至本地缓存
-                mLocalCacheUtils.setBitmapToLocal(url, result);
+                mDiskLruCacheUtil.setBitmapToLocal(url, result);
                 //保存至内存中
                 mMemoryCacheUtils.setBitmapToMemory(url, result);
             }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.boom.android">
+    package="com.boom.android"
+    android:versionCode="0000001"
+    android:versionName="1.0.0">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -52,6 +54,9 @@
             android:label="@string/video"
             android:parentActivityName=".MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <activity android:name=".AboutActivity"
+            android:label="@string/about"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>

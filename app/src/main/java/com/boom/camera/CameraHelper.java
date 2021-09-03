@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 
+import com.boom.android.log.Dogger;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -108,6 +110,7 @@ public class CameraHelper implements Camera.PreviewCallback {
                 if (cameraListener != null) {
                     cameraListener.onCameraError(e);
                 }
+                Dogger.e(Dogger.BOOM, "", "CameraHelper", "start", e);
             }
         }
     }

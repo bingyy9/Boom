@@ -1,9 +1,12 @@
 package com.boom.android.util.cache;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 
+import com.boom.android.BoomApplication;
+import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.HashUtils;
 
@@ -11,19 +14,33 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-public class LocalCacheUtils {
+import static android.os.Environment.isExternalStorageRemovable;
 
-    private static final String CACHE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + BoomHelper.getRecorderFolder() + "/" + "Cache";
+public class LocalCacheUtils {
+    private String mCachePath;
+    LocalCacheUtils(){
+        mCachePath = BoomApplication.getInstance().getApplicationContext().getCacheDir().getPath();
+        Dogger.d(Dogger.BOOM, "cachePath: " + mCachePath, "LocalCacheUtils", "getBitmapFromLocal");
+    }
+
+    public static File getDiskCacheDir(Context context, String uniqueName) {
+        final String cachePath = Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||!isExternalStorageRemovable()
+                ? context.getExternalCacheDir().getPath()
+                : context.getCacheDir().getPath();
+
+        return new File(cachePath + File.separator + uniqueName);
+    }
+
 
     public Bitmap getBitmapFromLocal(String url) {
         String fileName;
         try {
             fileName = HashUtils.md5(url);
-            File file = new File(CACHE_PATH, fileName);
+            File file = new File(mCachePath, fileName);
             Bitmap bitmap = BitmapFactory.decodeStream(new FileInputStream(file));
             return bitmap;
         } catch (Exception e) {
-            e.printStackTrace();
+            Dogger.e(Dogger.BOOM, "", "LocalCacheUtils", "getBitmapFromLocal", e);
         }
         return null;
     }
@@ -31,7 +48,7 @@ public class LocalCacheUtils {
     public void setBitmapToLocal(String url, Bitmap bitmap) {
         try {
             String fileName = HashUtils.md5(url);
-            File file = new File(CACHE_PATH, fileName);
+            File file = new File(mCachePath, fileName);
             File parentFile = file.getParentFile();
             if (!parentFile.exists()) {
                 parentFile.mkdirs();
@@ -39,7 +56,7 @@ public class LocalCacheUtils {
 
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new FileOutputStream(file));
         } catch (Exception e) {
-            e.printStackTrace();
+            Dogger.e(Dogger.BOOM, "", "LocalCacheUtils", "setBitmapToLocal", e);
         }
 
     }

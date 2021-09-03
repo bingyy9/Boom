@@ -185,7 +185,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         try {
             mediaRecorder.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
+            Dogger.e(Dogger.BOOM, "", "MediaRecordService", "initRecorder", e);
         }
     }
 

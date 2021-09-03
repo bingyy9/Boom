@@ -83,14 +83,14 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             observableEmitter.onNext(result);
         }).observeOn(AndroidSchedulers.mainThread()).
                 subscribeOn(Schedulers.computation()).subscribe(result -> {
-            ((DiffUtil.DiffResult)result).dispatchUpdatesTo(videoListAdapter);
-            if(videoListAdapter != null && videoListAdapter.getSize() > 0){
+            if(videoListAdapter != null && videoListAdapter.getItemCount() > 0){
                 tvTip.setVisibility(View.GONE);
                 videoListView.setVisibility(View.VISIBLE);
             } else {
                 tvTip.setVisibility(View.VISIBLE);
                 videoListView.setVisibility(View.GONE);
             }
+            ((DiffUtil.DiffResult)result).dispatchUpdatesTo(videoListAdapter);
         }));
     }
 

@@ -8,6 +8,7 @@
     <string name="recent_videos">Recent Videos</string>
     <string name="recording_in_progress">Recording in progress...</string>
     <string name="video">Video</string>
+    <string name="about">About</string>
     <string name="edit_title">Edit Title</string>
     <string name="delete">Delete</string>
     <string name="file_name">File Name</string>
@@ -21,4 +22,7 @@
     <string name="no_permission_to_record">No permission to record.</string>
     <string name="no_permission_to_list_record">No permission to list record.</string>
     <string name="no_records">No records.</string>
+    <string name="version">Boom Recorder Version %1$s</string>
+    <string name="copy_rights">©%1$s Boom recorder. All rights reserved.</string>
+    <string name="contact_us">Contact Us</string>
 </resources>

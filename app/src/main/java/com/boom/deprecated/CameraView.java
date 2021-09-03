@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.boom.android.BoomApplication;
+import com.boom.android.log.Dogger;
 
 //deprecated
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
@@ -145,8 +146,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         try {
             mCamera.startPreview();
         } catch (Exception e) {
-            Log.w(LOG_TAG, "Failed to start preview: " + e.getMessage());
-
+            Dogger.i(Dogger.BOOM, "", "CameraView", "doSurfaceChanged", e);
             // Remove failed size
             mPreviewSizeList.remove(mPreviewSize);
             mPreviewSize = null;
