@@ -74,7 +74,7 @@ public class DiskLruCacheUtil {
         InputStream in = null;
         Bitmap bitmap = null;
         try {
-            String key = hashKeyForDisk(url);
+            String key = HashUtils.md5(url);
             //获取 snapshot 对象
             snapshot = diskLruCache.get(key);
             //如果为空，则需要从网络下载图片，并存入缓存
@@ -119,9 +119,22 @@ public class DiskLruCacheUtil {
                 //下载完成后，重新获取 snapshot 对象
                 snapshot = diskLruCache.get(key);
             }
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Dogger.e(Dogger.BOOM, "", "DiskLruCacheUtil", "setBitmapToLocal", e);
         } finally {
+        }
+    }
+
+    public void removeCache(String url) {
+        if(diskLruCache == null){
+            return;
+        }
+        try {
+            String key = HashUtils.md5(url);
+            key = ensureKey(key);
+            diskLruCache.remove(key);
+        } catch (Exception e) {
+            Dogger.e(Dogger.BOOM, "", "DiskLruCacheUtil", "removeBitmapFromLocal", e);
         }
     }
 
@@ -170,29 +183,5 @@ public class DiskLruCacheUtil {
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         InputStream is = new ByteArrayInputStream(baos.toByteArray());
         return is;
-    }
-
-    private String hashKeyForDisk(String url) {
-        String cacheKey;
-        try {
-            final MessageDigest digest = MessageDigest.getInstance("MD5");
-            digest.update(url.getBytes());
-            cacheKey = byteToHexString(digest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            cacheKey = String.valueOf(url.hashCode());
-        }
-        return cacheKey;
-    }
-
-    private String byteToHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
-            if (hex.length() == 1) {
-                sb.append('0');
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
     }
 }

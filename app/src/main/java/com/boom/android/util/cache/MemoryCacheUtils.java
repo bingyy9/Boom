@@ -3,6 +3,9 @@ package com.boom.android.util.cache;
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
+import com.boom.android.log.Dogger;
+import com.boom.android.util.HashUtils;
+
 import java.lang.ref.SoftReference;
 
 public class MemoryCacheUtils {
@@ -44,5 +47,9 @@ public class MemoryCacheUtils {
             mMemoryCache.put(url, new SoftReference<>(bitmap));
             */
         mMemoryCache.put(url,new SoftReference<Bitmap>(bitmap));
+    }
+
+    public void removeCache(String url) {
+        mMemoryCache.remove(url);
     }
 }

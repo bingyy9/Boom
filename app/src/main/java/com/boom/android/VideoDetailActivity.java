@@ -24,6 +24,7 @@ import com.boom.android.ui.videos.VideoDetailFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.KeybordUtils;
+import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.interf.impl.ModelBuilderManager;
 import com.boom.utils.StringUtils;
@@ -180,6 +181,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
                 if(file != null) {
                     file.delete();
                 }
+                BitmapCacheUtils.getInstance().removeCache(filePath);
                 finish();
                 break;
             case android.R.id.home:

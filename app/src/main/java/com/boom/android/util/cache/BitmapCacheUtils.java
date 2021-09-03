@@ -5,10 +5,6 @@ import android.widget.ImageView;
 
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
-import com.jakewharton.disklrucache.DiskLruCache;
-
-import java.io.File;
-import java.io.IOException;
 
 public class BitmapCacheUtils {
     private static BitmapCacheUtils mInstance;
@@ -36,7 +32,7 @@ public class BitmapCacheUtils {
         ivPic.setImageResource(R.drawable.ic_placeholder);
         Bitmap bitmap;
         //内存缓存
-        bitmap=mMemoryCacheUtils.getBitmapFromMemory(url);
+        bitmap=mMemoryCacheUtils == null? null: mMemoryCacheUtils.getBitmapFromMemory(url);
         if (bitmap!=null){
             ivPic.setImageBitmap(bitmap);
             Dogger.i(Dogger.BOOM, "Get Bitmap from memory", "BitmapUtils", "disPlay");
@@ -44,7 +40,7 @@ public class BitmapCacheUtils {
         }
 
         //本地缓存
-        bitmap = mDiskLruCacheUtil.getBitmapFromLocal(url);
+        bitmap = mDiskLruCacheUtil == null? null: mDiskLruCacheUtil.getBitmapFromLocal(url);
         if(bitmap !=null){
             ivPic.setImageBitmap(bitmap);
             Dogger.i(Dogger.BOOM, "Get bitmap from local cache", "BitmapUtils", "disPlay");
@@ -52,5 +48,16 @@ public class BitmapCacheUtils {
             return;
         }
         mNetCacheUtils.getBitmapFromNet(ivPic,url);
+    }
+
+    public void removeCache(String url) {
+        if (mMemoryCacheUtils != null) {
+            mMemoryCacheUtils.removeCache(url);
+        }
+
+        if(mDiskLruCacheUtil != null){
+            mDiskLruCacheUtil.removeCache(url);
+        }
+
     }
 }
