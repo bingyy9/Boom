@@ -74,7 +74,7 @@ public class DiskLruCacheUtil {
         InputStream in = null;
         Bitmap bitmap = null;
         try {
-            String key = HashUtils.md5(url);
+            String key = getBitmapKey(url);
             //获取 snapshot 对象
             snapshot = diskLruCache.get(key);
             //如果为空，则需要从网络下载图片，并存入缓存
@@ -99,8 +99,7 @@ public class DiskLruCacheUtil {
 
     public void setBitmapToLocal(String url, Bitmap bitmap) {
         try {
-            String key = HashUtils.md5(url);
-            key = ensureKey(key);
+            String key = getBitmapKey(url);
             //获取 snapshot 对象
             snapshot = diskLruCache.get(key);
             //如果为空，则需要从网络下载图片，并存入缓存
@@ -130,15 +129,22 @@ public class DiskLruCacheUtil {
             return;
         }
         try {
-            String key = HashUtils.md5(url);
-            key = ensureKey(key);
-            diskLruCache.remove(key);
+            diskLruCache.remove(getBitmapKey(url));
         } catch (Exception e) {
             Dogger.e(Dogger.BOOM, "", "DiskLruCacheUtil", "removeBitmapFromLocal", e);
         }
     }
 
-    private String ensureKey(String input){
+    private String getBitmapKey(String url){
+        String key = null;
+        try {
+            key = HashUtils.md5(url);
+        } catch (NoSuchAlgorithmException e) {
+            Dogger.e(Dogger.BOOM, "", "DiskLruCacheUtil", "getBitmapKey", e);
+        }
+        return trimKey(key);
+    }
+    private String trimKey(String input){
         if(StringUtils.isEmpty(input)){
             return null;
         }
