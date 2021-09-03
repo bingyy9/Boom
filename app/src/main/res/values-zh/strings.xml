@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Boom</string>
+    <string name="app_name">Boom Recorder</string>
     <string name="display_over_other_apps_fail_tip">显示在其他应用的上层，授权失败。</string>
     <string name="display_over_other_apps_request_tip">请授权显示在其他应用的上层</string>
     <string name="share_to">分享到：</string>

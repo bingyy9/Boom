@@ -13,7 +13,7 @@ import java.io.FileOutputStream;
 
 public class LocalCacheUtils {
 
-    private static final String CACHE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + BoomHelper.getApplicationName() + "/" + "Cache";
+    private static final String CACHE_PATH = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + BoomHelper.getRecorderFolder() + "/" + "Cache";
 
     public Bitmap getBitmapFromLocal(String url) {
         String fileName;

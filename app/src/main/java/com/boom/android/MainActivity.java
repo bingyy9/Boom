@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         recordScreenWithCamera = this.findViewById(R.id.record_screen_with_camera);
         stopRecord = this.findViewById(R.id.fab_stop_record);
 
-        tabs = new String[]{this.getResources().getString(R.string.my_videos), this.getResources().getString(R.string.recent_videos)};
+        tabs = new String[]{this.getResources().getString(R.string.my_videos)};
         for (int i = 0; i < tabs.length; i++) {
             tabLayout.addTab(tabLayout.newTab().setText(tabs[i]));
             if(StringUtils.contentEquals(tabs[i], getString(R.string.my_videos))){

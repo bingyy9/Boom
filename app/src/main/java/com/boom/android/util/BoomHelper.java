@@ -70,11 +70,15 @@ public class BoomHelper {
         return BoomApplication.getInstance().getApplicationContext().getResources().getString(R.string.app_name);
     }
 
+    public static String getRecorderFolder(){
+        return "Boom";
+    }
+
     public static String getRecordDirectory(){
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + "/"
-                    + BoomHelper.getApplicationName()
+                    + BoomHelper.getRecorderFolder()
                     + "/"
                     + "Record" + "/";
 

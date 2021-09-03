@@ -1,23 +1,17 @@
 package com.boom.android.ui.videos;
 
-import android.Manifest;
-import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.VideoDetailActivity;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.ui.videos.bean.VideoItemDiffCallback;
-import com.boom.android.util.BitmapUtils;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FileUtils;
@@ -28,21 +22,15 @@ import com.boom.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.internal.Utils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
