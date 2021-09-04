@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private MediaProjectionManager projectionManager;
     private MediaProjection mediaProjection;
-    private MediaRecordService recordService;
     private RecordViewModel recordViewModel;
 
     TabLayout tabLayout;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         initPermission();
         initView();
-        initService();
     }
 
     private void initView(){
@@ -160,11 +158,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         floatingMenu.setIconToggleAnimatorSet(set);
     }
 
-    private void initService(){
-        Intent intent = new Intent(this, MediaRecordService.class);
-        bindService(intent, recordServiceConnection, BIND_AUTO_CREATE);
-    }
-
     private void startRecording(){
         if (RecordHelper.isRecording() || RecordHelper.isCountDowning()) {
             NotificationUtils.showToast(this, getResources().getString(R.string.recording_in_progress));
@@ -177,8 +170,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     }
 
     private void stopRecording(){
-        if(recordService != null){
-            recordService.stopRecord();
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().stopRecord();
         }
         RecordHelper.setRecordingStop(true);
     }
@@ -215,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     protected void onDestroy() {
         super.onDestroy();
         if(this.isFinishing()) {
-            unbindService(recordServiceConnection);
         }
     }
 
@@ -224,10 +216,19 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RECORD_REQUEST_CODE && resultCode == RESULT_OK) {
             mediaProjection = projectionManager.getMediaProjection(resultCode, data);
-            recordService.setMediaProject(mediaProjection);
+            configMediaRecordService(mediaProjection);
             showCounterFloatingWindow();
         } else if(requestCode == OVERLAY_REQUEST_CODE){
             showCounterFloatingWindow();
+        }
+    }
+
+    private void configMediaRecordService(MediaProjection mediaProjection){
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().setMediaProject(mediaProjection);
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            BoomApplication.getInstance().getMediaRecordService().setConfig(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi);
         }
     }
 
@@ -235,34 +236,13 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         if (!BoomHelper.ensureDrawOverlayPermission(this)) {
             NotificationUtils.showToast(this, getString(R.string.display_over_other_apps_fail_tip));
         } else {
-            recordService.showCounterFloatingWindow();
+            if(BoomApplication.getInstance().getMediaRecordService() != null){
+                BoomApplication.getInstance().getMediaRecordService().showCounterFloatingWindow();
+            } else {
+                Dogger.i(Dogger.BOOM, "mediaRecordService is null.", "MainActivity", "showCounterFloatingWindow");
+            }
         }
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == PermissionManager.STORAGE_REQUEST_CODE || requestCode == PermissionManager.AUDIO_REQUEST_CODE) {
-//            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//                finish();
-//            }
-//        }
-//    }
-
-    private ServiceConnection recordServiceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            MediaRecordService.RecordBinder binder = (MediaRecordService.RecordBinder) service;
-            recordService = binder.getRecordService();
-            recordService.setConfig(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi);
-            updateRecordingView();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {}
-    };
 
     public native String stringFromJNI();
 
