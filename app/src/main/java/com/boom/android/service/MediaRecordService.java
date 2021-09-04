@@ -289,8 +289,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             } else {
                 counterView.setVisibility(View.GONE);
             }
-
-//                updateLayoutParamsToCounterView();
             windowManager.updateViewLayout(rootView, layoutParams);
         } else if(RecordHelper.isRecording()){
             counterView.setVisibility(View.GONE);
@@ -301,9 +299,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             }
 
             updateLayoutParamsToCameraView();
-            rootView.post(()->{
-                windowManager.updateViewLayout(rootView, layoutParams);
-            });
+            windowManager.updateViewLayout(rootView, layoutParams);
         } else {
             counterView.setVisibility(View.GONE);
             cameraView.setVisibility(View.GONE);
@@ -352,12 +348,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     public void showCameraFloatingWindow() {
-        if (rootView != null && BoomHelper.ensureDrawOverlayPermission(this)) {
-            rootView.post(()->{
-                updateView();
-                cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
-                mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
-            });
+        if (BoomHelper.ensureDrawOverlayPermission(this)) {
+            updateView();
+            cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
+            mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
         }
     }
 
@@ -445,7 +439,11 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             return;
         }
 
-        cameraView.post(()->{
+        if(mHandler == null){
+            return;
+        }
+
+        mHandler.post(()->{
             if(cameraView == null){
                 return;
             }

@@ -127,10 +127,14 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         }
         mmr.setDataSource(videoItem.absolutePath);
         String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        try{
+        if(StringUtils.isEmpty(duration)) {
+            duration = "0";
+        }
+        
+        try {
             videoItem.duration = DataUtils.msecToTime(Integer.valueOf(duration));
-        } catch (NumberFormatException e){
-            Dogger.e(Dogger.BOOM, "", "MyVideosFragment", "getVideoItemDetails", e);
+        } catch (NumberFormatException e) {
+            Dogger.e(Dogger.BOOM, "duration: " + duration, "MyVideosFragment", "getVideoItemDetails", e);
         }
 
         videoItem.width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
@@ -210,7 +214,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 //                        updateLatestVideo();
                         break;
                 }
-            }, 1500);
+            }, 500);
         }
     }
 
