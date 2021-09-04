@@ -12,7 +12,9 @@
     <string name="edit_title">Edit Title</string>
     <string name="delete">Delete</string>
     <string name="file_name">File Name</string>
-
+    <string name="file_duration">Duration: %1$s</string>
+    <string name="file_resolution">Resolution: %1$s*%2$s</string>
+    <string name="file_size">Size: %1$s</string>
     <string name="share_your_video">Share your video</string>
     <string name="share_to">Share To</string>
 

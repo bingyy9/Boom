@@ -25,8 +25,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.MODIFIED_TIME_UPDATED;
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.DURATION_UPDATED;
 import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.NAME_UPDATED;
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.RESOLUTION_HEIGHT;
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.RESOLUTION_WIDTH;
+import static com.boom.android.ui.videos.bean.VideoItemDiffCallback.SIZE_UPDATED;
 
 public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -71,8 +74,25 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         ItemVH viewHolder = (ItemVH) holder;
         viewHolder.tvName.setText(videoItem.name.replace(BoomHelper.filePostfix, ""));
-        if(!StringUtils.isEmpty(videoItem.lastModified)){
-            viewHolder.tvLastModified.setText(videoItem.lastModified);
+        if(!StringUtils.isEmpty(videoItem.size)){
+            viewHolder.tvSize.setVisibility(View.VISIBLE);
+            viewHolder.tvSize.setText(mContext.getResources().getString(R.string.file_size, videoItem.size));
+        } else {
+            viewHolder.tvSize.setVisibility(View.GONE);
+        }
+
+        if(!StringUtils.isEmpty(videoItem.duration)){
+            viewHolder.tvDuration.setVisibility(View.VISIBLE);
+            viewHolder.tvDuration.setText(mContext.getResources().getString(R.string.file_duration, videoItem.duration));
+        } else {
+            viewHolder.tvDuration.setVisibility(View.GONE);
+        }
+
+        if(StringUtils.isEmpty(videoItem.width) || StringUtils.isEmpty(videoItem.height)){
+            viewHolder.tvResolution.setVisibility(View.GONE);
+        } else {
+            viewHolder.tvResolution.setVisibility(View.VISIBLE);
+            viewHolder.tvResolution.setText(mContext.getResources().getString(R.string.file_resolution, videoItem.width, videoItem.height));
         }
 
         BitmapCacheUtils.getInstance().display(viewHolder.iFrame, videoItem.absolutePath);
@@ -102,9 +122,19 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                                 String name = bundle.getString(NAME_UPDATED);
                                 viewHolder.tvName.setText(name);
                                 break;
-                            case MODIFIED_TIME_UPDATED:
-                                long time = bundle.getLong(MODIFIED_TIME_UPDATED);
-                                viewHolder.tvLastModified.setText(DataUtils.formatDate(time));
+                            case DURATION_UPDATED:
+                                String duration = bundle.getString(DURATION_UPDATED);
+                                viewHolder.tvDuration.setText(mContext.getResources().getString(R.string.file_duration, duration));
+                                break;
+                            case SIZE_UPDATED:
+                                String size = bundle.getString(SIZE_UPDATED);
+                                viewHolder.tvSize.setText(mContext.getResources().getString(R.string.file_size, size));
+                                break;
+                            case RESOLUTION_WIDTH:
+                            case RESOLUTION_HEIGHT:
+                                String width = bundle.getString(RESOLUTION_WIDTH);
+                                String height = bundle.getString(RESOLUTION_HEIGHT);
+                                viewHolder.tvResolution.setText(mContext.getResources().getString(R.string.file_resolution, width, height));
                                 break;
                         }
                     }
@@ -122,8 +152,12 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     protected class ItemVH extends RecyclerView.ViewHolder{
         @BindView(R.id.card_view)
         CardView cardView;
-        @BindView(R.id.tv_last_modified_time)
-        TextView tvLastModified;
+        @BindView(R.id.tv_duration)
+        TextView tvDuration;
+        @BindView(R.id.tv_size)
+        TextView tvSize;
+        @BindView(R.id.tv_resolution)
+        TextView tvResolution;
         @BindView(R.id.tv_name)
         TextView tvName;
         @BindView(R.id.i_frame)

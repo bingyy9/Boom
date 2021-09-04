@@ -1,5 +1,6 @@
 package com.boom.android.ui.videos;
 
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.ui.videos.bean.VideoItemDiffCallback;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
+import com.boom.android.util.FileSizeUtils;
 import com.boom.android.util.FileUtils;
 import com.boom.android.util.RecordHelper;
 import com.boom.model.interf.IRecordModel;
@@ -71,7 +73,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         videoListView.setAdapter(videoListAdapter);
     }
 
-    private void updateView(){
+    private void updateView(boolean scrollToTop){
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "updateView");
         compositeDisposable.add(Observable.create(observableEmitter -> {
             List<VideoItem> videoItems = buildVideoItems();
@@ -91,6 +93,9 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
                 videoListView.setVisibility(View.GONE);
             }
             ((DiffUtil.DiffResult)result).dispatchUpdatesTo(videoListAdapter);
+            if(scrollToTop && videoListView != null){
+                videoListView.scrollToPosition(0);
+            }
         }));
     }
 
@@ -101,13 +106,43 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             if(!file.exists()){
                 continue;
             }
-            items.add(new VideoItem(file.getName())
-                    .setLastModified(DataUtils.formatDate(file.lastModified()))
-                    .setLastModifyTime(file.lastModified())
-                    .setAbsolutePath(file.getAbsolutePath()));
+
+            VideoItem videoItem = new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath());
+            getVideoItemDetails(videoItem);
+            getFileSize(videoItem);
+            items.add(videoItem);
         }
 
         return items;
+    }
+
+    private void getVideoItemDetails(VideoItem videoItem){
+        if(videoItem == null){
+            return;
+        }
+
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        if(mmr == null){
+            return;
+        }
+        mmr.setDataSource(videoItem.absolutePath);
+        String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        try{
+            videoItem.duration = DataUtils.msecToTime(Integer.valueOf(duration));
+        } catch (NumberFormatException e){
+            Dogger.e(Dogger.BOOM, "", "MyVideosFragment", "getVideoItemDetails", e);
+        }
+
+        videoItem.width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+        videoItem.height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+    }
+
+    private void getFileSize(VideoItem videoItem){
+        if(videoItem == null){
+            return;
+        }
+
+        videoItem.size = FileSizeUtils.getAutoFileOrFilesSize(videoItem.absolutePath);
     }
 
     @Override
@@ -120,7 +155,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "onResume");
         super.onResume();
         RecordHelper.registerRecordEventListner(this);
-        updateView();
+        updateView(false);
     }
 
     @Override
@@ -170,14 +205,11 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             mHandler.postDelayed(()->{
                 switch (evt.getType()) {
                     case RecordEvent.RECORD_STOPPED:
-                        updateView();
-                        if(videoListView != null) {
-                            videoListView.scrollToPosition(0);
-                        }
+                        updateView(true);
 //                        updateLatestVideo();
                         break;
                 }
-            }, 1000);
+            }, 1500);
         }
     }
 
@@ -198,11 +230,11 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
                 if(item != null && StringUtils.contentEquals(item.name, file.getName())){
                     Dogger.i(Dogger.BOOM, "notifyItemChanged", "MyVideosFragment", "updateLatestVideo");
                     items.remove(0);
-                    items.add(0, new VideoItem(file.getName()).setLastModified(DataUtils.formatDate(file.lastModified())).setLastModifyTime(file.lastModified()).setAbsolutePath(file.getAbsolutePath()));
+                    items.add(0, new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
                     videoListAdapter.notifyItemChanged(0);
                 } else if(item != null && !StringUtils.contentEquals(item.name, file.getName())){
                     Dogger.i(Dogger.BOOM, "notifyItemInserted", "MyVideosFragment", "updateLatestVideo");
-                    items.add(new VideoItem(file.getName()).setLastModified(DataUtils.formatDate(file.lastModified())).setLastModifyTime(file.lastModified()).setAbsolutePath(file.getAbsolutePath()));
+                    items.add(new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
                     videoListAdapter.notifyItemInserted(0);
                 }
             }

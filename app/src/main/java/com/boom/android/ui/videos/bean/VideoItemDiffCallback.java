@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.DiffUtil;
 
 public class VideoItemDiffCallback extends DiffUtil.Callback {
     public static final String NAME_UPDATED = "NAME_UPDATED";
-    public static final String MODIFIED_TIME_UPDATED = "MODIFIED_TIME_UPDATED";
+    public static final String DURATION_UPDATED = "DURATION_UPDATED";
+    public static final String RESOLUTION_WIDTH = "RESOLUTION_WIDTH";
+    public static final String RESOLUTION_HEIGHT = "RESOLUTION_HEIGHT";
+    public static final String SIZE_UPDATED = "SIZE_UPDATED";
 
     private List<VideoItem> current;
     private List<VideoItem> next;
@@ -69,8 +72,20 @@ public class VideoItemDiffCallback extends DiffUtil.Callback {
         }
 
         if((currentItem != null && nextItem !=null)
-                && currentItem.lastModifyTime != nextItem.lastModifyTime){
-            bundle.putLong(MODIFIED_TIME_UPDATED, nextItem.lastModifyTime);
+                && currentItem.duration != nextItem.duration){
+            bundle.putString(DURATION_UPDATED, nextItem.duration);
+        }
+
+        if((currentItem != null && nextItem !=null)
+                && (currentItem.width != nextItem.width
+                    || currentItem.height != nextItem.height)){
+            bundle.putString(RESOLUTION_HEIGHT, nextItem.height);
+            bundle.putString(RESOLUTION_WIDTH, nextItem.width);
+        }
+
+        if((currentItem != null && nextItem !=null)
+                && currentItem.size != nextItem.size){
+            bundle.putString(SIZE_UPDATED, nextItem.size);
         }
 
         return bundle;

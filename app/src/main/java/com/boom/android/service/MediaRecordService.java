@@ -32,6 +32,7 @@ import com.boom.android.MainActivity;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
+import com.boom.android.util.DataUtils;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.util.WindowUtils;
 import com.boom.camera.CameraHelper;
@@ -176,7 +177,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setOutputFile(BoomHelper.getRecordDirectory() + System.currentTimeMillis() + ".mp4");
+        mediaRecorder.setOutputFile(BoomHelper.getRecordDirectory() + DataUtils.formatDate4RecordDefaultName(System.currentTimeMillis()) + ".mp4");
         mediaRecorder.setVideoSize(width, height);
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
