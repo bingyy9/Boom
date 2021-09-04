@@ -2,40 +2,15 @@ package com.boom.android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.boom.android.log.Dogger;
-import com.boom.android.ui.videos.VideoDetailFragment;
 import com.boom.android.util.AndroidVersionManager;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
-import com.boom.android.util.KeybordUtils;
-import com.boom.model.interf.IRecordModel;
-import com.boom.model.interf.impl.ModelBuilderManager;
-import com.boom.utils.StringUtils;
-import com.universalvideoview.UniversalMediaController;
-import com.universalvideoview.UniversalVideoView;
 
-import java.io.File;
-import java.util.ArrayList;
-
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.FileProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 

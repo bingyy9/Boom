@@ -1,5 +1,6 @@
 package com.boom.android;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -15,15 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boom.android.log.Dogger;
-import com.boom.android.ui.videos.VideoDetailFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.KeybordUtils;
+import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.interf.impl.ModelBuilderManager;
@@ -43,6 +43,8 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     private static final String TAG = "VideoDetailActivity";
     private static final String FILENAME = "FILE_NAME";
     private static final String SEEK_POSITION_KEY = "SEEK_POSITION_KEY";
+
+    private static final int SHREA_REQUEST_CODE = 1;
     private IRecordModel recordModel;
 
     View root;
@@ -71,7 +73,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     public static void start(Context context, String filename) {
         Intent intent = new Intent(context, VideoDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        intent.putExtra(VideoDetailFragment.FILENAME, filename);
+        intent.putExtra(FILENAME, filename);
         context.startActivity(intent);
     }
 
@@ -286,21 +288,33 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     }
 
     private void shareFile(){
-//        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-//        shareIntent.putExtra(Intent.EXTRA_STREAM,
-//        Uri.fromFile(new File(filePath)));
-//        shareIntent.setType("video/*");//此处可发送多种文件
-//        startActivity(Intent.createChooser(shareIntent, this.getResources().getString(R.string.share_to)));
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Intent intent = new Intent(Intent.ACTION_SEND);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             Uri contentUri = FileProvider.getUriForFile(BoomApplication.getInstance().getApplicationContext()
                     , BuildConfig.APPLICATION_ID + ".fileProvider", file);
-            intent.setDataAndType(contentUri, "video/mp4");
+
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
+            intent.putExtra(Intent.EXTRA_SUBJECT, "MyApp File Share: " + file.getName());
+            intent.putExtra(Intent.EXTRA_TEXT, "MyApp File Share: " + file.getName());
+            intent.setDataAndType(contentUri, getContentResolver().getType(contentUri));
         } else {
             intent.setDataAndType(Uri.fromFile(file), "video/mp4");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
-        startActivity(intent);
+
+        this.startActivityForResult(Intent.createChooser(intent, file.getName()), SHREA_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SHREA_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+//                NotificationUtils.showToast(this, getResources().getString(R.string.share_success));
+            } else  {
+//                NotificationUtils.showToast(this, getResources().getString(R.string.share_fail));
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@
      <external-files-path/>代表的根目录:Context.getExternalFilesDir(null)
      更多类型参考：https://blog.csdn.net/Next_Second/article/details/78585745
      -->
+    <files-path name="files" path="." />
     <external-path
         name="external_files"
         path="." />

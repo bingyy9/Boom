@@ -25,4 +25,6 @@
     <string name="version">Boom Recorder Version %1$s</string>
     <string name="copy_rights">©%1$s Boom recorder. All rights reserved.</string>
     <string name="contact_us">Contact Us</string>
+    <string name="share_success">Share successfully.</string>
+    <string name="share_fail">Share failed.</string>
 </resources>
