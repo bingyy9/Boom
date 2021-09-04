@@ -214,7 +214,9 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(recordServiceConnection);
+        if(this.isFinishing()) {
+            unbindService(recordServiceConnection);
+        }
     }
 
     @Override

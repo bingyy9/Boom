@@ -16,6 +16,7 @@ import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.view.GestureDetector;
@@ -50,6 +51,7 @@ import java.util.TimerTask;
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
         , CameraListener
         , IRecordModel.RecordEvtListener {
+    private Handler mHandler;
     private MediaProjection mediaProjection;
     private MediaRecorder mediaRecorder;
     private VirtualDisplay virtualDisplay;
@@ -72,6 +74,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private static final int CAMERA_ID = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera.Size previewSize;
     private GestureDetector mGestureDetector;
+    private boolean isAddedRootView;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -87,6 +90,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     @Override
     public void onCreate() {
         super.onCreate();
+        mHandler = new Handler();
         HandlerThread serviceThread = new HandlerThread("service_thread",
                 android.os.Process.THREAD_PRIORITY_BACKGROUND);
         RecordHelper.registerRecordEventListner(this);
@@ -108,6 +112,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         rootView.setOnTouchListener(new FloatingOnTouchListener());
         counterView = rootView.findViewById(R.id.iv_counter);
         cameraView = rootView.findViewById(R.id.texture_preview);
+        isAddedRootView = false;
     }
 
     @Override
@@ -163,7 +168,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             cameraHelper.release();
         }
 
-        if(windowManager != null){
+        if(windowManager != null && isAddedRootView){
             windowManager.removeView(rootView);
         }
     }
@@ -225,48 +230,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
 
-    private void updateView(){
-        if(rootView == null){
-            return;
-        }
-        rootView.post(()->{
-            if(RecordHelper.isCountDowning()) {
-                if (counterView == null) {
-                    return;
-                }
-                counterView.setVisibility(View.VISIBLE);
-                cameraView.setVisibility(View.GONE);
-                if (mCounter == 3) {
-                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
-                } else if (mCounter == 2) {
-                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
-                } else if (mCounter == 1) {
-                    counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
-                } else {
-                    counterView.setVisibility(View.GONE);
-                }
-
-//                updateLayoutParamsToCounterView();
-                windowManager.updateViewLayout(rootView, layoutParams);
-            } else if(RecordHelper.isRecording()){
-                counterView.setVisibility(View.GONE);
-                if(RecordHelper.isRecordCamera()){
-                    cameraView.setVisibility(View.VISIBLE);
-                } else {
-                    cameraView.setVisibility(View.GONE);
-                }
-
-                updateLayoutParamsToCameraView();
-                rootView.post(()->{
-                    windowManager.updateViewLayout(rootView, layoutParams);
-                });
-            } else {
-                counterView.setVisibility(View.GONE);
-                cameraView.setVisibility(View.GONE);
-            }
-        });
-    }
-
     private void stopTimer(){
         if (mCounterTimer != null) {
             mCounterTimer.cancel();
@@ -281,17 +244,69 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             mCounterTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    if(mCounter > 1){
-                        mCounter--;
-                        updateView();
-                    } else {
-                        updateView();
-                        mCounter = INIT_COUNT_DOWN;
-                        stopTimer();
-                        startRecord();
-                    }
+                    updateTimer();
                 }
             }, 1000, 1000);
+        }
+    }
+
+    private void updateTimer(){
+        if(mCounter > 1){
+            mCounter--;
+            if(mHandler != null) {
+                mHandler.post(() -> {
+                    updateView();
+                });
+            }
+        } else {
+            mCounter = INIT_COUNT_DOWN;
+            stopTimer();
+            if(mHandler != null) {
+                mHandler.post(() -> {
+                    updateView();
+                    startRecord();
+                });
+            }
+        }
+    }
+
+    private void updateView(){
+        if(rootView == null){
+            return;
+        }
+        if(RecordHelper.isCountDowning()) {
+            if (counterView == null) {
+                return;
+            }
+            counterView.setVisibility(View.VISIBLE);
+            cameraView.setVisibility(View.GONE);
+            if (mCounter == 3) {
+                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
+            } else if (mCounter == 2) {
+                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
+            } else if (mCounter == 1) {
+                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
+            } else {
+                counterView.setVisibility(View.GONE);
+            }
+
+//                updateLayoutParamsToCounterView();
+            windowManager.updateViewLayout(rootView, layoutParams);
+        } else if(RecordHelper.isRecording()){
+            counterView.setVisibility(View.GONE);
+            if(RecordHelper.isRecordCamera()){
+                cameraView.setVisibility(View.VISIBLE);
+            } else {
+                cameraView.setVisibility(View.GONE);
+            }
+
+            updateLayoutParamsToCameraView();
+            rootView.post(()->{
+                windowManager.updateViewLayout(rootView, layoutParams);
+            });
+        } else {
+            counterView.setVisibility(View.GONE);
+            cameraView.setVisibility(View.GONE);
         }
     }
 
@@ -304,6 +319,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             RecordHelper.setCountDowning(true);
 
             updateLayoutParamsToCounterView();
+            isAddedRootView = true;
             windowManager.addView(rootView, layoutParams);
             mCounter = INIT_COUNT_DOWN;
             startTimer();
