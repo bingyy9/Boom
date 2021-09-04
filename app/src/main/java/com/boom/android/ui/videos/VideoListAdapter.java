@@ -46,7 +46,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public interface AdapterListener {
-        void onRecycleItemSelected(String name);
+        void onRecycleItemSelected(String name, String size, String resolution, String duration);
     }
 
     public void setDataList(List<VideoItem> items){
@@ -99,7 +99,10 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         viewHolder.cardView.setOnClickListener((View v)->{
             if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {
-                adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString());
+                adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString()
+                    , viewHolder.tvSize.getText().toString()
+                    , viewHolder.tvResolution.getText().toString()
+                    , viewHolder.tvDuration.getText().toString());
             }
         });
     }

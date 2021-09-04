@@ -174,13 +174,14 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     }
 
     @Override
-    public void onRecycleItemSelected(String name) {
+    public void onRecycleItemSelected(String name, String size, String resolution, String duration) {
         Dogger.i(Dogger.BOOM, "name: " + name, "MyVideosFragment", "onRecycleItemSelected");
         if(getActivity() == null){
             return;
         }
 
-        VideoDetailActivity.start(getActivity(), name + BoomHelper.filePostfix);
+        VideoDetailActivity.start(getActivity(), name + BoomHelper.filePostfix
+            , size, resolution, duration);
 
 //        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
 //        if(supportFragmentManager == null){

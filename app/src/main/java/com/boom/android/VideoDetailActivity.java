@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.KeybordUtils;
@@ -41,7 +42,10 @@ import butterknife.ButterKnife;
 
 public class VideoDetailActivity extends AppCompatActivity implements UniversalVideoView.VideoViewCallback {
     private static final String TAG = "VideoDetailActivity";
-    private static final String FILENAME = "FILE_NAME";
+    private static final String FILE_NAME = "FILE_NAME";
+    private static final String FILE_SIZE = "FILE_SIZE";
+    private static final String FILE_RESOLUTION = "FILE_RESOLUTION";
+    private static final String FILE_DURATION = "FILE_DURATION";
     private static final String SEEK_POSITION_KEY = "SEEK_POSITION_KEY";
 
     private static final int SHREA_REQUEST_CODE = 1;
@@ -50,8 +54,12 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     View root;
     @BindView(R.id.ed_name)
     EditText editName;
-    @BindView(R.id.tv_last_modified_time)
-    TextView tvLastModified;
+    @BindView(R.id.tv_duration)
+    TextView tvDuration;
+    @BindView(R.id.tv_resolution)
+    TextView tvResolution;
+    @BindView(R.id.tv_size)
+    TextView tvSize;
     @BindView(R.id.share_video)
     TextView shareVideo;
     @BindView(R.id.video_layout)
@@ -69,11 +77,14 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     private boolean isFullscreen;
     private Drawable editTextBackground;
 
-
-    public static void start(Context context, String filename) {
+    public static void start(Context context, String filename
+        , String size, String resolution, String duration) {
         Intent intent = new Intent(context, VideoDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        intent.putExtra(FILENAME, filename);
+        intent.putExtra(FILE_NAME, filename);
+        intent.putExtra(FILE_RESOLUTION, resolution);
+        intent.putExtra(FILE_SIZE, size);
+        intent.putExtra(FILE_DURATION, duration);
         context.startActivity(intent);
     }
 
@@ -87,7 +98,10 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     }
 
     private void initView() {
-        fileName = getIntent() == null ? null : getIntent().getStringExtra(FILENAME);
+        if(getIntent() == null){
+            return;
+        }
+        fileName = getIntent().getStringExtra(FILE_NAME);
         if (StringUtils.isEmpty(fileName)) {
             Dogger.i(Dogger.BOOM, "file name is null", "VideoDetailActivity", "initView");
             finish();
@@ -114,9 +128,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             return true;
         });
 
-        tvLastModified.setText(DataUtils.formatDate(file.lastModified()));
         filePath = file.getAbsolutePath();
-
         mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
         mVideoView.setVideoViewCallback(this);
@@ -124,6 +136,10 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         shareVideo.setOnClickListener((v)->{
             shareFile();
         });
+
+        tvDuration.setText(getIntent().getStringExtra(FILE_DURATION));
+        tvResolution.setText(getIntent().getStringExtra(FILE_RESOLUTION));
+        tvSize.setText(getIntent().getStringExtra(FILE_SIZE));
     }
 
     private void updateEditTextEnable(boolean enable){
@@ -242,7 +258,9 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         ActionBar supportActionBar = getSupportActionBar();
         if(isFullscreen){
             editName.setVisibility(View.GONE);
-            tvLastModified.setVisibility(View.GONE);
+            tvDuration.setVisibility(View.GONE);
+            tvSize.setVisibility(View.GONE);
+            tvResolution.setVisibility(View.GONE);
             shareVideo.setVisibility(View.GONE);
 
             if(supportActionBar != null){
@@ -250,7 +268,9 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             }
         } else {
             editName.setVisibility(View.VISIBLE);
-            tvLastModified.setVisibility(View.VISIBLE);
+            tvSize.setVisibility(View.VISIBLE);
+            tvResolution.setVisibility(View.VISIBLE);
+            tvDuration.setVisibility(View.VISIBLE);
             shareVideo.setVisibility(View.VISIBLE);
             if(supportActionBar != null){
                 supportActionBar.show();
