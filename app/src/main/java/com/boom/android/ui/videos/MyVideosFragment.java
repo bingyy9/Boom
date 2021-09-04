@@ -130,7 +130,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         if(StringUtils.isEmpty(duration)) {
             duration = "0";
         }
-        
+
         try {
             videoItem.duration = DataUtils.msecToTime(Integer.valueOf(duration));
         } catch (NumberFormatException e) {

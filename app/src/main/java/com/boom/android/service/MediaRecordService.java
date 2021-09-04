@@ -91,10 +91,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     public void onCreate() {
         super.onCreate();
         mHandler = new Handler();
-        HandlerThread serviceThread = new HandlerThread("service_thread",
-                android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//        HandlerThread serviceThread = new HandlerThread("service_thread",
+//                android.os.Process.THREAD_PRIORITY_BACKGROUND);
         RecordHelper.registerRecordEventListner(this);
-        serviceThread.start();
+//        serviceThread.start();
         RecordHelper.setRecording(false);
         mediaRecorder = new MediaRecorder();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
