@@ -12,7 +12,6 @@ import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.util.BoomHelper;
-import com.boom.android.util.DataUtils;
 import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.utils.StringUtils;
 

@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
@@ -38,10 +39,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-public class MyVideosFragment extends Fragment implements VideoListAdapter.AdapterListener, IRecordModel.RecordEvtListener {
+public class MyVideosFragment extends Fragment implements VideoListAdapter.AdapterListener
+        , IRecordModel.RecordEvtListener, SwipeRefreshLayout.OnRefreshListener {
     View root;
     @BindView(R.id.video_list)
     RecyclerView videoListView;
+    @BindView(R.id.swipeLayout)
+    SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.tv_tip)
     TextView tvTip;
     VideoListAdapter videoListAdapter;
@@ -71,7 +75,12 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         videoListAdapter.setListener(this);
         videoListView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
         videoListView.setAdapter(videoListAdapter);
+
+        swipeRefreshLayout.setColorSchemeResources(R.color.blue_normal);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
+
+
 
     private void updateView(boolean scrollToTop){
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "updateView");
@@ -95,6 +104,9 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             ((DiffUtil.DiffResult)result).dispatchUpdatesTo(videoListAdapter);
             if(scrollToTop && videoListView != null){
                 videoListView.scrollToPosition(0);
+            }
+            if(swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()){
+                swipeRefreshLayout.setRefreshing(false);
             }
         }));
     }
@@ -247,5 +259,11 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
                 videoListView.scrollToPosition(0);
             }
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(true);
+        updateView(false);
     }
 }
