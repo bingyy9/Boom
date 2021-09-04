@@ -17,7 +17,6 @@ import android.media.projection.MediaProjection;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -106,7 +105,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         }
         layoutParams.format = PixelFormat.RGBA_8888;
         layoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-
+        disableLayoutParamsAnimations();
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         rootView = layoutInflater.inflate(R.layout.floating_display, null);
         rootView.setOnTouchListener(new FloatingOnTouchListener());
@@ -139,10 +138,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         RecordHelper.setRecording(true);
 
         //updateView
+        updateView();
         if(RecordHelper.isRecordCamera()){
             showCameraFloatingWindow();
-        } else {
-            updateView();
         }
 
         initRecorder();
@@ -152,6 +150,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     public void stopRecord() {
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "stopRecord");
         if (!RecordHelper.isRecording()) {
             return;
         }
@@ -179,16 +178,20 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     private void initRecorder() {
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        mediaRecorder.setOutputFile(BoomHelper.getRecordDirectory() + DataUtils.formatDate4RecordDefaultName(System.currentTimeMillis()) + ".mp4");
-        mediaRecorder.setVideoSize(width, height);
-        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
-        mediaRecorder.setVideoFrameRate(30);
         try {
+            //TODO: pending to address below exception based on referer other github record screen
+//            java.lang.RuntimeException: setAudioSource failed.
+//            at android.media.MediaRecorder.setAudioSource(Native Method)
+            mediaRecorder.reset();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setOutputFile(BoomHelper.getRecordDirectory() + DataUtils.formatDate4RecordDefaultName(System.currentTimeMillis()) + ".mp4");
+            mediaRecorder.setVideoSize(width, height);
+            mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
+            mediaRecorder.setVideoFrameRate(30);
             mediaRecorder.prepare();
         } catch (IOException e) {
             Dogger.e(Dogger.BOOM, "", "MediaRecordService", "initRecorder", e);
@@ -261,6 +264,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         } else {
             mCounter = INIT_COUNT_DOWN;
             stopTimer();
+            RecordHelper.setCountDowning(false);
             if(mHandler != null) {
                 mHandler.post(() -> {
                     updateView();
@@ -278,19 +282,22 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             if (counterView == null) {
                 return;
             }
-            counterView.setVisibility(View.VISIBLE);
+
             cameraView.setVisibility(View.GONE);
             if (mCounter == 3) {
+                counterView.setVisibility(View.VISIBLE);
                 counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
             } else if (mCounter == 2) {
+                counterView.setVisibility(View.VISIBLE);
                 counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
             } else if (mCounter == 1) {
+                counterView.setVisibility(View.VISIBLE);
                 counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
             } else {
                 counterView.setVisibility(View.GONE);
             }
-            windowManager.updateViewLayout(rootView, layoutParams);
-        } else if(RecordHelper.isRecording()){
+//            windowManager.updateViewLayout(rootView, layoutParams);
+        } else if(RecordHelper.isRecording() ){
             counterView.setVisibility(View.GONE);
             if(RecordHelper.isRecordCamera()){
                 cameraView.setVisibility(View.VISIBLE);
@@ -349,7 +356,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
     public void showCameraFloatingWindow() {
         if (BoomHelper.ensureDrawOverlayPermission(this)) {
-            updateView();
             cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
             mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
         }
@@ -464,6 +470,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
     @Override
     public void onGlobalLayout() {
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onGlobalLayout");
         cameraView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         ViewGroup.LayoutParams layoutParams = cameraView.getLayoutParams();
         int sideLength = Math.min(cameraView.getWidth(), cameraView.getHeight());
@@ -508,6 +515,15 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                 break;
             case RecordEvent.RECORD_READY_TO_RECORD:
                 break;
+        }
+    }
+
+    private void disableLayoutParamsAnimations() {
+        try {
+            int currentFlags = (Integer) layoutParams.getClass().getField("privateFlags").get(layoutParams);
+            layoutParams.getClass().getField("privateFlags").set(layoutParams, currentFlags|0x00000040);
+        } catch (Exception e) {
+            Dogger.e(Dogger.BOOM, "", "MediaRecordService", "disableAnimations", e);
         }
     }
 }

@@ -1,27 +1,23 @@
 package com.boom.android.util.cache;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
 import com.boom.android.log.Dogger;
-import com.boom.android.util.BitmapUtils;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Hashtable;
 
 public class NetCacheUtils {
 //    private LocalCacheUtils mLocalCacheUtils;
     private MemoryCacheUtils mMemoryCacheUtils;
     private DiskLruCacheUtil mDiskLruCacheUtil;
+    private MediaMetadataRetriever mediaMetadataRetriever;
 
     public NetCacheUtils(DiskLruCacheUtil diskLruCacheUtil, MemoryCacheUtils memoryCacheUtils) {
         mDiskLruCacheUtil = diskLruCacheUtil;
         mMemoryCacheUtils = memoryCacheUtils;
+        mediaMetadataRetriever = new MediaMetadataRetriever();
     }
 
     public void getBitmapFromNet(ImageView ivPic, String url) {
@@ -54,6 +50,8 @@ public class NetCacheUtils {
                 mDiskLruCacheUtil.setBitmapToLocal(url, result);
                 //保存至内存中
                 mMemoryCacheUtils.setBitmapToMemory(url, result);
+            } else {
+                Dogger.e(Dogger.BOOM, "Get bitmap from network null, url" + url, "BitmapTask", "onPostExecute");
             }
         }
     }
@@ -63,24 +61,24 @@ public class NetCacheUtils {
     }
 
     public Bitmap createVideoThumbnail(String filePath) {
+        mediaMetadataRetriever = new MediaMetadataRetriever();
         Bitmap bitmap = null;
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         try {
             if (filePath.startsWith("http://") || filePath.startsWith("https://") || filePath.startsWith("widevine://")) {
-                retriever.setDataSource(filePath, new Hashtable<String, String>());
+                mediaMetadataRetriever.setDataSource(filePath, new Hashtable<String, String>());
             } else {
-                retriever.setDataSource(filePath);
+                mediaMetadataRetriever.setDataSource(filePath);
             }
-            bitmap = retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC); //retriever.getFrameAtTime(-1);
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
+            bitmap = mediaMetadataRetriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC); //retriever.getFrameAtTime(-1);
+        } catch (Exception ex) {
+            Dogger.e(Dogger.BOOM, "", "NetCacheUtils", "createVideoThumbnail", ex);
         } finally {
             try {
-                retriever.release();
+                if(mediaMetadataRetriever != null) {
+                    mediaMetadataRetriever.release();
+                }
             } catch (RuntimeException ex) {
-                ex.printStackTrace();
+                Dogger.e(Dogger.BOOM, "", "NetCacheUtils", "createVideoThumbnail", ex);
             }
         }
 

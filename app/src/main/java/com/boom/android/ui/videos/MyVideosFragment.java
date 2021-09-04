@@ -52,6 +52,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 
     Handler mHandler = new Handler();
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    MediaMetadataRetriever mediaMetadataRetriever;
 
     public static MyVideosFragment newInstance(String label) {
         Bundle args = new Bundle();
@@ -66,6 +67,7 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.my_videos_tab, container, false);
         ButterKnife.bind(this,root);
+        mediaMetadataRetriever = new MediaMetadataRetriever();
         initView();
         return root;
     }
@@ -83,6 +85,9 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 
 
     private void updateView(boolean scrollToTop){
+        if(swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "updateView");
         compositeDisposable.add(Observable.create(observableEmitter -> {
             List<VideoItem> videoItems = buildVideoItems();
@@ -105,6 +110,8 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             if(scrollToTop && videoListView != null){
                 videoListView.scrollToPosition(0);
             }
+            videoListAdapter.notifyItemChanged(0);
+            videoListAdapter.notifyItemChanged(1);
             if(swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()){
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -133,24 +140,33 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             return;
         }
 
-        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        if(mmr == null){
-            return;
-        }
-        mmr.setDataSource(videoItem.absolutePath);
-        String duration = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        if(StringUtils.isEmpty(duration)) {
-            duration = "0";
-        }
-
+        mediaMetadataRetriever = new MediaMetadataRetriever();
         try {
-            videoItem.duration = DataUtils.msecToTime(Integer.valueOf(duration));
-        } catch (NumberFormatException e) {
-            Dogger.e(Dogger.BOOM, "duration: " + duration, "MyVideosFragment", "getVideoItemDetails", e);
-        }
+            mediaMetadataRetriever.setDataSource(videoItem.absolutePath);
+            String duration = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            if (StringUtils.isEmpty(duration)) {
+                videoItem.duration = null;
+            } else {
+                try {
+                    videoItem.duration = DataUtils.msecToTime(Integer.valueOf(duration));
+                } catch (NumberFormatException e) {
+                    Dogger.e(Dogger.BOOM, "duration: " + duration, "MyVideosFragment", "getVideoItemDetails", e);
+                }
+            }
 
-        videoItem.width = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-        videoItem.height = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+            videoItem.width = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+            videoItem.height = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+        } catch (Exception e){
+            Dogger.e(Dogger.BOOM, "videItem : " + videoItem.absolutePath, "MyVideosFragment", "getVideoItemDetails", e);
+        } finally {
+            try {
+                if(mediaMetadataRetriever != null) {
+                    mediaMetadataRetriever.release();
+                }
+            } catch (RuntimeException ex) {
+                Dogger.e(Dogger.BOOM, "", "NetCacheUtils", "createVideoThumbnail", ex);
+            }
+        }
     }
 
     private void getFileSize(VideoItem videoItem){

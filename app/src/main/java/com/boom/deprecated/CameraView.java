@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
@@ -153,7 +154,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
             // Reconfigure
             if (mPreviewSizeList.size() > 0) { // prevent infinite loop
-                surfaceChanged(null, 0, width, height);
+                surfaceChanged(null, PixelFormat.RGBA_8888, width, height);
             } else {
                 Toast.makeText(mContext, "Can't start preview", Toast.LENGTH_LONG).show();
                 Log.w(LOG_TAG, "Gave up starting preview");

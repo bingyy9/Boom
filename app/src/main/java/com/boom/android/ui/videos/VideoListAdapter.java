@@ -119,6 +119,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 Bundle bundle = (Bundle) payloads.get(0);
                 if(bundle != null) {
                     for(String key: bundle.keySet()){
+                        Dogger.i(Dogger.BOOM, "position: " + position + " key: " + key, "VideoListAdapter", "onBindViewHolder");
                         switch (key){
                             case NAME_UPDATED:
                                 String name = bundle.getString(NAME_UPDATED);
@@ -137,6 +138,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                                 String width = bundle.getString(RESOLUTION_WIDTH);
                                 String height = bundle.getString(RESOLUTION_HEIGHT);
                                 viewHolder.tvResolution.setText(mContext.getResources().getString(R.string.file_resolution, width, height));
+                                viewHolder.tvResolution.setVisibility(View.VISIBLE);
                                 break;
                         }
                     }

@@ -1,6 +1,6 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Boom Recorder</string>
-    <string name="start_record">Start Recording</string>
+    <string name="start_record" tools:ignore="MissingTranslation">Start Recording</string>
     <string name="stop_record">Stop Recording</string>
     <string name="record_screen_with_camera">Record screen + camera</string>
     <string name="record_screen">Record screen</string>
