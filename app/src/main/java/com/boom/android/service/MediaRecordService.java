@@ -33,6 +33,7 @@ import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
+import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.util.WindowUtils;
 import com.boom.camera.CameraHelper;
@@ -160,6 +161,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         virtualDisplay.release();
         mediaProjection.stop();
         clearWindow();
+
+        NotificationUtils.removeRecordingNotification(this);
     }
 
     private void clearWindow(){
@@ -193,6 +196,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
             mediaRecorder.setVideoFrameRate(30);
             mediaRecorder.prepare();
+
+            NotificationUtils.startRecordingNotification(this);
         } catch (IOException e) {
             Dogger.e(Dogger.BOOM, "", "MediaRecordService", "initRecorder", e);
         }

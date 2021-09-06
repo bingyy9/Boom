@@ -17,7 +17,8 @@
     <string name="file_size">Size: %1$s</string>
     <string name="share_your_video">Share your video</string>
     <string name="share_to">Share To</string>
-
+    <string name="recording_notification">Screen Recording in progress</string>
+    <string name="recording_control">Recording controller</string>
 
     <string name="display_over_other_apps_request_tip">Not enabled display over other apps.</string>
     <string name="display_over_other_apps_fail_tip">Display over other apps request fail.</string>

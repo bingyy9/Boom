@@ -13,4 +13,15 @@ public class StringUtils {
         return KotlinUtil.trim(string1).equals(KotlinUtil.trim(string2));
     }
 
+    public static boolean stringStartsWith(final String string1, final String string2, final boolean ignoreCase) {  //OKOK
+        if (string1 == null || string2 == null) {
+            return false;
+        }
+        if (ignoreCase) {
+            return string1.toLowerCase().startsWith(string2.toLowerCase());
+        } else {
+            return string1.startsWith(string2);
+        }
+    }
+
 }

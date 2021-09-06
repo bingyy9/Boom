@@ -85,9 +85,6 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 
 
     private void updateView(boolean scrollToTop){
-        if(swipeRefreshLayout != null) {
-            swipeRefreshLayout.setRefreshing(true);
-        }
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "updateView");
         compositeDisposable.add(Observable.create(observableEmitter -> {
             List<VideoItem> videoItems = buildVideoItems();
@@ -187,6 +184,11 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
         Dogger.i(Dogger.BOOM, "", "MyVideosFragment", "onResume");
         super.onResume();
         RecordHelper.registerRecordEventListner(this);
+        if(swipeRefreshLayout != null
+                && videoListAdapter != null
+                && videoListAdapter.getItemCount() == 0) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
         updateView(false);
     }
 
@@ -238,8 +240,10 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
             mHandler.postDelayed(()->{
                 switch (evt.getType()) {
                     case RecordEvent.RECORD_STOPPED:
+                        if(swipeRefreshLayout != null) {
+                            swipeRefreshLayout.setRefreshing(true);
+                        }
                         updateView(true);
-//                        updateLatestVideo();
                         break;
                 }
             }, 500);
