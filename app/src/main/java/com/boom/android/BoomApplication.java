@@ -10,6 +10,7 @@ import android.os.IBinder;
 import com.boom.android.log.FactoryMgr;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.AndroidFactory;
+import com.boom.android.util.NotificationUtils;
 import com.boom.model.interf.impl.ModelBuilderImpl;
 import com.boom.model.interf.impl.ModelBuilderManager;
 
@@ -38,6 +39,7 @@ public class BoomApplication extends Application {
     public void onTerminate() {
         super.onTerminate();
         stopMediaRecordService();
+        NotificationUtils.removeRecordingNotification(this);
     }
 
     public static BoomApplication getInstance() {

@@ -42,7 +42,6 @@ public class NotificationUtils {
     }
 
     //1）activity： Context.startForegroundService()
-    //
     //2）Service：startForeground(int id, Notification notification)（id must not be 0）
     public static void startRecordingNotification(Context context) {
         if (context == null) {

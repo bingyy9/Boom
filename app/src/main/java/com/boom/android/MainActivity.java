@@ -29,6 +29,7 @@ import android.view.animation.OvershootInterpolator;
 
 import com.boom.android.log.Dogger;
 import com.boom.android.service.MediaRecordService;
+import com.boom.android.service.RecordingForegroundService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
@@ -79,6 +80,25 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         initPermission();
         initView();
+        handleIntent();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent();
+    }
+
+    private void handleIntent(){
+        Intent intent = getIntent();
+        if(intent != null){
+            String action = intent.getStringExtra(RecordingForegroundService.NOTIFICATION_ACTION);
+            Dogger.i(Dogger.BOOM, "action: " + action, "MainActivity", "handleIntent");
+            if(StringUtils.contentEquals(action, RecordingForegroundService.STOP)){
+                stopRecording();
+            }
+        }
     }
 
     private void initView(){
@@ -292,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenOnly");
         RecordHelper.setRecordCamera(false);
         startRecording();
+//        NotificationUtils.startRecordingNotification(this);
     }
 
     private void onClickRecordScreenWithCamera(){
