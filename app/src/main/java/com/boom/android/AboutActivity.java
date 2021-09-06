@@ -11,6 +11,9 @@ import com.boom.android.util.AndroidVersionManager;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +62,16 @@ public class AboutActivity extends AppCompatActivity {
             to = new String[]{EMAIL_ADDRESS_126};
         }
         intent.putExtra(Intent.EXTRA_EMAIL, to);
-        intent.putExtra(Intent.EXTRA_SUBJECT, "");
+        intent.putExtra(Intent.EXTRA_SUBJECT, buildReportSubject());
+        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.email_body));
         startActivity(intent);
+    }
+
+    private String buildReportSubject() {
+        String version = AndroidVersionManager.getVersion();
+        String productionName = getString(R.string.app_name);
+        String versionNo = getString(R.string.version2, version);
+        String date = DateFormat.getDateTimeInstance().format(new Date());
+        return getString(R.string.email_subject, productionName, versionNo, date);
     }
 }

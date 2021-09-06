@@ -26,8 +26,11 @@
     <string name="no_permission_to_list_record">No permission to list record.</string>
     <string name="no_records">No records.</string>
     <string name="version">Boom Recorder Version %1$s</string>
+    <string name="version2">Version %s</string>
     <string name="copy_rights">©%1$s Boom recorder. All rights reserved.</string>
     <string name="contact_us">Contact Us</string>
     <string name="share_success">Share successfully.</string>
     <string name="share_fail">Share failed.</string>
+    <string name="email_subject">Problem Report: %1$s %2$s for Android: %3$s</string>
+    <string name="email_body">Provide information about your issue here, and then send this email.\nDescription of problem:</string>
 </resources>
