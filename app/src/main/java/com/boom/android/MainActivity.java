@@ -13,13 +13,10 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,11 +25,11 @@ import android.view.View;
 import android.view.animation.OvershootInterpolator;
 
 import com.boom.android.log.Dogger;
-import com.boom.android.service.MediaRecordService;
 import com.boom.android.service.RecordingForegroundService;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
+import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.viewmodel.RecordViewModel;
@@ -276,6 +273,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                         new CheckRequestPermissionsListener() {
                             @Override
                             public void onAllPermissionOk(Permission[] allPermissions) {
+                                ensureLogToFileInit();
                                 onClickRecordScreenOnly();
                             }
 
@@ -293,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                         new CheckRequestPermissionsListener() {
                             @Override
                             public void onAllPermissionOk(Permission[] allPermissions) {
+                                ensureLogToFileInit();
                                 onClickRecordScreenWithCamera();
                             }
 
@@ -356,11 +355,13 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private void initPermission(){
         SoulPermission.getInstance().checkAndRequestPermissions(
-                Permissions.build(Manifest.permission.READ_EXTERNAL_STORAGE),
+                Permissions.build(Manifest.permission.READ_EXTERNAL_STORAGE
+                    , Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     //if you want do noting or no need all the callbacks you may use SimplePermissionsAdapter instead
                 new CheckRequestPermissionsListener() {
                     @Override
                     public void onAllPermissionOk(Permission[] allPermissions) {
+                        ensureLogToFileInit();
                     }
 
                     @Override
@@ -383,5 +384,11 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                 break;
         }
         return true;
+    }
+
+    private void ensureLogToFileInit(){
+        if(!LogToFileUtils.isInit){
+            LogToFileUtils.init(this);
+        }
     }
 }

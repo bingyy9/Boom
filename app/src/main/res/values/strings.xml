@@ -9,6 +9,7 @@
     <string name="recording_in_progress">Recording in progress...</string>
     <string name="video">Video</string>
     <string name="about">About</string>
+    <string name="settings">Settings</string>
     <string name="edit_title">Edit Title</string>
     <string name="delete">Delete</string>
     <string name="file_name">File Name</string>

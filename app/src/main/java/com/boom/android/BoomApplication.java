@@ -10,6 +10,7 @@ import android.os.IBinder;
 import com.boom.android.log.FactoryMgr;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.AndroidFactory;
+import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
 import com.boom.model.interf.impl.ModelBuilderImpl;
 import com.boom.model.interf.impl.ModelBuilderManager;
@@ -29,6 +30,7 @@ public class BoomApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LogToFileUtils.init(this);
         ModelBuilderManager.setModelBuilder(new ModelBuilderImpl());
         ModelBuilderManager.initModel();
         FactoryMgr.iPlatformFactory = new AndroidFactory(this);
