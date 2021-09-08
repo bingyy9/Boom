@@ -17,13 +17,14 @@ public class FilesDirUtil {
 
     public static final String recordFirstDir = "Boom";
     public static final String recordSecondDir = "record";
+    private static boolean debugHasSDCard = true;
 
     public static File getLogFile(Context context){
         if(context == null){
             return null;
         }
 
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) && debugHasSDCard) {
             // 有SD卡则使用SD - PS:没SD卡但是有外部存储器，会使用外部存储器
             // SD\Android\data\包名\files\Log\logs.txt
             ///storage/emulated/0/Android/data/com.boom.android/files/Log
@@ -47,6 +48,10 @@ public class FilesDirUtil {
         } else {
             return new File(context.getCacheDir().getPath() + File.separator + cacheDir);
         }
+    }
+
+    public static String getCacheZipLogPath(Context context){
+        return context == null? null: context.getCacheDir().getAbsolutePath() + "/boom-trace.zip";
     }
 
     public static String getRecordFileWriteDir(Context context){

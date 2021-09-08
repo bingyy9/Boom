@@ -14,4 +14,13 @@
     <external-path
         name="external_files"
         path="." />
+
+    <!-- context.getFilesDir + /Log/ and /Record/ -->
+    <files-path name="name" path="." />
+
+    <!-- context.getExternalFilesDir + /Log/ -->
+    <external-files-path name="name" path="Log" />
+
+    <!-- context.getFilesDir + /Log/ and /Record/ -->
+    <cache-path name="name" path="." />
 </paths>
