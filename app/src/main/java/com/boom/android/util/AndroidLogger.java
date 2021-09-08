@@ -18,9 +18,9 @@ public class AndroidLogger implements ILog {
                 return;
             }
             StringBuffer stringBuffer = new StringBuffer()
-                    .append("[TID:")
-                    .append(Thread.currentThread().getId())
-                    .append("]")
+//                    .append("[TID:")
+//                    .append(Thread.currentThread().getId())
+//                    .append("]")
                     .append(tag)
                     .append(msg);
             if(throwable != null){
@@ -31,16 +31,6 @@ public class AndroidLogger implements ILog {
             return;
         }
 
-        StringBuffer stringBuffer = new StringBuffer()
-//                .append("[TID:")
-//                .append(Thread.currentThread().getId())
-//                .append("]")
-                .append(tag)
-                .append(msg);
-        if(throwable != null){
-            stringBuffer.append(throwable);
-        }
-        LogToFileUtils.write(stringBuffer.toString());
         switch (level) {
             case Dogger.DEBUG:
                 Log.d(tag, msg, throwable);

@@ -9,6 +9,7 @@ import android.os.Environment;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.log.Dogger;
+import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.HashUtils;
 import com.boom.utils.StringUtils;
 import com.jakewharton.disklrucache.DiskLruCache;
@@ -36,7 +37,7 @@ public class DiskLruCacheUtil {
 
     public DiskLruCacheUtil(){
         try {
-            File cacheFile = getDiskCacheDir(BoomApplication.getInstance().getApplicationContext(), "snapshot");
+            File cacheFile = FilesDirUtil.getSnapshotCacheFile(BoomApplication.getInstance().getApplicationContext());
             if (!cacheFile.exists()) {
                 cacheFile.mkdirs();
             }
@@ -46,19 +47,6 @@ public class DiskLruCacheUtil {
             e.printStackTrace();
         }
     }
-
-    private File getDiskCacheDir(Context context, String uniqueName) {
-        String cachePath;
-        //判断 SD 卡是否存在，从而获取不同的缓存地址
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||
-                !Environment.isExternalStorageRemovable()) {
-            cachePath = context.getExternalCacheDir().getPath();
-        } else {
-            cachePath = context.getCacheDir().getPath();
-        }
-        return new File(cachePath + File.separator + uniqueName);
-    }
-
     private int getAppVersion(Context context) {
         try {
             PackageInfo info = context.getPackageManager().getPackageInfo(

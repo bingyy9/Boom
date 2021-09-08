@@ -52,7 +52,7 @@ public class LogToFileUtils {
 
     private static final String MY_TAG = "LogToFileUtils";
 
-    private boolean toggleFileLog = false;
+    private static boolean toggleFileLog = false;
 
     /**
      * 初始化日志库
@@ -60,24 +60,26 @@ public class LogToFileUtils {
      * @param context
      */
     public static void init(Context context) {
-        Log.i(MY_TAG, "init ...");
         if (null == mContext || null == instance || null == logFile || !logFile.exists()) {
             mContext = context;
             instance = new LogToFileUtils();
             logFile = getLogFile();
-            Log.d(MY_TAG, "LogFilePath is: " + logFile.getPath());
+            if(toggleFileLog) {
+                Log.d(MY_TAG, "LogFilePath is: " + logFile.getPath());
+            }
             // 获取当前日志文件大小
             long logFileSize = getFileSize(logFile);
-            Log.d(MY_TAG, "Log max size is: " + Formatter.formatFileSize(context, LOG_MAX_SIZE));
-            Log.i(MY_TAG, "log now size is: " + Formatter.formatFileSize(context, logFileSize));
+            if(toggleFileLog) {
+                Log.d(MY_TAG, "Log max size is: " + Formatter.formatFileSize(context, LOG_MAX_SIZE));
+                Log.i(MY_TAG, "log now size is: " + Formatter.formatFileSize(context, logFileSize));
+            }
             // 若日志文件超出了预设大小，则重置日志文件
             if (LOG_MAX_SIZE < logFileSize) {
                 resetLogFile();
             }
             isInit = true;
         } else {
-            Log.i(MY_TAG, "LogToFileUtils has been init ...");
-            isInit = false;
+            isInit = true;
         }
     }
 
@@ -89,11 +91,12 @@ public class LogToFileUtils {
     public static void write(Object str) {
         // 判断是否初始化或者初始化是否成功
         if (null == mContext || null == instance || null == logFile || !logFile.exists()) {
-            Log.e(MY_TAG, "Initialization failure !!!");
+            if(toggleFileLog) {
+                Log.e(MY_TAG, "Initialization failure !!!");
+            }
             return;
         }
         String logStr = getFunctionInfo() + " - " + str.toString();
-//        Log.i(tag, logStr);
 
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
@@ -101,7 +104,9 @@ public class LogToFileUtils {
             bw.write("\r\n");
             bw.flush();
         } catch (Exception e) {
-            Log.e(tag, "Write failure !!! " + e.toString());
+            if(toggleFileLog) {
+                Log.e(tag, "Write failure !!! " + e.toString());
+            }
         }
     }
 
@@ -114,9 +119,11 @@ public class LogToFileUtils {
      * <p/>
      */
     private static void resetLogFile() {
-        Log.i(MY_TAG, "Reset Log File ... ");
+        if(toggleFileLog) {
+            Log.i(MY_TAG, "Reset Log File ... ");
+        }
         // 创建lastLog.txt，若存在则删除
-        File lastLogFile = new File(logFile.getParent() + "/lastLog.txt");
+        File lastLogFile = new File(logFile.getParent() + File.separator + FilesDirUtil.backLogFileName);
         if (lastLogFile.exists()) {
             lastLogFile.delete();
         }
@@ -126,7 +133,9 @@ public class LogToFileUtils {
         try {
             logFile.createNewFile();
         } catch (Exception e) {
-            Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
+            if(toggleFileLog) {
+                Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
+            }
         }
     }
 
@@ -155,28 +164,22 @@ public class LogToFileUtils {
      * @return APP日志文件
      */
     private static File getLogFile() {
-        File file;
-        // 判断是否有SD卡或者外部存储器
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            // 有SD卡则使用SD - PS:没SD卡但是有外部存储器，会使用外部存储器
-            // SD\Android\data\包名\files\Log\logs.txt
-            file = new File(mContext.getExternalFilesDir("Log").getPath() + "/");
-        } else {
-            // 没有SD卡或者外部存储器，使用内部存储器
-            // \data\data\包名\files\Log\logs.txt
-            file = new File(mContext.getFilesDir().getPath() + "/Log/");
+        File file = FilesDirUtil.getLogFile(mContext);
+        if(file == null){
+            return null;
         }
         // 若目录不存在则创建目录
         if (!file.exists()) {
-            Log.e(MY_TAG, "file not exist");
             file.mkdir();
         }
-        File logFile = new File(file.getPath() + "/boom_record_logs.txt");
+        File logFile = new File(file.getPath() + File.separator + FilesDirUtil.logFileName);
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
             } catch (Exception e) {
-                Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
+                if(toggleFileLog) {
+                    Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
+                }
             }
         }
         return logFile;
