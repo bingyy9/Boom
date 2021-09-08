@@ -382,6 +382,9 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             case R.id.about:
                 AboutActivity.start(this);
                 break;
+            case R.id.settings:
+                SettingsActivity.start(this);
+                break;
         }
         return true;
     }

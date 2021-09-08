@@ -22,9 +22,8 @@ import android.widget.TextView;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.videos.bean.VideoItem;
 import com.boom.android.util.BoomHelper;
-import com.boom.android.util.DataUtils;
+import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.KeybordUtils;
-import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.cache.BitmapCacheUtils;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.interf.impl.ModelBuilderManager;
@@ -42,6 +41,7 @@ import butterknife.ButterKnife;
 
 public class VideoDetailActivity extends AppCompatActivity implements UniversalVideoView.VideoViewCallback {
     private static final String TAG = "VideoDetailActivity";
+    private static final String VIDEO_ITEM = "VIDEO_ITEM";
     private static final String FILE_NAME = "FILE_NAME";
     private static final String FILE_SIZE = "FILE_SIZE";
     private static final String FILE_RESOLUTION = "FILE_RESOLUTION";
@@ -69,7 +69,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     @BindView(R.id.media_controller)
     UniversalMediaController mMediaController;
 
-    private String fileName;
+    private VideoItem videoItem;
     private String filePath;
     private File file;
     private int mSeekPosition;
@@ -77,14 +77,12 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
     private boolean isFullscreen;
     private Drawable editTextBackground;
 
-    public static void start(Context context, String filename
-        , String size, String resolution, String duration) {
+    public static void start(Context context, VideoItem item) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(VIDEO_ITEM, item);
         Intent intent = new Intent(context, VideoDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        intent.putExtra(FILE_NAME, filename);
-        intent.putExtra(FILE_RESOLUTION, resolution);
-        intent.putExtra(FILE_SIZE, size);
-        intent.putExtra(FILE_DURATION, duration);
+        intent.putExtras(bundle);
         context.startActivity(intent);
     }
 
@@ -94,20 +92,29 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         setContentView(R.layout.video_details);
         ButterKnife.bind(this);
         recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        parseIntentData();
         initView();
     }
 
-    private void initView() {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        parseIntentData();
+    }
+
+    private void parseIntentData(){
         if(getIntent() == null){
             return;
         }
-        fileName = getIntent().getStringExtra(FILE_NAME);
-        if (StringUtils.isEmpty(fileName)) {
-            Dogger.i(Dogger.BOOM, "file name is null", "VideoDetailActivity", "initView");
-            finish();
+        videoItem = getIntent().getParcelableExtra(VIDEO_ITEM);
+    }
+
+    private void initView() {
+        if(videoItem == null){
             return;
         }
-        file = new File(BoomHelper.getRecordDirectory() + fileName);
+        file = new File(videoItem.absolutePath);
         if (file == null) {
             Dogger.i(Dogger.BOOM, "file is not exist", "VideoDetailActivity", "initView");
             finish();
@@ -119,7 +126,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         editName.setOnEditorActionListener((v, actionId, event) -> {
             Dogger.i(Dogger.BOOM, "actionid" + actionId, "VideoDetailActivity", "initView");
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                File newFile = new File(BoomHelper.getRecordDirectory() + editName.getText() + BoomHelper.filePostfix);
+                File newFile = new File(FilesDirUtil.getRecordFileWriteDir(this) + editName.getText() + BoomHelper.filePostfix);
                 if(file != null && newFile != null){
                     file.renameTo(newFile);
                 }
@@ -128,7 +135,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             return true;
         });
 
-        filePath = file.getAbsolutePath();
+        filePath = videoItem.absolutePath;
         mVideoView.setMediaController(mMediaController);
         setVideoAreaSize();
         mVideoView.setVideoViewCallback(this);
@@ -137,9 +144,26 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
             shareFile();
         });
 
-        tvDuration.setText(getIntent().getStringExtra(FILE_DURATION));
-        tvResolution.setText(getIntent().getStringExtra(FILE_RESOLUTION));
-        tvSize.setText(getIntent().getStringExtra(FILE_SIZE));
+        if(!StringUtils.isEmpty(videoItem.size)){
+            tvSize.setVisibility(View.VISIBLE);
+            tvSize.setText(this.getResources().getString(R.string.file_size, videoItem.size));
+        } else {
+            tvSize.setVisibility(View.GONE);
+        }
+
+        if(!StringUtils.isEmpty(videoItem.duration)){
+            tvDuration.setVisibility(View.VISIBLE);
+            tvDuration.setText(this.getResources().getString(R.string.file_duration, videoItem.duration));
+        } else {
+            tvDuration.setVisibility(View.GONE);
+        }
+
+        if(StringUtils.isEmpty(videoItem.width) || StringUtils.isEmpty(videoItem.height)){
+            tvResolution.setVisibility(View.GONE);
+        } else {
+            tvResolution.setVisibility(View.VISIBLE);
+            tvResolution.setText(this.getResources().getString(R.string.file_resolution, videoItem.width, videoItem.height));
+        }
     }
 
     private void updateEditTextEnable(boolean enable){

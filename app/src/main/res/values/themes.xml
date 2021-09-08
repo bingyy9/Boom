@@ -36,4 +36,11 @@
     <style name="NewDialogFullScreen"><!-- FullScreen dialog for phone -->
         <item name="android:windowIsFloating">false</item>
     </style>
+
+    <style name="SettingSection">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/gray_base_new</item>
+        <item name="android:textSize">@dimen/text_size_14</item>
+        <item name="android:fontFamily">Roboto</item>
+    </style>
 </resources>

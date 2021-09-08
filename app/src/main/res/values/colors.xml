@@ -14,6 +14,7 @@
     <color name="color2">#767676</color>
     <color name="color3">#20000000</color>
     <color name="color4">#E6E6EA</color>
+    <color name="color5">#C6C6C6</color>
 
     <color name="blue_normal">#1565C0</color>
     <color name="blue_pressed">#2272CD</color>
@@ -24,6 +25,15 @@
     <color name="green_colorRipple">#1B5E20</color>
 
     <color name="color_red">#D42A2E</color>
+
+    <color name="content_background_level">@color/white</color>
+    <color name="gray_light_5">#14000000</color>
+
+
+    <color name="gray_base_new">#FF666666</color>
+    <color name="gray_dark_1">#6A6B6C</color>
+    <color name="gray_dark_2">#020202</color>
+
 
 
 

@@ -45,7 +45,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     public interface AdapterListener {
-        void onRecycleItemSelected(String name, String size, String resolution, String duration);
+        void onRecycleItemSelected(VideoItem videoItem);
     }
 
     public void setDataList(List<VideoItem> items){
@@ -65,7 +65,7 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        VideoItem videoItem = mDataList.get(position);
+        final VideoItem videoItem = mDataList.get(position);
         if(!(holder instanceof ItemVH)){
             Dogger.i(Dogger.BOOM, "onBindUser not Item!!!", "VideoListAdapter", "onBindViewHolder");
             return;
@@ -97,11 +97,8 @@ public class VideoListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         BitmapCacheUtils.getInstance().display(viewHolder.iFrame, videoItem.absolutePath);
 
         viewHolder.cardView.setOnClickListener((View v)->{
-            if(adapterListener != null && viewHolder != null && viewHolder.tvName != null) {
-                adapterListener.onRecycleItemSelected(viewHolder.tvName.getText().toString()
-                    , viewHolder.tvSize.getText().toString()
-                    , viewHolder.tvResolution.getText().toString()
-                    , viewHolder.tvDuration.getText().toString());
+            if(adapterListener != null && videoItem != null) {
+                adapterListener.onRecycleItemSelected(videoItem);
             }
         });
     }

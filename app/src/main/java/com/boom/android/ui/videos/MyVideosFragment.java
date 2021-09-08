@@ -1,4 +1,4 @@
-package com.boom.android.ui.videos;
+ package com.boom.android.ui.videos;
 
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FileSizeUtils;
 import com.boom.android.util.FileUtils;
+import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.RecordHelper;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
@@ -117,18 +118,22 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
 
     private List<VideoItem> buildVideoItems(){
         List<VideoItem> items = new ArrayList<>();
-        List<File> files = FileUtils.listMp4FileSortByModifyTime(BoomHelper.getRecordDirectory());
-        for(File file: files){
-            if(!file.exists()){
-                continue;
+        List<String> recordFileReadDirs = FilesDirUtil.getRecordFileReadDirs(getActivity());
+        if(recordFileReadDirs != null){
+            for (String dir: recordFileReadDirs){
+                List<File> files = FileUtils.listMp4FileSortByModifyTime(dir);
+                for(File file: files){
+                    if(!file.exists()){
+                        continue;
+                    }
+
+                    VideoItem videoItem = new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath());
+                    getVideoItemDetails(videoItem);
+                    getFileSize(videoItem);
+                    items.add(videoItem);
+                }
             }
-
-            VideoItem videoItem = new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath());
-            getVideoItemDetails(videoItem);
-            getFileSize(videoItem);
-            items.add(videoItem);
         }
-
         return items;
     }
 
@@ -208,14 +213,13 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     }
 
     @Override
-    public void onRecycleItemSelected(String name, String size, String resolution, String duration) {
-        Dogger.i(Dogger.BOOM, "name: " + name, "MyVideosFragment", "onRecycleItemSelected");
-        if(getActivity() == null){
+    public void onRecycleItemSelected(VideoItem item) {
+        if(getActivity() == null || item == null){
             return;
         }
+        Dogger.i(Dogger.BOOM, "name: " + item.name, "MyVideosFragment", "onRecycleItemSelected");
 
-        VideoDetailActivity.start(getActivity(), name + BoomHelper.filePostfix
-            , size, resolution, duration);
+        VideoDetailActivity.start(getActivity(), item);
 
 //        FragmentManager supportFragmentManager = getActivity().getSupportFragmentManager();
 //        if(supportFragmentManager == null){
@@ -251,34 +255,34 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
     }
 
     private void updateLatestVideo(){
-        if(videoListAdapter != null) {
-            List<VideoItem> items = videoListAdapter.getDataList();
-            if(items == null || items.size() == 0){
-                return;
-            }
-            VideoItem item = items.get(0);
-            List<File> files = FileUtils.listMp4FileSortByModifyTime(BoomHelper.getRecordDirectory());
-            if (files != null && files.size() > 0) {
-                File file = files.get(0);
-                if(!file.exists()){
-                    return;
-                }
-                //only add latest one
-                if(item != null && StringUtils.contentEquals(item.name, file.getName())){
-                    Dogger.i(Dogger.BOOM, "notifyItemChanged", "MyVideosFragment", "updateLatestVideo");
-                    items.remove(0);
-                    items.add(0, new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
-                    videoListAdapter.notifyItemChanged(0);
-                } else if(item != null && !StringUtils.contentEquals(item.name, file.getName())){
-                    Dogger.i(Dogger.BOOM, "notifyItemInserted", "MyVideosFragment", "updateLatestVideo");
-                    items.add(new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
-                    videoListAdapter.notifyItemInserted(0);
-                }
-            }
-            if(videoListView != null) {
-                videoListView.scrollToPosition(0);
-            }
-        }
+//        if(videoListAdapter != null) {
+//            List<VideoItem> items = videoListAdapter.getDataList();
+//            if(items == null || items.size() == 0){
+//                return;
+//            }
+//            VideoItem item = items.get(0);
+//            List<File> files = FileUtils.listMp4FileSortByModifyTime(BoomHelper.getRecordDirectory());
+//            if (files != null && files.size() > 0) {
+//                File file = files.get(0);
+//                if(!file.exists()){
+//                    return;
+//                }
+//                //only add latest one
+//                if(item != null && StringUtils.contentEquals(item.name, file.getName())){
+//                    Dogger.i(Dogger.BOOM, "notifyItemChanged", "MyVideosFragment", "updateLatestVideo");
+//                    items.remove(0);
+//                    items.add(0, new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
+//                    videoListAdapter.notifyItemChanged(0);
+//                } else if(item != null && !StringUtils.contentEquals(item.name, file.getName())){
+//                    Dogger.i(Dogger.BOOM, "notifyItemInserted", "MyVideosFragment", "updateLatestVideo");
+//                    items.add(new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath()));
+//                    videoListAdapter.notifyItemInserted(0);
+//                }
+//            }
+//            if(videoListView != null) {
+//                videoListView.scrollToPosition(0);
+//            }
+//        }
     }
 
     @Override

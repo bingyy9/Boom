@@ -74,39 +74,6 @@ public class BoomHelper {
         return BoomApplication.getInstance().getApplicationContext().getResources().getString(R.string.app_name);
     }
 
-    public static String getRecorderFolder(){
-        return "Boom";
-    }
-
-    public static String getRecordDirectory(){
-        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            String rootDir = Environment.getExternalStorageDirectory().getAbsolutePath()
-                    + "/"
-                    + BoomHelper.getRecorderFolder()
-                    + "/"
-                    + "Record" + "/";
-
-            if(ensureFileExist(rootDir)){
-                return rootDir;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private static boolean ensureFileExist(String rootDir){
-        File file = new File(rootDir);
-        if (!file.exists()) {
-            if (!file.mkdirs()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public static boolean enableGoogleService(){
         int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(BoomApplication.getInstance());
         if(resultCode != ConnectionResult.SUCCESS) {

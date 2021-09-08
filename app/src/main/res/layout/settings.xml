@@ -1,11 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root_view1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="20dp"
-    android:layout_marginRight="20dp">
+    android:background="@color/content_background_level">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_control_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/content_background_level">
+
+            <TextView
+                android:id="@+id/tv_control_settings"
+                style="@style/SettingSection"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_alignParentLeft="true"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:singleLine="true"
+                android:text="@string/control_settings"
+                android:textColor="@color/blue_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_time_delay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_control_settings">
+
+                <ImageView
+                    android:id="@+id/iv_delay_recording"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_time_delay"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_delay_recording"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/time_delay_before_recording"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_delay_recording"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_current_delay_recording"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/current_time"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_delay_recording"
+                    app:layout_constraintTop_toBottomOf="@id/tv_delay_recording" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/line_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_control_settings"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/gray_light_5" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_video_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/line_1"
+            android:background="@color/content_background_level">
+
+            <TextView
+                android:id="@+id/tv_video_settings"
+                style="@style/SettingSection"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_alignParentLeft="true"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:singleLine="true"
+                android:text="@string/video_settings"
+                android:textColor="@color/blue_normal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_file_format"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/tv_video_settings">
+
+                <ImageView
+                    android:id="@+id/iv_file_name_format"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_file"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_file_name_format"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/file_name_format"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_file_name_format"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_file_name_format_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/file_name_format_value"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_file_name_format"
+                    app:layout_constraintTop_toBottomOf="@id/tv_file_name_format" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

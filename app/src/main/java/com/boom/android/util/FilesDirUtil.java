@@ -5,6 +5,8 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FilesDirUtil {
 
@@ -13,7 +15,8 @@ public class FilesDirUtil {
 
     public static final String cacheDir = "snapshot";
 
-    public static final String recordDir = "record";
+    public static final String recordFirstDir = "Boom";
+    public static final String recordSecondDir = "record";
 
     public static File getLogFile(Context context){
         if(context == null){
@@ -46,20 +49,20 @@ public class FilesDirUtil {
         }
     }
 
-    public static String getRecordFileDir(Context context){
+    public static String getRecordFileWriteDir(Context context){
         String recordPath;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             recordPath = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + File.separator
-                    + BoomHelper.getRecorderFolder()
+                    + recordFirstDir
                     + File.separator
-                    + recordDir
+                    + recordSecondDir
                     + File.separator;
         } else {
             //\data\data\包名\files\record\
             recordPath = context.getFilesDir().getPath()
                    + File.separator
-                   + recordDir
+                   + recordSecondDir
                    + File.separator;
         }
         if(ensureFileExist(recordPath)){
@@ -67,6 +70,26 @@ public class FilesDirUtil {
         } else {
             return null;
         }
+    }
+
+    public static List<String> getRecordFileReadDirs(Context context){
+        List<String> dirs = new ArrayList();
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            dirs.add(Environment.getExternalStorageDirectory().getAbsolutePath()
+                    + File.separator
+                    + recordFirstDir
+                    + File.separator
+                    + recordSecondDir
+                    + File.separator);
+        }
+
+        //\data\data\包名\files\record\
+        dirs.add(context.getFilesDir().getPath()
+                + File.separator
+                + recordSecondDir
+                + File.separator);
+
+        return dirs;
     }
 
     private static boolean ensureFileExist(String rootDir){

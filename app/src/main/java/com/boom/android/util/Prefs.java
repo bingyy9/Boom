@@ -37,6 +37,11 @@ public class Prefs {
     private static final long DEFAULT_LONG_VALUE = -1L;
     private static final boolean DEFAULT_BOOLEAN_VALUE = false;
 
+    public static final String TIME_DELAY_BEFORE_RECORDING = "time_delay_before_recording";
+    public static final int DEFAULT_TIME_DELAY_BEFORE_RECORDING = 3;
+    public static final String FILE_NAME_FORMAT = "file_name_format";
+    public static final String DEFAULT_FILE_NAME_FORMAT = "yyyy_MM_dd_HH_mm_ss";
+
     private static SharedPreferences sharedPreferences;
     private static Prefs prefsInstance;
 

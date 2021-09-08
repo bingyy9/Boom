@@ -34,4 +34,13 @@
     <string name="share_fail">Share failed.</string>
     <string name="email_subject">Problem Report: %1$s %2$s for Android: %3$s</string>
     <string name="email_body">Provide information about your issue here, and then send this email.\nDescription of problem:</string>
+
+    <string name="control_settings">Control Settings</string>
+    <string name="time_delay_before_recording">Time delay before recording</string>
+    <string name="current_time">Current time: %1$s</string>
+
+    <string name="video_settings">Video Settings</string>
+    <string name="file_name_format">File name format</string>
+    <string name="file_name_format_value">%1$s</string>
+
 </resources>

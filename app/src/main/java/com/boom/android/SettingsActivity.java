@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.boom.android.util.AndroidVersionManager;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
+import com.boom.android.util.Prefs;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -17,15 +18,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity implements View.OnClickListener{
 
-    View root;
-    @BindView(R.id.tv_version)
-    TextView tvVersion;
-    @BindView(R.id.tv_copy_rights)
-    TextView tvCopyRights;
-    @BindView(R.id.tv_contact_us)
-    View tvContactUs;
+    @BindView(R.id.layout_time_delay)
+    View layoutTimeDelay;
+    @BindView(R.id.tv_current_delay_recording)
+    TextView tvDelayRecording;
+    @BindView(R.id.layout_file_format)
+    View layoutFileNameFormat;
+    @BindView(R.id.tv_file_name_format_value)
+    TextView tvFileFormat;
 
     public static void start(Context context) {
         Intent intent = new Intent(context, SettingsActivity.class);
@@ -42,6 +44,23 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
+                String.valueOf(Prefs.with(this).readInt(Prefs.TIME_DELAY_BEFORE_RECORDING
+                        , Prefs.DEFAULT_TIME_DELAY_BEFORE_RECORDING))));
+        tvFileFormat.setText(this.getResources().getString(R.string.file_name_format_value
+                , Prefs.with(this).read(Prefs.FILE_NAME_FORMAT, Prefs.DEFAULT_FILE_NAME_FORMAT)));
     }
 
+    @Override
+    public void onClick(View view) {
+        if(view == null){
+            return;
+        }
+        switch (view.getId()){
+            case R.id.layout_time_delay:
+                break;
+            case R.id.layout_file_format:
+                break;
+        }
+    }
 }
