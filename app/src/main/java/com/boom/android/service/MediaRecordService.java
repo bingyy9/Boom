@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.boom.android.MainActivity;
 import com.boom.android.R;
@@ -35,6 +36,7 @@ import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.NotificationUtils;
+import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.util.WindowUtils;
 import com.boom.camera.CameraHelper;
@@ -64,10 +66,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
     private View rootView;
-    private final int INIT_COUNT_DOWN = 3;
-    private ImageView counterView;
+    private TextView counterView;
     private Timer mCounterTimer;
-    private int mCounter = INIT_COUNT_DOWN;
+    private int mCounter;
 
     private RoundTextureView cameraView;
     private CameraHelper cameraHelper;
@@ -268,7 +269,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                 });
             }
         } else {
-            mCounter = INIT_COUNT_DOWN;
+            mCounter = Integer.valueOf(PrefsUtil.getTimeDelayBeforeRecording(this));
             stopTimer();
             RecordHelper.setCountDowning(false);
             if(mHandler != null) {
@@ -290,15 +291,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             }
 
             cameraView.setVisibility(View.GONE);
-            if (mCounter == 3) {
+            if(mCounter >= 1){
                 counterView.setVisibility(View.VISIBLE);
-                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_3));
-            } else if (mCounter == 2) {
-                counterView.setVisibility(View.VISIBLE);
-                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_2));
-            } else if (mCounter == 1) {
-                counterView.setVisibility(View.VISIBLE);
-                counterView.setImageDrawable(this.getResources().getDrawable(R.drawable.ic_1));
+                counterView.setText(String.valueOf(mCounter));
             } else {
                 counterView.setVisibility(View.GONE);
             }
@@ -330,7 +325,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             updateLayoutParamsToCounterView();
             isAddedRootView = true;
             windowManager.addView(rootView, layoutParams);
-            mCounter = INIT_COUNT_DOWN;
+            mCounter = Integer.valueOf(PrefsUtil.getTimeDelayBeforeRecording(this));
             startTimer();
             updateView();
         }

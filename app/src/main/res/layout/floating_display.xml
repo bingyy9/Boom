@@ -4,11 +4,13 @@
     android:layout_height="wrap_content"
     android:animateLayoutChanges="false">
 
-    <ImageView
+    <TextView
         android:id="@+id/iv_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_3"
+        android:textSize="120sp"
+        android:textStyle="bold"
+        android:textColor="@color/color_red"
         android:visibility="gone"/>
 
     <com.boom.camera.RoundTextureView
