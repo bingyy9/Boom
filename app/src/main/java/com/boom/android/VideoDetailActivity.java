@@ -3,11 +3,14 @@ package com.boom.android;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +35,10 @@ import com.universalvideoview.UniversalMediaController;
 import com.universalvideoview.UniversalVideoView;
 
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -94,6 +100,7 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
         parseIntentData();
         initView();
+
     }
 
     @Override
@@ -335,12 +342,11 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         Intent intent = new Intent(Intent.ACTION_SEND);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(this
-                    , BuildConfig.APPLICATION_ID + ".fileprovider", file);
-
-            intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
-            intent.putExtra(Intent.EXTRA_SUBJECT, "MyApp File Share: " + file.getName());
-            intent.putExtra(Intent.EXTRA_TEXT, "MyApp File Share: " + file.getName());
+            Uri contentUri = FileProvider.getUriForFile(BoomApplication.getInstance().getApplicationContext()
+                    , "com.boom.android.fileprovider", file);
+            intent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            intent.putExtra(Intent.EXTRA_SUBJECT, file.getName());
+            intent.putExtra(Intent.EXTRA_TEXT, file.getName());
             intent.setDataAndType(contentUri, getContentResolver().getType(contentUri));
         } else {
             intent.setDataAndType(Uri.fromFile(file), "video/mp4");

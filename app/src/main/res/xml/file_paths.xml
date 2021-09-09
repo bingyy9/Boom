@@ -2,14 +2,14 @@
 
 <paths xmlns:android="http://schemas.android.com/apk/res/android">>
     <files-path
-        name="../record/"
-        path="record" />
+        name="files_record/"
+        path="record/" />
     <external-path
         name="external_files"
         path="." />
     <external-files-path
-        name="my_external_records"
-        path="record/." />
+        name="external_files_record"
+        path="record/" />
     <cache-path
         name="cache"
         path="." />

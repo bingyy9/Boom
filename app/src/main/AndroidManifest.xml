@@ -56,7 +56,8 @@
         <activity android:name=".VideoDetailActivity"
             android:label="@string/video"
             android:parentActivityName=".MainActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+            android:configChanges="orientation|keyboardHidden|screenSize" >
+        </activity>
         <activity android:name=".AboutActivity"
             android:label="@string/about"
             android:parentActivityName=".SettingsActivity"/>

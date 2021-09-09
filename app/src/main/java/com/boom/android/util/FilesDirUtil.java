@@ -1,12 +1,15 @@
 package com.boom.android.util;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.RequiresApi;
 
 public class FilesDirUtil {
 
@@ -56,7 +59,15 @@ public class FilesDirUtil {
         String recordPath;
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) && debugHasSDCard) {
             // /storage/emulated/0/Android/data/com.boom.android/files + /record/
-            recordPath = context.getExternalFilesDir(recordDir).getPath()
+//            recordPath = context.getExternalFilesDir(recordDir).getPath()
+//                    + File.separator;
+
+            // this folder wouldn't be delete after app uninstall
+            recordPath = Environment.getExternalStorageDirectory().getPath()
+                    + File.separator
+                    + "Boom"
+                    + File.separator
+                    + recordDir
                     + File.separator;
         } else {
             // /data/user/0/com.boom.android/files/record/
@@ -65,6 +76,7 @@ public class FilesDirUtil {
                    + recordDir
                    + File.separator;
         }
+
         if(ensureFileExist(recordPath)){
             return recordPath;
         } else {
@@ -75,7 +87,13 @@ public class FilesDirUtil {
     public static List<String> getRecordFileReadDirs(Context context){
         List<String> dirs = new ArrayList();
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            dirs.add(context.getExternalFilesDir(recordDir).getPath()
+//            dirs.add(context.getExternalFilesDir(recordDir).getPath()
+//                    + File.separator);
+            dirs.add(Environment.getExternalStorageDirectory().getPath()
+                    + File.separator
+                    + "Boom"
+                    + File.separator
+                    + recordDir
                     + File.separator);
         }
 
