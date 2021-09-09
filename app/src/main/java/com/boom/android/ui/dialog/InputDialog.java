@@ -15,13 +15,17 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.boom.android.BoomApplication;
 import com.boom.android.R;
+import com.boom.android.SettingsActivity;
 import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.KeybordUtils;
 import com.boom.android.util.PrefsUtil;
+import com.boom.android.viewmodel.SettingsViewModel;
 import com.boom.utils.StringUtils;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 
 
 public class InputDialog extends DialogFragment {
@@ -35,6 +39,8 @@ public class InputDialog extends DialogFragment {
     private TextView btCancel;
     private TextView btOk;
     private int dlgType;
+
+    SettingsViewModel settingsViewModel;
 
     public static DialogFragment newInstance(int type) {
         DialogFragment fragment = new InputDialog();
@@ -62,6 +68,10 @@ public class InputDialog extends DialogFragment {
         etInput = rootView.findViewById(R.id.et_input);
         btCancel = rootView.findViewById(R.id.btn1);
         btOk = rootView.findViewById(R.id.btn2);
+
+        settingsViewModel = new ViewModelProvider(getActivity(), new ViewModelProvider.AndroidViewModelFactory(BoomApplication.getInstance()))
+                .get(SettingsViewModel.class);
+
         initView();
         return rootView;
     }
@@ -100,6 +110,9 @@ public class InputDialog extends DialogFragment {
         if (etInput != null) {
             if(dlgType == TYPE_TIME_DELAY_BEFORE_RECORD && !StringUtils.isEmpty(etInput.getText().toString())){
                 PrefsUtil.setTimeDelayBeforeRecording(getActivity(), Integer.valueOf(etInput.getText().toString()));
+                if(settingsViewModel != null){
+                    settingsViewModel.updateTimeDelayBeforeRecording();
+                }
             }
         }
         this.dismiss();

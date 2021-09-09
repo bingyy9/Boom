@@ -3,19 +3,20 @@ package com.boom.android;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 
-import com.afollestad.materialdialogs.MaterialDialog;
+import com.boom.android.log.Dogger;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.util.PrefsUtil;
+import com.boom.android.viewmodel.SettingsViewModel;
 
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -30,7 +31,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.tv_file_name_format_value)
     TextView tvFileFormat;
 
+    SettingsViewModel settingsViewModel;
+
     public static void start(Context context) {
+        if(context == null){
+            return;
+        }
+
         Intent intent = new Intent(context, SettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
         context.startActivity(intent);
@@ -41,12 +48,18 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
         ButterKnife.bind(this);
+        settingsViewModel = new ViewModelProvider(SettingsActivity.this, new ViewModelProvider.AndroidViewModelFactory((this).getApplication()))
+                .get(SettingsViewModel.class);
         initView();
     }
 
     private void initView() {
         layoutTimeDelay.setOnClickListener(this);
         layoutFileNameFormat.setOnClickListener(this);
+        settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> {
+            tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
+                    PrefsUtil.getTimeDelayBeforeRecording(this)));
+        });
     }
 
     private void updateView(){
@@ -59,6 +72,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onResume() {
         super.onResume();
+        Dogger.i(Dogger.BOOM, "", "SettingsActivity", "onResume");
         updateView();
     }
 
@@ -86,15 +100,5 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             prev.dismiss();
         }
         InputDialog.newInstance(InputDialog.TYPE_TIME_DELAY_BEFORE_RECORD).show(fragmentManager.beginTransaction(), InputDialog.TAG);
-//        new MaterialDialog.Builder(this)
-//                .title(R.string.delay_value_in_seconds)
-//                .inputType(InputType.TYPE_CLASS_NUMBER)
-//                .inputRange(1, 10)
-//                .input("", PrefsUtil.getTimeDelayBeforeRecording(this), new MaterialDialog.InputCallback() {
-//                    @Override
-//                    public void onInput(MaterialDialog dialog, CharSequence input) {
-//                        // Do something
-//                    }
-//                }).show();
     }
 }
