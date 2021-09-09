@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dlg_round_6_background"
+    android:minWidth="@dimen/common_dialog_min_width"
+    android:orientation="vertical"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="Roboto"
+        android:gravity="center"
+        android:text="Test"
+        android:textColor="@color/tv_color_1"
+        android:textSize="@dimen/font_20"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_msg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="Roboto"
+        android:gravity="left"
+        android:textColor="@color/tv_color_12"
+        android:textSize="@dimen/font_14"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <EditText
+        android:id="@+id/et_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:imeOptions="actionDone|flagNoExtractUi|flagNoFullscreen"
+        android:labelFor="@id/tv_title"
+        android:maxLength="32"
+        android:minWidth="320dp"
+        android:singleLine="true"
+        android:background="@drawable/edittext_border"
+        android:textCursorDrawable="@drawable/edittext_cursor"
+        android:textColorHighlight="@color/blue_colorRipple"
+        app:layout_constraintTop_toBottomOf="@id/tv_msg">
+
+        <requestFocus />
+    </EditText>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/et_input">
+
+        <TextView
+            android:id="@+id/btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="Roboto"
+            android:gravity="right"
+            android:text="@string/cancel"
+            android:textColor="@color/blue_normal"
+            android:textSize="@dimen/font_14"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/btn2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginBottom="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="Roboto"
+            android:gravity="right"
+            android:text="@string/ok"
+            android:textColor="@color/blue_normal"
+            android:textSize="@dimen/font_14"
+            android:textStyle="bold"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

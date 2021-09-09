@@ -3,18 +3,19 @@ package com.boom.android;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.TextView;
 
-import com.boom.android.util.AndroidVersionManager;
-import com.boom.android.util.BoomHelper;
-import com.boom.android.util.DataUtils;
-import com.boom.android.util.Prefs;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.boom.android.ui.dialog.InputDialog;
+import com.boom.android.util.PrefsUtil;
 
-import java.text.DateFormat;
-import java.util.Date;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -44,11 +45,21 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void initView() {
+        layoutTimeDelay.setOnClickListener(this);
+        layoutFileNameFormat.setOnClickListener(this);
+    }
+
+    private void updateView(){
         tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
-                String.valueOf(Prefs.with(this).readInt(Prefs.TIME_DELAY_BEFORE_RECORDING
-                        , Prefs.DEFAULT_TIME_DELAY_BEFORE_RECORDING))));
+                PrefsUtil.getTimeDelayBeforeRecording(this)));
         tvFileFormat.setText(this.getResources().getString(R.string.file_name_format_value
-                , Prefs.with(this).read(Prefs.FILE_NAME_FORMAT, Prefs.DEFAULT_FILE_NAME_FORMAT)));
+                , PrefsUtil.getFileNameFormat(this)));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateView();
     }
 
     @Override
@@ -58,9 +69,32 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
         switch (view.getId()){
             case R.id.layout_time_delay:
+                showInputDialog();
                 break;
             case R.id.layout_file_format:
                 break;
         }
+    }
+
+    private void showInputDialog(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager == null) {
+            return;
+        }
+        DialogFragment prev = (DialogFragment)fragmentManager.findFragmentByTag(InputDialog.TAG);
+        if (prev != null) {
+            prev.dismiss();
+        }
+        InputDialog.newInstance(InputDialog.TYPE_TIME_DELAY_BEFORE_RECORD).show(fragmentManager.beginTransaction(), InputDialog.TAG);
+//        new MaterialDialog.Builder(this)
+//                .title(R.string.delay_value_in_seconds)
+//                .inputType(InputType.TYPE_CLASS_NUMBER)
+//                .inputRange(1, 10)
+//                .input("", PrefsUtil.getTimeDelayBeforeRecording(this), new MaterialDialog.InputCallback() {
+//                    @Override
+//                    public void onInput(MaterialDialog dialog, CharSequence input) {
+//                        // Do something
+//                    }
+//                }).show();
     }
 }

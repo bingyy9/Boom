@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <dimen name="common_dialog_min_width">540dp</dimen>
+
+</resources>

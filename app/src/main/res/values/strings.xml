@@ -37,10 +37,14 @@
 
     <string name="control_settings">Control Settings</string>
     <string name="time_delay_before_recording">Time delay before recording</string>
+    <string name="delay_value_in_seconds">Delay value in seconds</string>
     <string name="current_time">Current time: %1$s</string>
 
     <string name="video_settings">Video Settings</string>
     <string name="file_name_format">File name format</string>
     <string name="file_name_format_value">%1$s</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
 </resources>
