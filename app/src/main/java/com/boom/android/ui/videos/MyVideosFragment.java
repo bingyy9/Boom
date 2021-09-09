@@ -25,6 +25,7 @@ import com.boom.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -128,12 +129,14 @@ public class MyVideosFragment extends Fragment implements VideoListAdapter.Adapt
                     }
 
                     VideoItem videoItem = new VideoItem(file.getName()).setAbsolutePath(file.getAbsolutePath());
+                    videoItem.lastModified = file.lastModified();
                     getVideoItemDetails(videoItem);
                     getFileSize(videoItem);
                     items.add(videoItem);
                 }
             }
         }
+        Collections.sort(items);
         return items;
     }
 

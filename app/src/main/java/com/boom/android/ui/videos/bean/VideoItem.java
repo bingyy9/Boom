@@ -1,19 +1,18 @@
 package com.boom.android.ui.videos.bean;
 
-
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.Objects;
 
-public class VideoItem implements Parcelable {
+public class VideoItem implements Parcelable, Comparable<VideoItem> {
     public String name;
     public String absolutePath;
     public String duration;
     public String width;
     public String height;
     public String size;
+    public long lastModified;
 
     public VideoItem(String name) {
         this.name = name;
@@ -79,4 +78,17 @@ public class VideoItem implements Parcelable {
     }
 
 
+    @Override
+    public int compareTo(VideoItem videoItem) {
+        if(videoItem == null){
+            return -1;
+        }
+        if(lastModified > videoItem.lastModified){
+            return -1;
+        } else if(lastModified == videoItem.lastModified){
+            return 0;
+        } else {
+            return 1;
+        }
+    }
 }

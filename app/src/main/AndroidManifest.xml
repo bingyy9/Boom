@@ -28,7 +28,7 @@
         android:theme="@style/Theme.MyApplication">
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.boom.android.fileProvider"
+            android:authorities="com.boom.android.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

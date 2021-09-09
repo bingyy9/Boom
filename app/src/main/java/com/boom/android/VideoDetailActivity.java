@@ -335,8 +335,8 @@ public class VideoDetailActivity extends AppCompatActivity implements UniversalV
         Intent intent = new Intent(Intent.ACTION_SEND);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            Uri contentUri = FileProvider.getUriForFile(BoomApplication.getInstance().getApplicationContext()
-                    , BuildConfig.APPLICATION_ID + ".fileProvider", file);
+            Uri contentUri = FileProvider.getUriForFile(this
+                    , BuildConfig.APPLICATION_ID + ".fileprovider", file);
 
             intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + filePath));
             intent.putExtra(Intent.EXTRA_SUBJECT, "MyApp File Share: " + file.getName());
