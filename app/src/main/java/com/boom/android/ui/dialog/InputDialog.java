@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
-import com.boom.android.SettingsActivity;
 import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.KeybordUtils;
 import com.boom.android.util.PrefsUtil;
@@ -28,17 +27,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 
-public class InputDialog extends DialogFragment {
-    public static final String TAG = "InputDialog";
-    public static final int TYPE_TIME_DELAY_BEFORE_RECORD = 1;
-
+public class InputDialog extends AppDialogFragment {
     private View rootView;
     private TextView tvTitle;
     private TextView tvMsg;
     private EditText etInput;
     private TextView btCancel;
     private TextView btOk;
-    private int dlgType;
 
     SettingsViewModel settingsViewModel;
 
@@ -54,14 +49,14 @@ public class InputDialog extends DialogFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if(getArguments() != null) {
-            dlgType = getArguments().getInt("type");
+            type = getArguments().getInt("type");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        rootView = inflater.inflate(R.layout.input_dlg, container, false);
+        rootView = inflater.inflate(R.layout.dlg_input, container, false);
         getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         tvTitle = rootView.findViewById(R.id.tv_title);
         tvMsg = rootView.findViewById(R.id.tv_msg);
@@ -77,7 +72,7 @@ public class InputDialog extends DialogFragment {
     }
 
     private void initView(){
-        if(dlgType == TYPE_TIME_DELAY_BEFORE_RECORD){
+        if(type == TYPE_TIME_DELAY_BEFORE_RECORD){
             tvTitle.setText(getResources().getString(R.string.delay_value_in_seconds));
             tvMsg.setVisibility(View.GONE);
             etInput.setFilters(new InputFilter[]{new InputFilterMinMax(1, ConfigUtil.MAX_DELAY_BEFORE_RECORD_SECONDS)});
@@ -108,10 +103,10 @@ public class InputDialog extends DialogFragment {
 
     private void onOKClick(){
         if (etInput != null) {
-            if(dlgType == TYPE_TIME_DELAY_BEFORE_RECORD && !StringUtils.isEmpty(etInput.getText().toString())){
+            if(type == TYPE_TIME_DELAY_BEFORE_RECORD && !StringUtils.isEmpty(etInput.getText().toString())){
                 PrefsUtil.setTimeDelayBeforeRecording(getActivity(), Integer.valueOf(etInput.getText().toString()));
                 if(settingsViewModel != null){
-                    settingsViewModel.updateTimeDelayBeforeRecording();
+                    settingsViewModel.postValueUpdated(SettingsViewModel.PostType.TIME_DELAY_BEFORE_RECORDING);
                 }
             }
         }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <dimen name="dlg_single_list_max_height">200dp</dimen>
+
+</resources>

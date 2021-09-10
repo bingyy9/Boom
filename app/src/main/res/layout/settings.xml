@@ -187,7 +187,6 @@
                     android:gravity="center_vertical"
                     android:maxLines="2"
                     android:singleLine="false"
-                    android:text="@string/file_name_format_value"
                     android:textColor="@color/gray_dark_1"
                     android:textSize="@dimen/font_14"
                     app:layout_constraintLeft_toRightOf="@id/iv_file_name_format"

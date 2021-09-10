@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <declare-styleable name="MaxLimitRecyclerView">
+        <attr name="limit_maxHeight" format="dimension" />
+    </declare-styleable>
+</resources>

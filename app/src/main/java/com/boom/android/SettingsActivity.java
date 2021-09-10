@@ -8,7 +8,9 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
+import com.boom.android.ui.dialog.SingleSelectDialog;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.viewmodel.SettingsViewModel;
 
@@ -60,13 +62,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
                     PrefsUtil.getTimeDelayBeforeRecording(this)));
         });
+        settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> {
+            tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
+        });
     }
 
     private void updateView(){
         tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
                 PrefsUtil.getTimeDelayBeforeRecording(this)));
-        tvFileFormat.setText(this.getResources().getString(R.string.file_name_format_value
-                , PrefsUtil.getFileNameFormat(this)));
+        tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
     }
 
     @Override
@@ -83,22 +87,32 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
         switch (view.getId()){
             case R.id.layout_time_delay:
-                showInputDialog();
+                displayDialog(AppDialogFragment.TYPE_TIME_DELAY_BEFORE_RECORD);
                 break;
             case R.id.layout_file_format:
+                displayDialog(AppDialogFragment.TYPE_FILE_NAME_FORMAT_SELECT);
                 break;
         }
     }
 
-    private void showInputDialog(){
+    private void displayDialog(int type){
         FragmentManager fragmentManager = getSupportFragmentManager();
         if (fragmentManager == null) {
             return;
         }
-        DialogFragment prev = (DialogFragment)fragmentManager.findFragmentByTag(InputDialog.TAG);
+        DialogFragment prev = (DialogFragment)fragmentManager.findFragmentByTag(AppDialogFragment.TAG);
         if (prev != null) {
             prev.dismiss();
         }
-        InputDialog.newInstance(InputDialog.TYPE_TIME_DELAY_BEFORE_RECORD).show(fragmentManager.beginTransaction(), InputDialog.TAG);
+
+        switch (type){
+            case AppDialogFragment.TYPE_TIME_DELAY_BEFORE_RECORD:
+                InputDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
+                break;
+            case AppDialogFragment.TYPE_FILE_NAME_FORMAT_SELECT:
+                SingleSelectDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
+                break;
+
+        }
     }
 }

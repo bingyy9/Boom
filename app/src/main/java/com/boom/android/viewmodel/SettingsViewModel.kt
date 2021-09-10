@@ -15,17 +15,25 @@ import com.boom.model.repo.RecordRepo
 
 class SettingsViewModel : ViewModel(){
     val timeDelayBeforeRecording: MutableLiveData<Boolean> = MutableLiveData()
+    val fileNameFormatUpdated: MutableLiveData<Boolean> = MutableLiveData()
+
+    enum class PostType{
+        TIME_DELAY_BEFORE_RECORDING, FILE_NAME_FORMAT
+    }
 
 
     override fun onCleared() {
         super.onCleared()
     }
 
+    fun postValueUpdated(type: PostType){
+        when(type){
+            PostType.TIME_DELAY_BEFORE_RECORDING -> timeDelayBeforeRecording.postValue(true)
+            PostType.FILE_NAME_FORMAT -> fileNameFormatUpdated.postValue(true)
+        }
 
-
-    fun updateTimeDelayBeforeRecording(){
-        timeDelayBeforeRecording.postValue(true)
     }
+
 
 
 

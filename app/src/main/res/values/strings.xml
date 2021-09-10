@@ -42,9 +42,8 @@
 
     <string name="video_settings">Video Settings</string>
     <string name="file_name_format">File name format</string>
-    <string name="file_name_format_value">%1$s</string>
 
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
-
+    <string name="checked">Checked</string>
 </resources>
