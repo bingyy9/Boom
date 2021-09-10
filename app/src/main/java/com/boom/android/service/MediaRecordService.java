@@ -191,7 +191,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            mediaRecorder.setOutputFile(FilesDirUtil.getRecordFileWriteDir(MediaRecordService.this) + DataUtils.formatDate4RecordDefaultName(System.currentTimeMillis()) + ".mp4");
+            mediaRecorder.setOutputFile(FilesDirUtil.getRecordFileWriteDir(MediaRecordService.this)
+                    + DataUtils.formatDate4RecordDefaultName(MediaRecordService.this, System.currentTimeMillis()) + ".mp4");
             mediaRecorder.setVideoSize(width, height);
             mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);

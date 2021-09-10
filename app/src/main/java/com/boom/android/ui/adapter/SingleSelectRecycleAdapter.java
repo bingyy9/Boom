@@ -1,4 +1,4 @@
-package com.boom.android.ui.adapter.repo;
+package com.boom.android.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,6 +12,7 @@ import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.SettingsActivity;
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.adapter.repo.SingleSelectBean;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.viewmodel.SettingsViewModel;
 
@@ -70,14 +71,10 @@ public class SingleSelectRecycleAdapter extends RecyclerView.Adapter<RecyclerVie
         }
 
         ItemVH userHolder = (ItemVH) holder;
-        userHolder.tvValue.setText(bean.getValue());
+        userHolder.tvValue.setText(String.valueOf(bean.getValue()));
         userHolder.ivChecked.setVisibility(bean.getChecked()? View.VISIBLE :View.GONE);
 
         userHolder.container.setOnClickListener((v) ->{
-            PrefsUtil.setFileNameFormat(BoomApplication.getInstance().getApplicationContext(), bean.getValue());
-            if(settingsViewModel != null){
-                settingsViewModel.postValueUpdated(SettingsViewModel.PostType.FILE_NAME_FORMAT);
-            }
             if(mListener != null){
                 mListener.onItemSelected(bean);
             }

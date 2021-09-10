@@ -1,4 +1,4 @@
 package com.boom.android.ui.adapter.repo
 
-data class SingleSelectBean(var value: String, var checked: Boolean) {
+data class SingleSelectBean<T>(var value: T, var checked: Boolean) {
 }

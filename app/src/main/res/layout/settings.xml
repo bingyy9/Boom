@@ -193,6 +193,194 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_file_name_format" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_resolution"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_file_format">
+
+                <ImageView
+                    android:id="@+id/iv_resolution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_resolution"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_resolution"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/resolution"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_resolution"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_resolution_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_resolution"
+                    app:layout_constraintTop_toBottomOf="@id/tv_resolution" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_bitrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_resolution">
+
+                <ImageView
+                    android:id="@+id/iv_bitrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_bitrate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_bitrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:text="@string/bitrate_value"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_bitrate"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_bitrate_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_bitrate"
+                    app:layout_constraintTop_toBottomOf="@id/tv_bitrate"
+                    android:text="@string/bitrate_value_desc"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_frame_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_bitrate">
+
+                <ImageView
+                    android:id="@+id/iv_frame_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_frame_rate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_frame_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_frame_rate"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/frame_rate_value"/>
+
+                <TextView
+                    android:id="@+id/tv_frame_rate_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_frame_rate"
+                    app:layout_constraintTop_toBottomOf="@id/tv_frame_rate"
+                    android:text="@string/frame_rate_desc"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

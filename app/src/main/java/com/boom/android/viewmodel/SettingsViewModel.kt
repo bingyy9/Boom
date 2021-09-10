@@ -16,9 +16,17 @@ import com.boom.model.repo.RecordRepo
 class SettingsViewModel : ViewModel(){
     val timeDelayBeforeRecording: MutableLiveData<Boolean> = MutableLiveData()
     val fileNameFormatUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val resolutionUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val bitrateUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val frameRateUpdated: MutableLiveData<Boolean> = MutableLiveData()
 
     enum class PostType{
-        TIME_DELAY_BEFORE_RECORDING, FILE_NAME_FORMAT
+        NONE
+        , TIME_DELAY_BEFORE_RECORDING
+        , FILE_NAME_FORMAT
+        , RESOLUTION
+        , FRAME_RATE
+        , BITRATE
     }
 
 
@@ -30,6 +38,9 @@ class SettingsViewModel : ViewModel(){
         when(type){
             PostType.TIME_DELAY_BEFORE_RECORDING -> timeDelayBeforeRecording.postValue(true)
             PostType.FILE_NAME_FORMAT -> fileNameFormatUpdated.postValue(true)
+            PostType.BITRATE -> bitrateUpdated.postValue(true)
+            PostType.FRAME_RATE -> frameRateUpdated.postValue(true)
+            PostType.RESOLUTION -> resolutionUpdated.postValue(true)
         }
 
     }

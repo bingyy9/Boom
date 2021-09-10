@@ -43,6 +43,15 @@
     <string name="video_settings">Video Settings</string>
     <string name="file_name_format">File name format</string>
 
+    <string name="resolution">Resolution</string>
+    <string name="resolution_value">%1$sx%2$s (%3$s)</string>
+    <string name="bitrate">Bitrate</string>
+    <string name="bitrate_value">Bitrate (%1$s Mbps)</string>
+    <string name="bitrate_value_desc">Select quality of recording. Higher quality means larger video file sizes</string>
+    <string name="frame_rate">Frame rate</string>
+    <string name="frame_rate_value">Frame rate (%1$s fps)</string>
+    <string name="frame_rate_desc">Higher rate means more CPU usage</string>
+
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="checked">Checked</string>

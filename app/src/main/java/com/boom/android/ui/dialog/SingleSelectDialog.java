@@ -3,28 +3,21 @@ package com.boom.android.ui.dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.Spanned;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.adapter.repo.SingleSelectBean;
-import com.boom.android.ui.adapter.repo.SingleSelectRecycleAdapter;
+import com.boom.android.ui.adapter.SingleSelectRecycleAdapter;
 import com.boom.android.ui.videos.WrapContentLinearLayoutManager;
 import com.boom.android.ui.view.RecycleViewDecoration;
 import com.boom.android.util.ConfigUtil;
-import com.boom.android.util.KeybordUtils;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.viewmodel.SettingsViewModel;
 import com.boom.utils.StringUtils;
@@ -92,6 +85,23 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
         });
     }
 
+    private void updateTitle(){
+        switch (type){
+            case TYPE_FILE_NAME_FORMAT_SELECT:
+                tvTitle.setText(getResources().getString(R.string.file_name_format));
+                break;
+            case TYPE_BITRATE:
+                tvTitle.setText(getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(getActivity()))));
+                break;
+            case TYPE_FRAME_RATE:
+                tvTitle.setText(getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(getActivity()))));
+                break;
+            case TYPE_RESOLUTION:
+                tvTitle.setText(getResources().getString(R.string.resolution));
+                break;
+        }
+    }
+
     private void initList(){
         if(recyclerView == null){
             Dogger.i(Dogger.BOOM, "recyclerView is null", "SingleSelectDialog", "initList");
@@ -122,18 +132,78 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
     }
 
     private List<SingleSelectBean> buildListData() {
-        if(ConfigUtil.fileNameFormat == null || ConfigUtil.fileNameFormat.size() == 0){
-            return null;
-        }
         List<SingleSelectBean> beans = new ArrayList<>();
-        for(int i = 0; i<ConfigUtil.fileNameFormat.size(); i++){
-            boolean checked = StringUtils.contentEquals(ConfigUtil.fileNameFormat.get(i), PrefsUtil.getFileNameFormat(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.fileNameFormat.get(i), checked));
-            if(checked){
+        switch (type){
+            case TYPE_FILE_NAME_FORMAT_SELECT:
+                buildFileNameData(beans);
+                break;
+            case TYPE_BITRATE:
+                buildBitrateData(beans);
+                break;
+            case TYPE_FRAME_RATE:
+                buildFrameRateData(beans);
+                break;
+            case TYPE_RESOLUTION:
+                buildResolutionData(beans);
+                break;
+        }
+        return beans;
+    }
+
+    private void buildFileNameData(List<SingleSelectBean> beans){
+        if (ConfigUtil.fileNameFormats == null || ConfigUtil.fileNameFormats.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.fileNameFormats.size(); i++) {
+            boolean checked = StringUtils.contentEquals(ConfigUtil.fileNameFormats.get(i), PrefsUtil.getFileNameFormat(getActivity()));
+            beans.add(new SingleSelectBean(ConfigUtil.fileNameFormats.get(i), checked));
+            if (checked) {
                 checkedIndex = i;
             }
         }
-        return beans;
+    }
+
+    private void buildBitrateData(List<SingleSelectBean> beans){
+        if (ConfigUtil.bitRates == null || ConfigUtil.bitRates.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.bitRates.size(); i++) {
+            boolean checked = (ConfigUtil.bitRates.get(i) == PrefsUtil.getBitrate(getActivity()));
+            beans.add(new SingleSelectBean(ConfigUtil.bitRates.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
+    private void buildFrameRateData(List<SingleSelectBean> beans){
+        if (ConfigUtil.frameRates == null || ConfigUtil.frameRates.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.frameRates.size(); i++) {
+            boolean checked = (ConfigUtil.frameRates.get(i) == PrefsUtil.getFrameRate(getActivity()));
+            beans.add(new SingleSelectBean(ConfigUtil.frameRates.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
+    private void buildResolutionData(List<SingleSelectBean> beans){
+        if (ConfigUtil.resolutions == null || ConfigUtil.resolutions.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.resolutions.size(); i++) {
+            boolean checked = (ConfigUtil.resolutions.get(i).equals(PrefsUtil.getResolution(getActivity())));
+            beans.add(new SingleSelectBean(ConfigUtil.resolutions.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
     }
 
     private void updateView(){
@@ -153,6 +223,28 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
     @Override
     public void onItemSelected(SingleSelectBean bean) {
+        SettingsViewModel.PostType postType = SettingsViewModel.PostType.NONE;
+        switch (type){
+            case TYPE_FILE_NAME_FORMAT_SELECT:
+                PrefsUtil.setFileNameFormat(BoomApplication.getInstance().getApplicationContext(), (String)bean.getValue());
+                postType = SettingsViewModel.PostType.FILE_NAME_FORMAT;
+                break;
+            case TYPE_BITRATE:
+                PrefsUtil.setBitrate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                postType = SettingsViewModel.PostType.BITRATE;
+                break;
+            case TYPE_FRAME_RATE:
+                PrefsUtil.setFrameRate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                postType = SettingsViewModel.PostType.FRAME_RATE;
+                break;
+            case TYPE_RESOLUTION:
+                PrefsUtil.setResolution(BoomApplication.getInstance().getApplicationContext(), (Resolution) bean.getValue());
+                postType = SettingsViewModel.PostType.FRAME_RATE;
+                break;
+        }
+        if(settingsViewModel != null){
+            settingsViewModel.postValueUpdated(postType);
+        }
         this.dismiss();
     }
 }

@@ -1,5 +1,7 @@
 package com.boom.android.util;
 
+import android.content.Context;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -9,8 +11,9 @@ public class DataUtils {
         return formatter == null? null: formatter.format(time);
     }
 
-    public static String formatDate4RecordDefaultName(long time){
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+    public static String formatDate4RecordDefaultName(Context context, long time){
+        String fileNameFormat = PrefsUtil.getFileNameFormat(context);
+        SimpleDateFormat formatter = new SimpleDateFormat(fileNameFormat);
         return formatter == null? null: formatter.format(time);
     }
 

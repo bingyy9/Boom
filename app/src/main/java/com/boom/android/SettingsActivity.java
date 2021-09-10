@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.ui.dialog.SingleSelectDialog;
@@ -26,12 +27,25 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     @BindView(R.id.layout_time_delay)
     View layoutTimeDelay;
-    @BindView(R.id.tv_current_delay_recording)
-    TextView tvDelayRecording;
     @BindView(R.id.layout_file_format)
     View layoutFileNameFormat;
+    @BindView(R.id.layout_resolution)
+    View layoutResolution;
+    @BindView(R.id.layout_frame_rate)
+    View layoutFrameRate;
+    @BindView(R.id.layout_bitrate)
+    View layoutBitrate;
+
+    @BindView(R.id.tv_current_delay_recording)
+    TextView tvDelayRecording;
     @BindView(R.id.tv_file_name_format_value)
     TextView tvFileFormat;
+    @BindView(R.id.tv_resolution_value)
+    TextView tvResolution;
+    @BindView(R.id.tv_bitrate)
+    TextView tvBitrate;
+    @BindView(R.id.tv_frame_rate)
+    TextView tvFrameRate;
 
     SettingsViewModel settingsViewModel;
 
@@ -58,6 +72,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private void initView() {
         layoutTimeDelay.setOnClickListener(this);
         layoutFileNameFormat.setOnClickListener(this);
+        layoutResolution.setOnClickListener(this);
+        layoutBitrate.setOnClickListener(this);
+        layoutFrameRate.setOnClickListener(this);
         settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> {
             tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
                     PrefsUtil.getTimeDelayBeforeRecording(this)));
@@ -65,12 +82,32 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> {
             tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
         });
+        settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> {
+            tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(this))));
+        });
+        settingsViewModel.getFrameRateUpdated().observe(this, (Boolean b)-> {
+            tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(this))));
+        });
+        settingsViewModel.getResolutionUpdated().observe(this, (Boolean b)-> {
+            Resolution resolution = PrefsUtil.getResolution(this);
+            if(resolution != null){
+                tvResolution.setText(this.getResources().getString(R.string.resolution_value
+                        , String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
+            }
+        });
     }
 
     private void updateView(){
         tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
                 PrefsUtil.getTimeDelayBeforeRecording(this)));
         tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
+        Resolution resolution = PrefsUtil.getResolution(this);
+        if(resolution != null){
+            tvResolution.setText(this.getResources().getString(R.string.resolution_value
+                , String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
+        }
+        tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(this))));
+        tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(this))));
     }
 
     @Override
@@ -92,6 +129,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.layout_file_format:
                 displayDialog(AppDialogFragment.TYPE_FILE_NAME_FORMAT_SELECT);
                 break;
+            case R.id.layout_resolution:
+                displayDialog(AppDialogFragment.TYPE_RESOLUTION);
+                break;
+            case R.id.layout_frame_rate:
+                displayDialog(AppDialogFragment.TYPE_FRAME_RATE);
+                break;
+            case R.id.layout_bitrate:
+                displayDialog(AppDialogFragment.TYPE_BITRATE);
+                break;
         }
     }
 
@@ -110,6 +156,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 InputDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
                 break;
             case AppDialogFragment.TYPE_FILE_NAME_FORMAT_SELECT:
+            case AppDialogFragment.TYPE_RESOLUTION:
+            case AppDialogFragment.TYPE_FRAME_RATE:
+            case AppDialogFragment.TYPE_BITRATE:
                 SingleSelectDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
                 break;
 
