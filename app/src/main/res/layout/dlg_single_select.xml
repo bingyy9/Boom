@@ -26,6 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
         android:minWidth="@dimen/common_dialog_min_width"
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/tv_title"

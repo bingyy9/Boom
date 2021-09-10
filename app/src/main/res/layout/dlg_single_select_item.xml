@@ -17,7 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:text="native"
-        android:textSize="@dimen/font_17"/>
+        android:textSize="@dimen/font_17"
+        android:textColor="@color/gray_dark_1"/>
 
     <ImageView
         android:id="@+id/iv_checked"
