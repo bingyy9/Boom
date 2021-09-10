@@ -14,7 +14,6 @@ import com.boom.android.SettingsActivity;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.adapter.repo.SingleSelectBean;
-import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
 
@@ -23,7 +22,6 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;

@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.boom.android.MainActivity;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.adapter.repo.RecordParams;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FilesDirUtil;
@@ -59,9 +60,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private MediaRecorder mediaRecorder;
     private VirtualDisplay virtualDisplay;
 
-    private int width = 720;
-    private int height = 1080;
-    private int dpi;
+    private RecordParams recordParams;
 
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
@@ -128,10 +127,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         mediaProjection = project;
     }
 
-    public void setConfig(int width, int height, int dpi) {
-        this.width = width;
-        this.height = height;
-        this.dpi = dpi;
+    public void setConfig(RecordParams recordParams) {
+        this.recordParams = recordParams;
     }
 
     public boolean startRecord() {
@@ -178,7 +175,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     private void createVirtualDisplay() {
-        virtualDisplay = mediaProjection.createVirtualDisplay("MainScreen", width, height, dpi,
+        virtualDisplay = mediaProjection.createVirtualDisplay("MainScreen"
+                , recordParams.getWidth()
+                , recordParams.getHeight()
+                , recordParams.getDpi(),
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, mediaRecorder.getSurface(), null, null);
     }
 
@@ -193,7 +193,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             mediaRecorder.setOutputFile(FilesDirUtil.getRecordFileWriteDir(MediaRecordService.this)
                     + DataUtils.formatDate4RecordDefaultName(MediaRecordService.this, System.currentTimeMillis()) + ".mp4");
-            mediaRecorder.setVideoSize(width, height);
+            mediaRecorder.setVideoSize(recordParams.getWidth(), recordParams.getHeight());
             mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
             mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
@@ -335,8 +335,8 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private void updateLayoutParamsToCounterView(){
         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        layoutParams.x = (width >> 1) - WindowUtils.dp2px(this, 75);
-        layoutParams.y = (height >> 1) - WindowUtils.dp2px(this, 75);
+        layoutParams.x = (recordParams.getWidth() >> 1) - WindowUtils.dp2px(this, 75);
+        layoutParams.y = (recordParams.getHeight() >> 1) - WindowUtils.dp2px(this, 75);
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
     }
 

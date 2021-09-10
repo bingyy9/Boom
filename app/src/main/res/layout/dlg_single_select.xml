@@ -55,7 +55,7 @@
             android:gravity="right"
             android:text="@string/cancel"
             android:textColor="@color/blue_normal"
-            android:textSize="@dimen/font_14"
+            android:textSize="@dimen/font_16"
             android:foreground="?attr/selectableItemBackground"
             android:padding="10dp"/>
     </LinearLayout>

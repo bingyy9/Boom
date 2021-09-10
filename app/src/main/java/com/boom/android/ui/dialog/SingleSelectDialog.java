@@ -16,7 +16,6 @@ import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.adapter.repo.SingleSelectBean;
 import com.boom.android.ui.adapter.SingleSelectRecycleAdapter;
 import com.boom.android.ui.videos.WrapContentLinearLayoutManager;
-import com.boom.android.ui.view.RecycleViewDecoration;
 import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.viewmodel.SettingsViewModel;

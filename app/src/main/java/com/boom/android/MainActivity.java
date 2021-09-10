@@ -26,11 +26,14 @@ import android.view.animation.OvershootInterpolator;
 
 import com.boom.android.log.Dogger;
 import com.boom.android.service.RecordingForegroundService;
+import com.boom.android.ui.adapter.repo.RecordParams;
+import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.videos.MyVideosFragment;
 import com.boom.android.ui.videos.RecentVideosFragment;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
+import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.viewmodel.RecordViewModel;
 import com.boom.model.interf.IRecordModel;
@@ -243,11 +246,27 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private void configMediaRecordService(MediaProjection mediaProjection){
         if(BoomApplication.getInstance().getMediaRecordService() != null){
             BoomApplication.getInstance().getMediaRecordService().setMediaProject(mediaProjection);
-            DisplayMetrics metrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(metrics);
-            Dogger.i(Dogger.BOOM, "metrics.widthPixels: " + metrics.widthPixels + " metrics.heightPixels: " + metrics.heightPixels, "MainActivity", "configMediaRecordService");
-            BoomApplication.getInstance().getMediaRecordService().setConfig(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi);
+            BoomApplication.getInstance().getMediaRecordService().setConfig(getRecordParams());
         }
+    }
+
+    private RecordParams getRecordParams(){
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        Dogger.i(Dogger.BOOM, "metrics.widthPixels: " + metrics.widthPixels + " metrics.heightPixels: " + metrics.heightPixels, "MainActivity", "configMediaRecordService");
+        Resolution resolution = PrefsUtil.getResolution(this);
+        if(resolution != null){
+            if(resolution.getWidth() == 1) {
+                return new RecordParams(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi, PrefsUtil.getBitrate(this), PrefsUtil.getFrameRate(this));
+            } else {
+                return new RecordParams(resolution.getWidth()
+                        , resolution.getHeight()
+                        , metrics.densityDpi
+                        , PrefsUtil.getBitrate(this)
+                        , PrefsUtil.getFrameRate(this));
+            }
+        }
+        return null;
     }
 
     private void showCounterFloatingWindow(){
