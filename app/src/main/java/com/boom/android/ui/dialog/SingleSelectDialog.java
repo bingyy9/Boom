@@ -113,7 +113,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
         recyclerView.setLayoutManager(new WrapContentLinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.addItemDecoration(new RecycleViewDecoration(getActivity(), RecycleViewDecoration.VERTICAL_LIST));
+//        recyclerView.addItemDecoration(new RecycleViewDecoration(getActivity(), RecycleViewDecoration.VERTICAL_LIST));
         recyclerView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
             @Override
             public void onViewAttachedToWindow(View v) {
