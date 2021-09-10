@@ -76,10 +76,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
     }
 
     private void initView(){
-        if(type == TYPE_FILE_NAME_FORMAT_SELECT){
-            tvTitle.setText(getResources().getString(R.string.file_name_format));
-        }
-
+        updateTitle();
         cancelButton.setOnClickListener((v)->{
             this.dismiss();
         });
@@ -239,7 +236,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
                 break;
             case TYPE_RESOLUTION:
                 PrefsUtil.setResolution(BoomApplication.getInstance().getApplicationContext(), (Resolution) bean.getValue());
-                postType = SettingsViewModel.PostType.FRAME_RATE;
+                postType = SettingsViewModel.PostType.RESOLUTION;
                 break;
         }
         if(settingsViewModel != null){

@@ -44,6 +44,8 @@
     <string name="file_name_format">File name format</string>
 
     <string name="resolution">Resolution</string>
+    <string name="use_screen_resolution">Screen resolution \n(%1$sx%2$s)</string>
+    <string name="use_screen_resolution_short">(%1$sx%2$s)</string>
     <string name="resolution_value">%1$sx%2$s (%3$s)</string>
     <string name="bitrate">Bitrate</string>
     <string name="bitrate_value">Bitrate (%1$s Mbps)</string>

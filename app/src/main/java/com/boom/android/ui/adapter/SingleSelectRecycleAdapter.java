@@ -12,8 +12,10 @@ import com.boom.android.BoomApplication;
 import com.boom.android.R;
 import com.boom.android.SettingsActivity;
 import com.boom.android.log.Dogger;
+import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.adapter.repo.SingleSelectBean;
 import com.boom.android.util.PrefsUtil;
+import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
 
 import java.util.ArrayList;
@@ -71,7 +73,15 @@ public class SingleSelectRecycleAdapter extends RecyclerView.Adapter<RecyclerVie
         }
 
         ItemVH userHolder = (ItemVH) holder;
-        userHolder.tvValue.setText(String.valueOf(bean.getValue()));
+        if(bean.getValue() instanceof Resolution && ((Resolution) bean.getValue()).getWidth() == 1){
+            userHolder.tvValue.setText(BoomApplication.getInstance().getApplicationContext().getResources()
+                        .getString(R.string.use_screen_resolution
+                            , String.valueOf(WindowUtils.getScreenWidth(mContext))
+                            , String.valueOf(WindowUtils.getScreenHeight(mContext))));
+        } else {
+            userHolder.tvValue.setText(String.valueOf(bean.getValue()));
+        }
+
         userHolder.ivChecked.setVisibility(bean.getChecked()? View.VISIBLE :View.GONE);
 
         userHolder.container.setOnClickListener((v) ->{

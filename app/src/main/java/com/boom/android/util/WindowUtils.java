@@ -17,7 +17,6 @@ public class WindowUtils {
         Display display = wndMgr.getDefaultDisplay();
         Point outSize = new Point();
         display.getSize(outSize);
-
         return outSize.y;
     }
 
@@ -33,7 +32,6 @@ public class WindowUtils {
         Display display = wndMgr.getDefaultDisplay();
         Point outSize = new Point();
         display.getSize(outSize);
-
         return outSize.x;
     }
 

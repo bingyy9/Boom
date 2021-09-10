@@ -245,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             BoomApplication.getInstance().getMediaRecordService().setMediaProject(mediaProjection);
             DisplayMetrics metrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            Dogger.i(Dogger.BOOM, "metrics.widthPixels: " + metrics.widthPixels + " metrics.heightPixels: " + metrics.heightPixels, "MainActivity", "configMediaRecordService");
             BoomApplication.getInstance().getMediaRecordService().setConfig(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi);
         }
     }

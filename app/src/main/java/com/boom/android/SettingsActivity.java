@@ -13,6 +13,7 @@ import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.ui.dialog.SingleSelectDialog;
 import com.boom.android.util.PrefsUtil;
+import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
 
 
@@ -75,39 +76,50 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         layoutResolution.setOnClickListener(this);
         layoutBitrate.setOnClickListener(this);
         layoutFrameRate.setOnClickListener(this);
-        settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> {
-            tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
-                    PrefsUtil.getTimeDelayBeforeRecording(this)));
-        });
-        settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> {
-            tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
-        });
-        settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> {
-            tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(this))));
-        });
-        settingsViewModel.getFrameRateUpdated().observe(this, (Boolean b)-> {
-            tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(this))));
-        });
-        settingsViewModel.getResolutionUpdated().observe(this, (Boolean b)-> {
-            Resolution resolution = PrefsUtil.getResolution(this);
-            if(resolution != null){
-                tvResolution.setText(this.getResources().getString(R.string.resolution_value
-                        , String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
-            }
-        });
+        settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> updateDelayRecording());
+        settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> updateFileFormate());
+        settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> updateBitRate());
+        settingsViewModel.getFrameRateUpdated().observe(this, (Boolean b)-> updateFrameRate());
+        settingsViewModel.getResolutionUpdated().observe(this, (Boolean b)-> updateResolution());
     }
 
     private void updateView(){
+        updateDelayRecording();
+        updateFileFormate();
+        updateFrameRate();
+        updateBitRate();
+        updateResolution();
+    }
+
+    private void updateDelayRecording(){
         tvDelayRecording.setText(this.getResources().getString(R.string.current_time,
                 PrefsUtil.getTimeDelayBeforeRecording(this)));
+    }
+
+    private void updateFileFormate(){
         tvFileFormat.setText(PrefsUtil.getFileNameFormat(this));
-        Resolution resolution = PrefsUtil.getResolution(this);
-        if(resolution != null){
-            tvResolution.setText(this.getResources().getString(R.string.resolution_value
-                , String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
-        }
+    }
+
+    private void updateFrameRate(){
         tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(this))));
+    }
+
+    private void updateBitRate(){
         tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(this))));
+    }
+
+    private void updateResolution(){
+        Resolution resolution = PrefsUtil.getResolution(this);
+        if(resolution != null && tvResolution != null){
+            if(resolution.getWidth() == 1){
+                tvResolution.setText(BoomApplication.getInstance().getApplicationContext().getResources()
+                        .getString(R.string.use_screen_resolution_short
+                                , String.valueOf(WindowUtils.getScreenWidth(this))
+                                , String.valueOf(WindowUtils.getScreenHeight(this))));
+            } else {
+                tvResolution.setText(this.getResources().getString(R.string.resolution_value, String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
+            }
+        }
     }
 
     @Override
