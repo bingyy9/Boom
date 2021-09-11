@@ -7,9 +7,13 @@ import com.boom.android.ui.adapter.repo.Resolution;
 public class PrefsUtil {
     private static final String TIME_DELAY_BEFORE_RECORDING = "time_delay_before_recording";
     private static final String FILE_NAME_FORMAT = "file_name_format";
-    private static final String FRAME_RATE = "frame_rate";
-    private static final String BITRATE = "bitrate";
+    private static final String VIDEO_FRAME_RATE = "video_frame_rate";
+    private static final String VIDEO_BITRATE = "video_bitrate";
     private static final String RESOLUTION = "resolution";
+    private static final String AUDIO_SAMPLE_RATE = "audio_sample_rate";
+    private static final String AUDIO_BITRATE = "audio_bitrate";
+    private static final String AUDIO_CHANNEL = "audio_channel";
+
 
     public static String getTimeDelayBeforeRecording(Context context){
         return String.valueOf(Prefs.with(context).readInt(TIME_DELAY_BEFORE_RECORDING
@@ -20,22 +24,21 @@ public class PrefsUtil {
         Prefs.with(context).writeInt(TIME_DELAY_BEFORE_RECORDING, seconds);
     }
 
-    public static int getFrameRate(Context context){
-        return Prefs.with(context).readInt(FRAME_RATE, ConfigUtil.defaultFrameRate);
+    public static int getVideoFrameRate(Context context){
+        return Prefs.with(context).readInt(VIDEO_FRAME_RATE, ConfigUtil.defaultFrameRate);
     }
 
-    public static void setFrameRate(Context context, int frameRate){
-        Prefs.with(context).writeInt(FRAME_RATE, frameRate);
+    public static void setVideoFrameRate(Context context, int frameRate){
+        Prefs.with(context).writeInt(VIDEO_FRAME_RATE, frameRate);
     }
 
-    public static int getBitrate(Context context){
-        return Prefs.with(context).readInt(BITRATE, ConfigUtil.defaultBitRate);
+    public static int getVideoBitrate(Context context){
+        return Prefs.with(context).readInt(VIDEO_BITRATE, ConfigUtil.defaultBitRate);
     }
 
-    public static void setBitrate(Context context, int bitrate){
-        Prefs.with(context).writeInt(BITRATE, bitrate);
+    public static void setVideoBitrate(Context context, int bitrate){
+        Prefs.with(context).writeInt(VIDEO_BITRATE, bitrate);
     }
-
 
 
     public static String getFileNameFormat(Context context){
@@ -57,6 +60,30 @@ public class PrefsUtil {
             return;
         }
         Prefs.with(context).write(RESOLUTION, resolution.save());
+    }
+
+    public static int getAudioBitrate(Context context){
+        return Prefs.with(context).readInt(AUDIO_BITRATE, ConfigUtil.defaultAudioBitrate);
+    }
+
+    public static void setAudioBitrate(Context context, int bitrate){
+        Prefs.with(context).writeInt(AUDIO_BITRATE, bitrate);
+    }
+
+    public static int getAudioSampleRate(Context context){
+        return Prefs.with(context).readInt(AUDIO_SAMPLE_RATE, ConfigUtil.defalutAudioSampleRate);
+    }
+
+    public static void setAudioSampleRate(Context context, int sampleRate){
+        Prefs.with(context).writeInt(AUDIO_SAMPLE_RATE, sampleRate);
+    }
+
+    public static String getAudioChannel(Context context){
+        return Prefs.with(context).read(AUDIO_CHANNEL, ConfigUtil.defaultAudioChannel);
+    }
+
+    public static void setAudioChannel(Context context, String value){
+        Prefs.with(context).write(AUDIO_CHANNEL, value);
     }
 
 }

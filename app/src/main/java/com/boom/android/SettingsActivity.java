@@ -105,11 +105,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void updateFrameRate(){
-        tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(this))));
+        tvFrameRate.setText(this.getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getVideoFrameRate(this))));
     }
 
     private void updateBitRate(){
-        tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(this))));
+        tvBitrate.setText(this.getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getVideoBitrate(this))));
     }
 
     private void updateResolution(){

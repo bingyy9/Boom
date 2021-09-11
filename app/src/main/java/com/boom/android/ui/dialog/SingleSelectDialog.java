@@ -87,10 +87,10 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
                 tvTitle.setText(getResources().getString(R.string.file_name_format));
                 break;
             case TYPE_BITRATE:
-                tvTitle.setText(getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getBitrate(getActivity()))));
+                tvTitle.setText(getResources().getString(R.string.bitrate_value, String.valueOf(PrefsUtil.getVideoBitrate(getActivity()))));
                 break;
             case TYPE_FRAME_RATE:
-                tvTitle.setText(getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getFrameRate(getActivity()))));
+                tvTitle.setText(getResources().getString(R.string.frame_rate_value, String.valueOf(PrefsUtil.getVideoFrameRate(getActivity()))));
                 break;
             case TYPE_RESOLUTION:
                 tvTitle.setText(getResources().getString(R.string.resolution));
@@ -166,7 +166,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
         }
 
         for (int i = 0; i < ConfigUtil.bitRates.size(); i++) {
-            boolean checked = (ConfigUtil.bitRates.get(i) == PrefsUtil.getBitrate(getActivity()));
+            boolean checked = (ConfigUtil.bitRates.get(i) == PrefsUtil.getVideoBitrate(getActivity()));
             beans.add(new SingleSelectBean(ConfigUtil.bitRates.get(i), checked));
             if (checked) {
                 checkedIndex = i;
@@ -180,7 +180,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
         }
 
         for (int i = 0; i < ConfigUtil.frameRates.size(); i++) {
-            boolean checked = (ConfigUtil.frameRates.get(i) == PrefsUtil.getFrameRate(getActivity()));
+            boolean checked = (ConfigUtil.frameRates.get(i) == PrefsUtil.getVideoFrameRate(getActivity()));
             beans.add(new SingleSelectBean(ConfigUtil.frameRates.get(i), checked));
             if (checked) {
                 checkedIndex = i;
@@ -226,11 +226,11 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
                 postType = SettingsViewModel.PostType.FILE_NAME_FORMAT;
                 break;
             case TYPE_BITRATE:
-                PrefsUtil.setBitrate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                PrefsUtil.setVideoBitrate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
                 postType = SettingsViewModel.PostType.BITRATE;
                 break;
             case TYPE_FRAME_RATE:
-                PrefsUtil.setFrameRate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                PrefsUtil.setVideoFrameRate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
                 postType = SettingsViewModel.PostType.FRAME_RATE;
                 break;
             case TYPE_RESOLUTION:

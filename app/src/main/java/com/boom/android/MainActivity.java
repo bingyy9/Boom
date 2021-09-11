@@ -257,13 +257,13 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         Resolution resolution = PrefsUtil.getResolution(this);
         if(resolution != null){
             if(resolution.getWidth() == 1) {
-                return new RecordParams(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi, PrefsUtil.getBitrate(this), PrefsUtil.getFrameRate(this));
+                return new RecordParams(metrics.widthPixels, metrics.heightPixels, metrics.densityDpi, PrefsUtil.getVideoBitrate(this), PrefsUtil.getVideoFrameRate(this));
             } else {
                 return new RecordParams(resolution.getWidth()
                         , resolution.getHeight()
                         , metrics.densityDpi
-                        , PrefsUtil.getBitrate(this)
-                        , PrefsUtil.getFrameRate(this));
+                        , PrefsUtil.getVideoBitrate(this)
+                        , PrefsUtil.getVideoFrameRate(this));
             }
         }
         return null;

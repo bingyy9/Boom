@@ -68,6 +68,21 @@ public class ConfigUtil {
             , new Resolution(2560, 1600, "8:5")
     ));
 
+    public static final int defalutAudioSampleRate = 44100;
+    public static List<Integer> audioSampleRates = new ArrayList<>(Arrays.asList(
+            44100, 48000
+    ));
+
+    public static final int defaultAudioBitrate = 128;
+    public static List<Integer> audioBitrates = new ArrayList<>(Arrays.asList(
+            64, 128, 256, 320
+    ));
+
+    public static final String defaultAudioChannel = "Mono";
+    public static List<String> audioChannels = new ArrayList<>(Arrays.asList(
+            "Mono", "Stereo"
+    ));
+
 
 
 }
