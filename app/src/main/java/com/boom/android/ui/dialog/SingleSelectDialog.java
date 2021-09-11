@@ -95,6 +95,15 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
             case TYPE_RESOLUTION:
                 tvTitle.setText(getResources().getString(R.string.resolution));
                 break;
+            case TYPE_AUDIO_BITRATE:
+                tvTitle.setText(getResources().getString(R.string.audio_bitrate));
+                break;
+            case TYPE_AUDIO_SAMPLE_RATE:
+                tvTitle.setText(getResources().getString(R.string.audio_sample_rate));
+                break;
+            case TYPE_AUDIO_CHANNEL:
+                tvTitle.setText(getResources().getString(R.string.audio_channel));
+                break;
         }
     }
 
@@ -141,6 +150,15 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
                 break;
             case TYPE_RESOLUTION:
                 buildResolutionData(beans);
+                break;
+            case TYPE_AUDIO_BITRATE:
+                buildAudioBitrateData(beans);
+                break;
+            case TYPE_AUDIO_SAMPLE_RATE:
+                buildAudioSampleRateData(beans);
+                break;
+            case TYPE_AUDIO_CHANNEL:
+                buildAudioChannelData(beans);
                 break;
         }
         return beans;
@@ -202,6 +220,48 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
         }
     }
 
+    private void buildAudioBitrateData(List<SingleSelectBean> beans){
+        if (ConfigUtil.audioBitrates == null || ConfigUtil.audioBitrates.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.audioBitrates.size(); i++) {
+            boolean checked = (ConfigUtil.audioBitrates.get(i) == PrefsUtil.getAudioBitrate(getActivity()));
+            beans.add(new SingleSelectBean(ConfigUtil.audioBitrates.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
+    private void buildAudioSampleRateData(List<SingleSelectBean> beans){
+        if (ConfigUtil.audioSampleRates == null || ConfigUtil.audioSampleRates.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.audioSampleRates.size(); i++) {
+            boolean checked = (ConfigUtil.audioSampleRates.get(i) == PrefsUtil.getAudioSampleRate(getActivity()));
+            beans.add(new SingleSelectBean(ConfigUtil.audioSampleRates.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
+    private void buildAudioChannelData(List<SingleSelectBean> beans){
+        if (ConfigUtil.audioChannels == null || ConfigUtil.audioChannels.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.audioChannels.size(); i++) {
+            boolean checked = (ConfigUtil.audioChannels.get(i).equals(PrefsUtil.getAudioChannel(getActivity())));
+            beans.add(new SingleSelectBean(ConfigUtil.audioChannels.get(i), checked));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
     private void updateView(){
         List<SingleSelectBean> languages = buildListData();
         if(adapter != null && adapter.getDataList() != null && languages != null) {
@@ -236,6 +296,18 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
             case TYPE_RESOLUTION:
                 PrefsUtil.setResolution(BoomApplication.getInstance().getApplicationContext(), (Resolution) bean.getValue());
                 postType = SettingsViewModel.PostType.RESOLUTION;
+                break;
+            case TYPE_AUDIO_BITRATE:
+                PrefsUtil.setAudioBitrate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                postType = SettingsViewModel.PostType.AUDIO_BITRATE;
+                break;
+            case TYPE_AUDIO_SAMPLE_RATE:
+                PrefsUtil.setAudioSampleRate(BoomApplication.getInstance().getApplicationContext(), (Integer)bean.getValue());
+                postType = SettingsViewModel.PostType.AUDIO_SAMPLE_RATE;
+                break;
+            case TYPE_AUDIO_CHANNEL:
+                PrefsUtil.setAudioChannel(BoomApplication.getInstance().getApplicationContext(), (String) bean.getValue());
+                postType = SettingsViewModel.PostType.AUDIO_CHANNEL;
                 break;
         }
         if(settingsViewModel != null){

@@ -54,6 +54,14 @@
     <string name="frame_rate_value">Frame rate (%1$s fps)</string>
     <string name="frame_rate_desc">Higher rate means more CPU usage</string>
 
+    <string name="audio_bitrate_with_value">Audio bitrate (%1$s Kbps)</string>
+    <string name="audio_bitrate">Audio bitrate</string>
+    <string name="audio_bitrate_desc">Sound quality while recording screen</string>
+    <string name="audio_sample_rate">Audio sample rate</string>
+    <string name="audio_sample_rate_value">%1$s Hz</string>
+    <string name="audio_channel">Audio channel</string>
+    <string name="audio_channel_with_value">%1$s</string>
+
     <string name="storage_value">%1$s</string>
     <string name="storage_location">Recording folder location</string>
 

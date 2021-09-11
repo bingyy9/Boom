@@ -19,6 +19,9 @@ class SettingsViewModel : ViewModel(){
     val resolutionUpdated: MutableLiveData<Boolean> = MutableLiveData()
     val bitrateUpdated: MutableLiveData<Boolean> = MutableLiveData()
     val frameRateUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val audioBitrateUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val audioSampleRateUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val audioChannelUpdated: MutableLiveData<Boolean> = MutableLiveData()
 
     enum class PostType{
         NONE
@@ -27,6 +30,9 @@ class SettingsViewModel : ViewModel(){
         , RESOLUTION
         , FRAME_RATE
         , BITRATE
+        , AUDIO_BITRATE
+        , AUDIO_SAMPLE_RATE
+        , AUDIO_CHANNEL
     }
 
 
@@ -41,6 +47,9 @@ class SettingsViewModel : ViewModel(){
             PostType.BITRATE -> bitrateUpdated.postValue(true)
             PostType.FRAME_RATE -> frameRateUpdated.postValue(true)
             PostType.RESOLUTION -> resolutionUpdated.postValue(true)
+            PostType.AUDIO_BITRATE -> audioBitrateUpdated.postValue(true)
+            PostType.AUDIO_SAMPLE_RATE -> audioSampleRateUpdated.postValue(true)
+            PostType.AUDIO_CHANNEL -> audioChannelUpdated.postValue(true)
         }
 
     }

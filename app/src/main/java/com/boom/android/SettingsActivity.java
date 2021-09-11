@@ -36,6 +36,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     View layoutFrameRate;
     @BindView(R.id.layout_bitrate)
     View layoutBitrate;
+    @BindView(R.id.layout_audio_bitrate)
+    View layoutAudioBitrate;
+    @BindView(R.id.layout_audio_channel)
+    View layoutAudioChannel;
+    @BindView(R.id.layout_audio_sample_rate)
+    View layoutAudioSampleRate;
 
     @BindView(R.id.tv_current_delay_recording)
     TextView tvDelayRecording;
@@ -49,6 +55,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     TextView tvFrameRate;
     @BindView(R.id.tv_storage_desc)
     TextView tvStorageLocation;
+    @BindView(R.id.tv_audio_bitrate)
+    TextView tvAudioBitrate;
+    @BindView(R.id.tv_audio_sample_rate_desc)
+    TextView tvAudioSampleRate;
+    @BindView(R.id.tv_audio_channel_desc)
+    TextView tvAudioChannel;
 
 
     SettingsViewModel settingsViewModel;
@@ -79,11 +91,17 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         layoutResolution.setOnClickListener(this);
         layoutBitrate.setOnClickListener(this);
         layoutFrameRate.setOnClickListener(this);
+        layoutAudioBitrate.setOnClickListener(this);
+        layoutAudioSampleRate.setOnClickListener(this);
+        layoutAudioChannel.setOnClickListener(this);
         settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> updateDelayRecording());
         settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> updateFileFormate());
         settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> updateBitRate());
         settingsViewModel.getFrameRateUpdated().observe(this, (Boolean b)-> updateFrameRate());
         settingsViewModel.getResolutionUpdated().observe(this, (Boolean b)-> updateResolution());
+        settingsViewModel.getAudioBitrateUpdated().observe(this, (Boolean b)-> updateAudioBitrate());
+        settingsViewModel.getAudioSampleRateUpdated().observe(this, (Boolean b)-> updateAudioSampleRate());
+        settingsViewModel.getAudioChannelUpdated().observe(this, (Boolean b)-> updateAudioChannel());
     }
 
     private void updateView(){
@@ -93,6 +111,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         updateBitRate();
         updateResolution();
         updateStorage();
+        updateAudioBitrate();
+        updateAudioSampleRate();
+        updateAudioChannel();
     }
 
     private void updateDelayRecording(){
@@ -128,7 +149,18 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private void updateStorage(){
         tvStorageLocation.setText(FilesDirUtil.getRecordFileWriteDir(this));
-//        tvStorageLocation.setText("I am from China I am from China I am from China I am from China");
+    }
+
+    private void updateAudioBitrate(){
+        tvAudioBitrate.setText(this.getResources().getString(R.string.audio_bitrate_with_value, String.valueOf(PrefsUtil.getAudioBitrate(this))));
+    }
+
+    private void updateAudioSampleRate(){
+        tvAudioSampleRate.setText(this.getResources().getString(R.string.audio_sample_rate_value, String.valueOf(PrefsUtil.getAudioSampleRate(this))));
+    }
+
+    private void updateAudioChannel(){
+        tvAudioChannel.setText(this.getResources().getString(R.string.audio_channel_with_value, PrefsUtil.getAudioChannel(this)));
     }
 
     @Override
@@ -159,6 +191,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case R.id.layout_bitrate:
                 displayDialog(AppDialogFragment.TYPE_BITRATE);
                 break;
+            case R.id.layout_audio_bitrate:
+                displayDialog(AppDialogFragment.TYPE_AUDIO_BITRATE);
+                break;
+            case R.id.layout_audio_sample_rate:
+                displayDialog(AppDialogFragment.TYPE_AUDIO_SAMPLE_RATE);
+                break;
+            case R.id.layout_audio_channel:
+                displayDialog(AppDialogFragment.TYPE_AUDIO_CHANNEL);
+                break;
         }
     }
 
@@ -180,6 +221,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case AppDialogFragment.TYPE_RESOLUTION:
             case AppDialogFragment.TYPE_FRAME_RATE:
             case AppDialogFragment.TYPE_BITRATE:
+            case AppDialogFragment.TYPE_AUDIO_BITRATE:
+            case AppDialogFragment.TYPE_AUDIO_CHANNEL:
+            case AppDialogFragment.TYPE_AUDIO_SAMPLE_RATE:
                 SingleSelectDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
                 break;
 

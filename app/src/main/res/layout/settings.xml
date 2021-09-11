@@ -446,6 +446,195 @@
                     android:text="@string/frame_rate_desc"/>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_audio_bitrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_frame_rate">
+
+                <ImageView
+                    android:id="@+id/iv_audio_bitrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_audio_bitrate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_audio_bitrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_bitrate"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/audio_bitrate_with_value"/>
+
+                <TextView
+                    android:id="@+id/tv_audio_bitrate_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_bitrate"
+                    app:layout_constraintTop_toBottomOf="@id/tv_audio_bitrate"
+                    android:text="@string/audio_bitrate_desc"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_audio_sample_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_audio_bitrate">
+
+                <ImageView
+                    android:id="@+id/iv_audio_sample_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_audio_sample_rate"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_audio_sample_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_sample_rate"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/audio_sample_rate"/>
+
+                <TextView
+                    android:id="@+id/tv_audio_sample_rate_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_sample_rate"
+                    app:layout_constraintTop_toBottomOf="@id/tv_audio_sample_rate"
+                    android:text="@string/audio_sample_rate_value"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_audio_channel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_audio_sample_rate">
+
+                <ImageView
+                    android:id="@+id/iv_audio_channel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_audio_channel"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_audio_channel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_channel"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:text="@string/audio_channel"/>
+
+                <TextView
+                    android:id="@+id/tv_audio_channel_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_1"
+                    android:textSize="@dimen/font_14"
+                    app:layout_constraintLeft_toRightOf="@id/iv_audio_channel"
+                    app:layout_constraintTop_toBottomOf="@id/tv_audio_channel"
+                    android:text="@string/audio_channel_with_value"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

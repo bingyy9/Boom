@@ -14,6 +14,9 @@ public class AppDialogFragment extends DialogFragment {
     public static final int TYPE_FRAME_RATE = 3;
     public static final int TYPE_RESOLUTION = 4;
     public static final int TYPE_BITRATE = 5;
+    public static final int TYPE_AUDIO_BITRATE = 6;
+    public static final int TYPE_AUDIO_SAMPLE_RATE = 7;
+    public static final int TYPE_AUDIO_CHANNEL = 8;
 
     protected int type;
     @NonNull
