@@ -54,6 +54,9 @@
     <string name="frame_rate_value">Frame rate (%1$s fps)</string>
     <string name="frame_rate_desc">Higher rate means more CPU usage</string>
 
+    <string name="storage_value">%1$s</string>
+    <string name="storage_location">Recording folder location</string>
+
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="checked">Checked</string>

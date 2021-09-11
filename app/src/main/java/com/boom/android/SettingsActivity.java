@@ -11,6 +11,7 @@ import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.ui.dialog.SingleSelectDialog;
+import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
@@ -46,6 +47,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     TextView tvBitrate;
     @BindView(R.id.tv_frame_rate)
     TextView tvFrameRate;
+    @BindView(R.id.tv_storage_desc)
+    TextView tvStorageLocation;
+
 
     SettingsViewModel settingsViewModel;
 
@@ -88,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         updateFrameRate();
         updateBitRate();
         updateResolution();
+        updateStorage();
     }
 
     private void updateDelayRecording(){
@@ -119,6 +124,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 tvResolution.setText(this.getResources().getString(R.string.resolution_value, String.valueOf(resolution.getWidth()), String.valueOf(resolution.getHeight()), resolution.getRate()));
             }
         }
+    }
+
+    private void updateStorage(){
+        tvStorageLocation.setText(FilesDirUtil.getRecordFileWriteDir(this));
+//        tvStorageLocation.setText("I am from China I am from China I am from China I am from China");
     }
 
     @Override
