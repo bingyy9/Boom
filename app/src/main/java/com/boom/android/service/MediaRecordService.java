@@ -196,8 +196,11 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             mediaRecorder.setVideoSize(recordParams.getWidth(), recordParams.getHeight());
             mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mediaRecorder.setVideoEncodingBitRate(5 * 1024 * 1024);
-            mediaRecorder.setVideoFrameRate(30);
+            mediaRecorder.setAudioSamplingRate(PrefsUtil.getAudioSampleRate(this));//44100, 48000
+            mediaRecorder.setAudioEncodingBitRate(PrefsUtil.getAudioBitrate(this) * 1000);  //128 kbps
+            mediaRecorder.setAudioChannels(PrefsUtil.getAudioChannelInt(this));
+            mediaRecorder.setVideoEncodingBitRate(PrefsUtil.getVideoBitrate(this) * 1024 * 1024);
+            mediaRecorder.setVideoFrameRate(PrefsUtil.getVideoFrameRate(this));
             mediaRecorder.prepare();
 
             NotificationUtils.startRecordingNotification(this);

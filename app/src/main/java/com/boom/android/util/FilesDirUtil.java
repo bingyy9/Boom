@@ -18,7 +18,7 @@ public class FilesDirUtil {
     public static final String cacheDir = "snapshot";
     public static final String logDir = "log";
     public static final String recordDir = "record";
-    private static boolean debugHasSDCard = false;
+    private static boolean debugHasSDCard = true;
 
     public static File getLogFile(Context context){
         if(context == null){

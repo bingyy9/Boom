@@ -3,6 +3,7 @@ package com.boom.android.util;
 import android.content.Context;
 
 import com.boom.android.ui.adapter.repo.Resolution;
+import com.boom.utils.StringUtils;
 
 public class PrefsUtil {
     private static final String TIME_DELAY_BEFORE_RECORDING = "time_delay_before_recording";
@@ -80,6 +81,14 @@ public class PrefsUtil {
 
     public static String getAudioChannel(Context context){
         return Prefs.with(context).read(AUDIO_CHANNEL, ConfigUtil.defaultAudioChannel);
+    }
+
+    public static int getAudioChannelInt(Context context){
+        if(StringUtils.contentEquals(Prefs.with(context).read(AUDIO_CHANNEL, ConfigUtil.defaultAudioChannel), ConfigUtil.defaultAudioChannel)){
+            return 1;
+        } else {
+            return 2;
+        }
     }
 
     public static void setAudioChannel(Context context, String value){
