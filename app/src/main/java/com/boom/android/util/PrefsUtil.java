@@ -14,6 +14,7 @@ public class PrefsUtil {
     private static final String AUDIO_SAMPLE_RATE = "audio_sample_rate";
     private static final String AUDIO_BITRATE = "audio_bitrate";
     private static final String AUDIO_CHANNEL = "audio_channel";
+    private static final String RECORD_AUDIO = "record_audio";
 
 
     public static String getTimeDelayBeforeRecording(Context context){
@@ -94,5 +95,14 @@ public class PrefsUtil {
     public static void setAudioChannel(Context context, String value){
         Prefs.with(context).write(AUDIO_CHANNEL, value);
     }
+
+    public static boolean isRecordAudio(Context context){
+        return Prefs.with(context).readBoolean(RECORD_AUDIO, ConfigUtil.defaultRecordAudio);
+    }
+
+    public static void setRecordAudio(Context context, boolean b){
+        Prefs.with(context).writeBoolean(RECORD_AUDIO, b);
+    }
+
 
 }

@@ -12,12 +12,14 @@ import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.ui.dialog.SingleSelectDialog;
 import com.boom.android.util.FilesDirUtil;
+import com.boom.android.util.Prefs;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
 
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
@@ -42,6 +44,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     View layoutAudioChannel;
     @BindView(R.id.layout_audio_sample_rate)
     View layoutAudioSampleRate;
+    @BindView(R.id.layout_record_audio)
+    View layoutRecordAudio;
 
     @BindView(R.id.tv_current_delay_recording)
     TextView tvDelayRecording;
@@ -61,6 +65,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     TextView tvAudioSampleRate;
     @BindView(R.id.tv_audio_channel_desc)
     TextView tvAudioChannel;
+    @BindView(R.id.sc_record_audio)
+    SwitchCompat scRecordAudio;
 
 
     SettingsViewModel settingsViewModel;
@@ -94,6 +100,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         layoutAudioBitrate.setOnClickListener(this);
         layoutAudioSampleRate.setOnClickListener(this);
         layoutAudioChannel.setOnClickListener(this);
+        layoutRecordAudio.setOnClickListener(this);
         settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> updateDelayRecording());
         settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> updateFileFormate());
         settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> updateBitRate());
@@ -102,6 +109,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         settingsViewModel.getAudioBitrateUpdated().observe(this, (Boolean b)-> updateAudioBitrate());
         settingsViewModel.getAudioSampleRateUpdated().observe(this, (Boolean b)-> updateAudioSampleRate());
         settingsViewModel.getAudioChannelUpdated().observe(this, (Boolean b)-> updateAudioChannel());
+
+        scRecordAudio.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            PrefsUtil.setRecordAudio(this, isChecked);
+        });
     }
 
     private void updateView(){
@@ -114,6 +125,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         updateAudioBitrate();
         updateAudioSampleRate();
         updateAudioChannel();
+        updateRecordAudio();
     }
 
     private void updateDelayRecording(){
@@ -159,6 +171,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         tvAudioSampleRate.setText(this.getResources().getString(R.string.audio_sample_rate_value, String.valueOf(PrefsUtil.getAudioSampleRate(this))));
     }
 
+    private void updateRecordAudio(){
+        scRecordAudio.setChecked(PrefsUtil.isRecordAudio(this));
+    }
+
     private void updateAudioChannel(){
         tvAudioChannel.setText(this.getResources().getString(R.string.audio_channel_with_value, PrefsUtil.getAudioChannel(this)));
     }
@@ -199,6 +215,10 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.layout_audio_channel:
                 displayDialog(AppDialogFragment.TYPE_AUDIO_CHANNEL);
+                break;
+            case R.id.layout_record_audio:
+                PrefsUtil.setRecordAudio(this, !PrefsUtil.isRecordAudio(this));
+                updateRecordAudio();
                 break;
         }
     }

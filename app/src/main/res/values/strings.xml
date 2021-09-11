@@ -61,6 +61,7 @@
     <string name="audio_sample_rate_value">%1$s Hz</string>
     <string name="audio_channel">Audio channel</string>
     <string name="audio_channel_with_value">%1$s</string>
+    <string name="record_audio">Record audio</string>
 
     <string name="storage_value">%1$s</string>
     <string name="storage_location">Recording folder location</string>

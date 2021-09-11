@@ -447,7 +447,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/layout_audio_bitrate"
+                android:id="@+id/layout_record_audio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/listChoiceBackgroundIndicator"
@@ -459,6 +459,60 @@
                 android:paddingRight="@dimen/common_page_sides_padding"
                 android:paddingBottom="10dp"
                 app:layout_constraintTop_toBottomOf="@id/layout_frame_rate">
+
+                <ImageView
+                    android:id="@+id/iv_record_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:focusable="false"
+                    android:src="@drawable/ic_record_audio"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tv_record_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="10dp"
+                    android:clickable="false"
+                    android:ellipsize="end"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:singleLine="false"
+                    android:textColor="@color/gray_dark_2"
+                    android:textSize="@dimen/font_16"
+                    app:layout_constraintLeft_toRightOf="@id/iv_record_audio"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:text="@string/record_audio"/>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/sc_record_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layout_audio_bitrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/listChoiceBackgroundIndicator"
+                android:clickable="true"
+                android:focusable="true"
+                android:minHeight="64dp"
+                android:paddingLeft="@dimen/common_page_sides_padding"
+                android:paddingTop="10dp"
+                android:paddingRight="@dimen/common_page_sides_padding"
+                android:paddingBottom="10dp"
+                app:layout_constraintTop_toBottomOf="@id/layout_record_audio">
 
                 <ImageView
                     android:id="@+id/iv_audio_bitrate"

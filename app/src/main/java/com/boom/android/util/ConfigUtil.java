@@ -83,6 +83,8 @@ public class ConfigUtil {
             "Mono", "Stereo"
     ));
 
+    public static final boolean defaultRecordAudio = true;
+
 
 
 }

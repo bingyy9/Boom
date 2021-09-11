@@ -188,19 +188,28 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 //            java.lang.RuntimeException: setAudioSource failed.
 //            at android.media.MediaRecorder.setAudioSource(Native Method)
             mediaRecorder.reset();
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            if(PrefsUtil.isRecordAudio(this)){
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            }
+
+
             mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
             mediaRecorder.setOutputFile(FilesDirUtil.getRecordFileWriteDir(MediaRecordService.this)
                     + DataUtils.formatDate4RecordDefaultName(MediaRecordService.this, System.currentTimeMillis()) + ".mp4");
+
+            if(PrefsUtil.isRecordAudio(this)){
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                mediaRecorder.setAudioSamplingRate(PrefsUtil.getAudioSampleRate(this));//44100, 48000
+                mediaRecorder.setAudioEncodingBitRate(PrefsUtil.getAudioBitrate(this) * 1000);  //128 kbps
+                mediaRecorder.setAudioChannels(PrefsUtil.getAudioChannelInt(this));
+            }
             mediaRecorder.setVideoSize(recordParams.getWidth(), recordParams.getHeight());
             mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mediaRecorder.setAudioSamplingRate(PrefsUtil.getAudioSampleRate(this));//44100, 48000
-            mediaRecorder.setAudioEncodingBitRate(PrefsUtil.getAudioBitrate(this) * 1000);  //128 kbps
-            mediaRecorder.setAudioChannels(PrefsUtil.getAudioChannelInt(this));
             mediaRecorder.setVideoEncodingBitRate(PrefsUtil.getVideoBitrate(this) * 1024 * 1024);
             mediaRecorder.setVideoFrameRate(PrefsUtil.getVideoFrameRate(this));
+
             mediaRecorder.prepare();
 
             NotificationUtils.startRecordingNotification(this);
