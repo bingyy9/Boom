@@ -619,4 +619,5 @@ public class Camera2Helper {
             return new Camera2Helper(this);
         }
     }
+
 }

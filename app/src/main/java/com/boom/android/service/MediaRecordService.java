@@ -34,9 +34,11 @@ import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.adapter.repo.RecordParams;
 import com.boom.android.util.BoomHelper;
+import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.NotificationUtils;
+import com.boom.android.util.Prefs;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.RecordHelper;
 import com.boom.android.util.WindowUtils;
@@ -55,7 +57,8 @@ import java.util.TimerTask;
 
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
         , CameraListener
-        , IRecordModel.RecordEvtListener {
+        , IRecordModel.RecordEvtListener
+        , View.OnClickListener{
     private Handler mHandler;
     private MediaProjection mediaProjection;
     private MediaRecorder mediaRecorder;
@@ -73,7 +76,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private RoundTextureView cameraView;
     private CameraHelper cameraHelper;
     private RoundBorderView roundBorderView;
-    private static final int CAMERA_ID = Camera.CameraInfo.CAMERA_FACING_FRONT;
     private Camera.Size previewSize;
     private GestureDetector mGestureDetector;
     private boolean isAddedRootView;
@@ -135,6 +137,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         rootView.setOnTouchListener(new FloatingOnTouchListener());
         counterView = rootView.findViewById(R.id.iv_counter);
         cameraView = rootView.findViewById(R.id.texture_preview);
+        cameraView.setOnClickListener(this);
         isAddedRootView = false;
     }
 
@@ -292,6 +295,31 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         } catch (IOException e) {
             Dogger.e(Dogger.BOOM, "", "MediaRecordService", "initRecorder", e);
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == null){
+            return;
+        }
+        if(view.getId() == R.id.texture_preview){
+            Dogger.i(Dogger.BOOM, "click camera view", "MediaRecordService", "onClick");
+            if(ConfigUtil.getInstance().hasMoreCamera){
+                ConfigUtil.getInstance().switchCamera(this);
+                switchCamera();
+            } else {
+                Dogger.i(Dogger.BOOM, "no more camera", "MediaRecordService", "onClick");
+            }
+        }
+    }
+    
+    private void switchCamera(){
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "switchCamera");
+        if(cameraHelper != null){
+            cameraHelper.release();
+        }
+
+        initCamera();
     }
 
     public class RecordBinder extends Binder {
@@ -475,14 +503,16 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     class MyOnGestureListener extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            Dogger.i(Dogger.BOOM, "e: " + e.getAction(), "MyOnGestureListener", "onSingleTapConfirmed");
             return super.onSingleTapConfirmed(e);
+
         }
     }
 
     void initCamera() {
         cameraHelper = new CameraHelper.Builder()
                 .cameraListener(this)
-                .specificCameraId(CAMERA_ID)
+                .specificCameraId(PrefsUtil.getCameraIInt(this))
                 .previewOn(cameraView)
                 .previewViewSize(new Point(cameraView.getLayoutParams().width, cameraView.getLayoutParams().height))
                 .rotation(windowManager.getDefaultDisplay().getRotation())

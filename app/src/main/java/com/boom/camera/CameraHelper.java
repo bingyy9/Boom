@@ -1,9 +1,11 @@
 package com.boom.camera;
 
+import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraManager;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
@@ -389,5 +391,4 @@ public class CameraHelper implements Camera.PreviewCallback {
             return new CameraHelper(this);
         }
     }
-
 }

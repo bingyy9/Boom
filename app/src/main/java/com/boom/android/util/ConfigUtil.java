@@ -1,12 +1,34 @@
 package com.boom.android.util;
 
+import android.content.Context;
+import android.hardware.Camera;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
+
+import com.boom.android.BoomApplication;
+import com.boom.android.log.Dogger;
 import com.boom.android.ui.adapter.repo.Resolution;
+import com.boom.camera.Camera2Helper;
+import com.boom.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class ConfigUtil {
+    public static ConfigUtil mInstance;
+
+    public static ConfigUtil getInstance(){
+        if(mInstance == null){
+            mInstance = new ConfigUtil();
+        }
+        return mInstance;
+    }
+
+    private ConfigUtil(){}
+
+    private CameraManager cameraManager;
+    private String[] mCameraIds;
     public static final int defaultTimeDelayBeforeRecording = 3;
     public static final int MAX_DELAY_BEFORE_RECORD_SECONDS = 20;
 
@@ -86,5 +108,55 @@ public class ConfigUtil {
     public static final boolean defaultRecordAudio = true;
 
 
+    public boolean hasMoreCamera = false;
+//    String[] cameraIdList = CameraManager.getCameraIdList();
+    //1: Front camera, 0: Rear camera
+    public String defaultCameraId;
+    public List<String> cameraIds;
 
+    public void initCameraIds(Context context){
+        if(context == null){
+            return;
+        }
+
+        cameraManager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
+        if(cameraManager ==null){
+            return;
+        }
+
+        try {
+            mCameraIds = cameraManager.getCameraIdList();
+            if(mCameraIds != null && mCameraIds.length > 1){
+                hasMoreCamera = true;
+                defaultCameraId = cameraManager.getCameraIdList()[1];
+                List<String> cameraIds = new ArrayList<>(Arrays.asList(
+                        mCameraIds
+                ));
+            } else {
+                hasMoreCamera = false;
+                defaultCameraId = cameraManager.getCameraIdList()[0];
+                List<String> cameraIds = new ArrayList<>(Arrays.asList(
+                        mCameraIds
+                ));
+            }
+        } catch (CameraAccessException e) {
+            Dogger.i(Dogger.BOOM, "", "ConfigUtil", "initCameraIds", e);
+        }
+    }
+
+    public void switchCamera(Context context){
+        if(cameraManager ==null || !hasMoreCamera || mCameraIds == null || context == null){
+            Dogger.w(Dogger.BOOM, "null, ignore", "ConfigUtil", "switchCamera");
+            return;
+        }
+
+        String switchId = "0";
+        for(String id: mCameraIds){
+            if(StringUtils.contentEquals(id, PrefsUtil.getCameraId(context))){
+                continue;
+            }
+            switchId = id;
+        }
+        PrefsUtil.setCameraId(context, switchId);
+    }
 }

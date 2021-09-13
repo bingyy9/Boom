@@ -8,6 +8,7 @@ import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
+import android.hardware.camera2.CameraManager;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;

@@ -5,11 +5,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.os.IBinder;
 
+import com.boom.android.log.Dogger;
 import com.boom.android.log.FactoryMgr;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.AndroidFactory;
+import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
 import com.boom.model.interf.impl.ModelBuilderImpl;
@@ -20,6 +24,7 @@ public class BoomApplication extends Application {
     private static BoomApplication application;
     private MediaRecordService mediaRecordService;
     private MediaRecordServiceConnection mediaRecordServiceConnection = null;
+    private ConfigUtil configUtil;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -31,6 +36,8 @@ public class BoomApplication extends Application {
     public void onCreate() {
         super.onCreate();
         LogToFileUtils.init(this);
+        configUtil = ConfigUtil.getInstance();
+        configUtil.initCameraIds(this);
         ModelBuilderManager.setModelBuilder(new ModelBuilderImpl());
         ModelBuilderManager.initModel();
         FactoryMgr.iPlatformFactory = new AndroidFactory(this);

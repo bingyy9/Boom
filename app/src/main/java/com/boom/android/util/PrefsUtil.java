@@ -15,6 +15,7 @@ public class PrefsUtil {
     private static final String AUDIO_BITRATE = "audio_bitrate";
     private static final String AUDIO_CHANNEL = "audio_channel";
     private static final String RECORD_AUDIO = "record_audio";
+    private static final String CAMERA_ID = "camera_id";
 
 
     public static String getTimeDelayBeforeRecording(Context context){
@@ -102,6 +103,23 @@ public class PrefsUtil {
 
     public static void setRecordAudio(Context context, boolean b){
         Prefs.with(context).writeBoolean(RECORD_AUDIO, b);
+    }
+
+    public static String getCameraId(Context context){
+        return Prefs.with(context).read(CAMERA_ID, ConfigUtil.getInstance().defaultCameraId);
+    }
+
+    public static int getCameraIInt(Context context){
+        String cameraId = Prefs.with(context).read(CAMERA_ID, ConfigUtil.getInstance().defaultCameraId);
+        if(StringUtils.contentEquals(cameraId, "1")){
+            return 1;  //front
+        } else {
+            return 0; //rear camera
+        }
+    }
+
+    public static void setCameraId(Context context, String id){
+        Prefs.with(context).write(CAMERA_ID, id);
     }
 
 
