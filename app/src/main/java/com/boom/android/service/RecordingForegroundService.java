@@ -5,27 +5,23 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.IBinder;
-import android.telephony.TelephonyManager;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.boom.android.BoomApplication;
 import com.boom.android.MainActivity;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.util.AndroidHardwareUtils;
-import com.boom.android.util.NotificationUtils;
 import com.boom.android.util.RecordHelper;
+import com.boom.utils.StringUtils;
 
 import androidx.core.app.NotificationCompat;
 
@@ -36,15 +32,18 @@ public class RecordingForegroundService extends Service {
     public static final String FOREGROUND_CHANNEL_NAME = "Recording service";
     public static final String NOTIFICATION_ACTION = "NOTIFICATION_ACTION";
     public static final String STOP = "stop";
+    public static final String PAUSE = "pause";
+    public static final String RESUME = "resume";
 
     @Override
     public IBinder onBind(Intent intent) {
+        Dogger.i(Dogger.BOOM, "", "RecordingForegroundService", "onBind");
         return null;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Dogger.i(Dogger.BOOM, "flags: " + flags + " startId: " + startId, "WirelessShareForegroundService", "onStartCommand");
+        Dogger.i(Dogger.BOOM, "flags: " + flags + " startId: " + startId, "RecordingForegroundService", "onStartCommand");
         handleCommand(intent);
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.
@@ -53,11 +52,12 @@ public class RecordingForegroundService extends Service {
 
     @Override
     public void onCreate() {
+        Dogger.i(Dogger.BOOM, "", "RecordingForegroundService", "onCreate");
     }
 
     @Override
     public void onDestroy() {
-        Dogger.i(Dogger.BOOM, "", "WirelessShareForegroundService", "onDestroy");
+        Dogger.i(Dogger.BOOM, "", "RecordingForegroundService", "onDestroy");
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             stopForeground(true);
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -76,9 +76,9 @@ public class RecordingForegroundService extends Service {
         super.onDestroy();
     }
     void handleCommand(Intent intent) {
-        Dogger.i(Dogger.BOOM, "", "WirelessShareForegroundService", "handleCommand");
+        Dogger.i(Dogger.BOOM, "", "RecordingForegroundService", "handleCommand");
         if (intent == null) {
-            Dogger.i(Dogger.BOOM, "intent is null", "WirelessShareForegroundService", "handleCommand");
+            Dogger.i(Dogger.BOOM, "intent is null", "RecordingForegroundService", "handleCommand");
             return ;
         }
         try {
@@ -88,19 +88,23 @@ public class RecordingForegroundService extends Service {
         }
     }
 
-    private PendingIntent returnToAppIntent(){
-        Intent clickIntent = new Intent(this, MainActivity.class);
-        clickIntent.putExtra("notification_id", ForegroundServiceNotification_ID);
-        clickIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        return PendingIntent.getActivity(this, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    private PendingIntent returnToAppAndStopRecordingIntent(){
+    private PendingIntent returnToApp(String action){
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("notification_id", ForegroundServiceNotification_ID);
-        intent.putExtra(NOTIFICATION_ACTION, STOP);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if(StringUtils.contentEquals(action, RecordingForegroundService.STOP)){
+            intent.putExtra(NOTIFICATION_ACTION, action);
+            return PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.PAUSE)){
+            Intent serviceIntent = new Intent(action, null, this, MediaRecordService.class);
+            return PendingIntent.getService(this, 2, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.RESUME)){
+            Intent serviceIntent = new Intent(action, null, this, MediaRecordService.class);
+            return PendingIntent.getService(this, 3, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else {
+            //just return to app
+            return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
     }
 
     private void showNotification() {
@@ -113,7 +117,7 @@ public class RecordingForegroundService extends Service {
             builder.setColor(getResources().getColor(R.color.blue_normal));
             builder.setContentTitle(getResources().getString(R.string.app_name));
             builder.setContentText(getResources().getString(R.string.recording_notification));
-            builder.setContentIntent(returnToAppIntent());
+            builder.setContentIntent(returnToApp(null));
             builder.setContent(getComplexNotificationView());
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             try {
@@ -137,7 +141,7 @@ public class RecordingForegroundService extends Service {
             builder.setColor(getResources().getColor(R.color.blue_normal));
             builder.setContentTitle(getResources().getString(R.string.app_name));
             builder.setContentText(getResources().getString(R.string.recording_notification));
-            builder.setContentIntent(returnToAppIntent());
+            builder.setContentIntent(returnToApp(null));
             builder.setChannelId(FOREGROUND_CHANNEL_ID);
             builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             builder.setContent(getComplexNotificationView());
@@ -148,12 +152,27 @@ public class RecordingForegroundService extends Service {
     }
 
     private RemoteViews getComplexNotificationView() {
-        RemoteViews notificationView = new RemoteViews(
+        RemoteViews remoteViews = new RemoteViews(
                 BoomApplication.getInstance().getPackageName(),
                 R.layout.notification_recording
         );
-        notificationView.setOnClickPendingIntent(R.id.iv_stop,returnToAppAndStopRecordingIntent());
-        return notificationView;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //support pause/resume
+            if(RecordHelper.isRecordingPaused()){
+                remoteViews.setImageViewResource(R.id.iv_pause, R.drawable.ic_start);
+                remoteViews.setOnClickPendingIntent(R.id.iv_pause, returnToApp(RESUME));
+            } else {
+                remoteViews.setImageViewResource(R.id.iv_pause, R.drawable.ic_pause);
+                remoteViews.setOnClickPendingIntent(R.id.iv_pause, returnToApp(PAUSE));
+            }
+            remoteViews.setViewVisibility(R.id.iv_pause, View.VISIBLE);
+        } else {
+            remoteViews.setViewVisibility(R.id.iv_pause, View.GONE);
+        }
+
+        remoteViews.setOnClickPendingIntent(R.id.iv_stop, returnToApp(STOP));
+        return remoteViews;
         // Locate and set the Image into customnotificationtext.xml ImageViews
 //        notificationView.setImageViewResource(
 //                R.id.stop_btn,
@@ -163,19 +182,23 @@ public class RecordingForegroundService extends Service {
 ////        notificationView.setTextViewText(R.id.text, getText());
     }
 
-    private void stopRecording(){
-        Dogger.i(Dogger.BOOM, "", "RecordingForegroundService", "stopRecording");
-        if(BoomApplication.getInstance().getMediaRecordService() != null){
-            BoomApplication.getInstance().getMediaRecordService().stopRecord();
-        }
-        RecordHelper.setRecordingStop(true);
-    }
-
     private boolean enableNewNotificationStyle(){
         //we ever found XiaoMi Build.VERSION.SDK = 30;Build.DEVICE = phoenixin Build.MODEL = POCO X2 not support new style
         if(AndroidHardwareUtils.isXiaomiDevice()){
             return false;
         }
         return true;
+    }
+
+    private void pauseRecording(){
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().pauseRecord();
+        }
+    }
+
+    private void resumeRecording(){
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().resumeRecord();
+        }
     }
 }

@@ -37,6 +37,7 @@ public class RecordModel implements IRecordModel {
         observeRecordingStatus();
         observeRecordingStop();
         observeReadyToRecord();
+        observeRecordingPaused();
     }
 
     @Override
@@ -141,6 +142,30 @@ public class RecordModel implements IRecordModel {
         compositeDisposableVM.add(disposable);
     }
 
+    public void observeRecordingPaused() {
+        Dogger.d(Dogger.BOOM, "", "RecordModel", "observeRecordingPaused");
+        if(compositeDisposableVM == null){
+            return;
+        }
+
+        if(recordRepo == null || recordRepo.getRecordingPausedSubject() == null){
+            return;
+        }
+
+        Disposable disposable = recordRepo.getRecordingPausedSubject().getObservable().subscribe(
+                recording -> {
+                    if (mEvtListeners != null) {
+                        Object[] listeners = mEvtListeners.getListeners();
+                        for (int i = listeners.length - 1; i >= 0; i -= 1) {
+                            ((RecordEvtListener) listeners[i]).onRecordEvt(new RecordEvent(RecordEvent.RECORD_PAUSED));
+                        }
+                    }
+                }
+        );
+
+        compositeDisposableVM.add(disposable);
+    }
+
     public void observeReadyToRecord() {
         Dogger.d(Dogger.BOOM, "", "RecordModel", "observeReadyToRecord");
         if(compositeDisposableVM == null){
@@ -194,6 +219,18 @@ public class RecordModel implements IRecordModel {
         if(recordRepo != null){
             recordRepo.setRecordingStop(true);
         }
+    }
+
+    @Override
+    public void setRecordingPaused(boolean b){
+        if(recordRepo != null){
+            recordRepo.setRecordingPaused(b);
+        }
+    }
+
+    @Override
+    public boolean isRecordingPaused(){
+        return recordRepo == null? false: recordRepo.isRecordingPaused();
     }
 
     @Override

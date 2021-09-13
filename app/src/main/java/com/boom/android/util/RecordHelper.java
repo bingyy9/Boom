@@ -67,6 +67,18 @@ public class RecordHelper {
         return recordModel == null? false: recordModel.isCountDowning();
     }
 
+    public static void setRecordingPaused(boolean b){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        if(recordModel != null){
+            recordModel.setRecordingPaused(b);
+        }
+    }
+
+    public static boolean isRecordingPaused(){
+        IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
+        return recordModel == null? false: recordModel.isRecordingPaused();
+    }
+
     public static void registerRecordEventListner(IRecordModel.RecordEvtListener listener){
         IRecordModel recordModel = ModelBuilderManager.getModelBuilder().getRecordModel();
         if(recordModel != null){

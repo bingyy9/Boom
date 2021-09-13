@@ -11,6 +11,8 @@ public class RecordRepo {
     private WbxSubject<Boolean> readyToRecord = new WbxSubject<Boolean>(false);
 
     private WbxSubject<Boolean> recordingStop = new WbxSubject<Boolean>(false);
+
+    private WbxSubject<Boolean> recordingPaused = new WbxSubject<Boolean>(false);
     
     private final int INIT_COUNT_DOWN = 3;
     private Timer mCounterTimer;
@@ -23,6 +25,7 @@ public class RecordRepo {
         isRecording = new WbxSubject<>(false);
         recordingStop = new WbxSubject<>(true);
         recordingStop.setAlwaysEmit(true);
+        recordingPaused = new WbxSubject<>(false);
         readyToRecord = new WbxSubject<>(true);
         readyToRecord.setAlwaysEmit(true);
         mCounterDown = 3;
@@ -31,6 +34,7 @@ public class RecordRepo {
     public void cleanup() {
         isRecording = null;
         recordingStop = null;
+        recordingPaused = null;
         readyToRecord = null;
         mCounterDown = INIT_COUNT_DOWN;
     }
@@ -58,6 +62,20 @@ public class RecordRepo {
         if(recordingStop != null){
             recordingStop.setVal(b);
         }
+    }
+
+    public WbxSubject<Boolean> getRecordingPausedSubject(){
+        return recordingPaused;
+    }
+
+    public void setRecordingPaused(boolean b){
+        if(recordingPaused != null){
+            recordingPaused.setVal(b);
+        }
+    }
+
+    public boolean isRecordingPaused(){
+        return recordingPaused == null? false: recordingPaused.getVal();
     }
 
     public WbxSubject<Boolean> getRecordingToRecordSubject(){

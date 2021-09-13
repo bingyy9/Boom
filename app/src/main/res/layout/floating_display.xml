@@ -8,10 +8,12 @@
         android:id="@+id/iv_counter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="120sp"
+        android:textSize="100sp"
         android:textStyle="bold"
-        android:textColor="@color/color_red"
-        android:visibility="gone"/>
+        android:textColor="@color/white"
+        android:background="@drawable/bg_circle_blue"
+        android:visibility="gone"
+        android:gravity="center"/>
 
     <com.boom.camera.RoundTextureView
         android:layout_width="@dimen/video_preview_width"

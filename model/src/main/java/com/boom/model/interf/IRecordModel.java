@@ -19,6 +19,11 @@ public interface IRecordModel extends IModel{
     void recordCamera(boolean b);
     boolean isRecordCamera();
     void setRecordingStop(boolean b);
+
+    void setRecordingPaused(boolean b);
+
+    boolean isRecordingPaused();
+
     void setReadyToRecord(boolean b);
     RecordRepo getRecordRepo();
     void startCounter();

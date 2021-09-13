@@ -97,6 +97,10 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             Dogger.i(Dogger.BOOM, "action: " + action, "MainActivity", "handleIntent");
             if(StringUtils.contentEquals(action, RecordingForegroundService.STOP)){
                 stopRecording();
+            } else if(StringUtils.contentEquals(action, RecordingForegroundService.PAUSE)){
+                pauseRecording();
+            } else if(StringUtils.contentEquals(action, RecordingForegroundService.RESUME)){
+                resumeRecording();
             }
         }
     }
@@ -194,6 +198,18 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
             BoomApplication.getInstance().getMediaRecordService().stopRecord();
         }
         RecordHelper.setRecordingStop(true);
+    }
+
+    private void pauseRecording(){
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().pauseRecord();
+        }
+    }
+
+    private void resumeRecording(){
+        if(BoomApplication.getInstance().getMediaRecordService() != null){
+            BoomApplication.getInstance().getMediaRecordService().resumeRecord();
+        }
     }
 
     @Override

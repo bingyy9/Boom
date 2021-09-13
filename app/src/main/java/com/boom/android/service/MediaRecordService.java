@@ -46,6 +46,7 @@ import com.boom.camera.RoundBorderView;
 import com.boom.camera.RoundTextureView;
 import com.boom.model.interf.IRecordModel;
 import com.boom.model.repo.RecordEvent;
+import com.boom.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -79,18 +80,35 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
     @Override
     public IBinder onBind(Intent intent) {
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onBind");
         return new RecordBinder();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        createNotificationChannel();
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onStartCommand");
+        handleIntentAction(intent);
+//        createNotificationChannel();
         return START_STICKY;
+    }
+
+    private void handleIntentAction(Intent intent){
+        if(intent == null){
+            return;
+        }
+        String action = intent.getAction();
+        Dogger.i(Dogger.BOOM, "action: " + action, "MediaRecordService", "onStartCommand");
+        if(StringUtils.contentEquals(action, RecordingForegroundService.PAUSE)){
+            pauseRecord();
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.RESUME)){
+            resumeRecord();
+        }
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onCreate");
         mHandler = new Handler();
 //        HandlerThread serviceThread = new HandlerThread("service_thread",
 //                android.os.Process.THREAD_PRIORITY_BACKGROUND);
@@ -118,6 +136,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
 
     @Override
     public void onDestroy() {
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onDestroy");
         super.onDestroy();
         RecordHelper.unregisterRecordEventListener(this);
         clearWindow();
@@ -147,6 +166,38 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         createVirtualDisplay();
         mediaRecorder.start();
         return true;
+    }
+
+    public void pauseRecord(){
+        if (!RecordHelper.isRecording()) {
+            return;
+        }
+
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "pauseRecord");
+        if(mediaRecorder != null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mediaRecorder.pause();
+                RecordHelper.setRecordingPaused(true);
+                NotificationUtils.startRecordingNotification(this);
+            }
+        }
+    }
+
+    public void resumeRecord(){
+        if (!RecordHelper.isRecordingPaused()) {
+            Dogger.i(Dogger.BOOM, "recording is not paused, ignore.", "MediaRecordService", "resumeRecord");
+            NotificationUtils.startRecordingNotification(this);
+            return;
+        }
+
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "resumeRecord");
+        if(mediaRecorder != null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mediaRecorder.resume();
+                RecordHelper.setRecordingPaused(false);
+                NotificationUtils.startRecordingNotification(this);
+            }
+        }
     }
 
     public void stopRecord() {
@@ -223,35 +274,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             return MediaRecordService.this;
         }
     }
-
-    private void createNotificationChannel() {
-        Notification.Builder builder = new Notification.Builder(this.getApplicationContext()); //获取一个Notification构造器
-        Intent nfIntent = new Intent(this, MainActivity.class); //点击后跳转的界面，可以设置跳转数据
-
-        builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
-                .setLargeIcon(BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_launcher)) // 设置下拉列表中的图标(大图标)
-                //.setContentTitle("SMI InstantView") // 设置下拉列表里的标题
-                .setSmallIcon(R.mipmap.ic_launcher) // 设置状态栏内的小图标
-                .setContentText("is running......") // 设置上下文内容
-                .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
-
-        /*以下是对Android 8.0的适配*/
-        //普通notification适配
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId("notification_id");
-        }
-        //前台服务notification适配
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationManager notificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-            NotificationChannel channel = new NotificationChannel("notification_id", "notification_name", NotificationManager.IMPORTANCE_LOW);
-            notificationManager.createNotificationChannel(channel);
-        }
-
-        Notification notification = builder.build(); // 获取构建好的Notification
-        notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
-        startForeground(110, notification);
-    }
-
 
     private void stopTimer(){
         if (mCounterTimer != null) {
