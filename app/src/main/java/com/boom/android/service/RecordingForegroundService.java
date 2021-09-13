@@ -139,7 +139,8 @@ public class RecordingForegroundService extends Service {
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             NotificationChannel channel = notificationManager.getNotificationChannel(FOREGROUND_CHANNEL_ID);
             if (channel == null) {
-                channel = new NotificationChannel(FOREGROUND_CHANNEL_ID, FOREGROUND_CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+                //IMPORTANCE_HIGH is for heads-up notification
+                channel = new NotificationChannel(FOREGROUND_CHANNEL_ID, FOREGROUND_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
                 notificationManager.createNotificationChannel(channel);
             }
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channel.getId());
