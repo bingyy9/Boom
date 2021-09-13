@@ -102,6 +102,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             pauseRecord();
         } else if(StringUtils.contentEquals(action, RecordingForegroundService.RESUME)){
             resumeRecord();
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.CAMERA_ON)){
+            updateCameraVisibility(true);
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.CAMERA_OFF)){
+            updateCameraVisibility(false);
         }
     }
 
@@ -169,7 +173,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     public void pauseRecord(){
-        if (!RecordHelper.isRecording()) {
+        if (!RecordHelper.isRecording() || RecordHelper.isRecordingPaused()) {
+            Dogger.i(Dogger.BOOM, "ignore", "MediaRecordService", "pauseRecord");
+            NotificationUtils.startRecordingNotification(this);
             return;
         }
 
@@ -198,6 +204,25 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                 NotificationUtils.startRecordingNotification(this);
             }
         }
+    }
+
+    public void updateCameraVisibility(boolean visible){
+        if(RecordHelper.isRecordCamera() == visible){
+            Dogger.w(Dogger.BOOM, "same camera visible: " + visible + " , ignore.", "MediaRecordService", "cameraOn");
+            return;
+        }
+
+        if(cameraView == null){
+            return;
+        }
+
+        if (visible) {
+            showCameraFloatingWindow();
+        } else {
+        }
+        RecordHelper.setRecordCamera(visible);
+        updateView();
+        NotificationUtils.startRecordingNotification(this);
     }
 
     public void stopRecord() {
@@ -380,14 +405,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
         layoutParams.x = 0;
         layoutParams.y = 150;
-    }
-
-    private float getCounterHeight(){
-        return this.getResources().getDimension(R.dimen.counter_height);
-    }
-
-    private float getCounterWidth(){
-        return this.getResources().getDimension(R.dimen.counter_width);
     }
 
     public void showCameraFloatingWindow() {

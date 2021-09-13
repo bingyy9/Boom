@@ -13,7 +13,7 @@ public class RecordRepo {
     private WbxSubject<Boolean> recordingStop = new WbxSubject<Boolean>(false);
 
     private WbxSubject<Boolean> recordingPaused = new WbxSubject<Boolean>(false);
-    
+
     private final int INIT_COUNT_DOWN = 3;
     private Timer mCounterTimer;
     private int mCounterDown = INIT_COUNT_DOWN;

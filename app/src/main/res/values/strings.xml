@@ -3,6 +3,7 @@
     <string name="start_record" tools:ignore="MissingTranslation">Start Recording</string>
     <string name="stop_record">Stop Recording</string>
     <string name="pause_record">Pause Recording</string>
+    <string name="camera">Camera</string>
     <string name="record_screen_with_camera">Record screen + camera</string>
     <string name="record_screen">Record screen</string>
     <string name="my_videos">My Videos</string>

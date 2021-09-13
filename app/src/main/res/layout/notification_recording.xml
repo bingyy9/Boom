@@ -71,7 +71,8 @@
             android:contentDescription="@string/stop_record"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/ic_notification_stop" />
+            android:src="@drawable/ic_stop"
+            android:background="?android:attr/selectableItemBackground"/>
 
         <ImageView
             android:id="@+id/iv_pause"
@@ -82,6 +83,19 @@
             android:contentDescription="@string/pause_record"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:src="@drawable/ic_start" />
+            android:src="@drawable/ic_pause"
+            android:background="?android:attr/selectableItemBackground"/>
+
+        <ImageView
+            android:id="@+id/iv_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/iv_pause"
+            android:contentDescription="@string/camera"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:src="@drawable/ic_camera_on"
+            android:background="?android:attr/selectableItemBackground"/>
     </RelativeLayout>
 </LinearLayout>

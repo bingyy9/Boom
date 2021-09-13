@@ -34,6 +34,8 @@ public class RecordingForegroundService extends Service {
     public static final String STOP = "stop";
     public static final String PAUSE = "pause";
     public static final String RESUME = "resume";
+    public static final String CAMERA_ON = "camera_on";
+    public static final String CAMERA_OFF = "camera_off";
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -101,6 +103,12 @@ public class RecordingForegroundService extends Service {
         } else if(StringUtils.contentEquals(action, RecordingForegroundService.RESUME)){
             Intent serviceIntent = new Intent(action, null, this, MediaRecordService.class);
             return PendingIntent.getService(this, 3, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.CAMERA_ON)){
+            Intent serviceIntent = new Intent(action, null, this, MediaRecordService.class);
+            return PendingIntent.getService(this, 4, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        } else if(StringUtils.contentEquals(action, RecordingForegroundService.CAMERA_OFF)){
+            Intent serviceIntent = new Intent(action, null, this, MediaRecordService.class);
+            return PendingIntent.getService(this, 5, serviceIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
             //just return to app
             return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -158,7 +166,7 @@ public class RecordingForegroundService extends Service {
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            //support pause/resume
+            //support pause/resume only >= N
             if(RecordHelper.isRecordingPaused()){
                 remoteViews.setImageViewResource(R.id.iv_pause, R.drawable.ic_start);
                 remoteViews.setOnClickPendingIntent(R.id.iv_pause, returnToApp(RESUME));
@@ -169,6 +177,14 @@ public class RecordingForegroundService extends Service {
             remoteViews.setViewVisibility(R.id.iv_pause, View.VISIBLE);
         } else {
             remoteViews.setViewVisibility(R.id.iv_pause, View.GONE);
+        }
+
+        if(RecordHelper.isRecordCamera()){
+            remoteViews.setImageViewResource(R.id.iv_camera, R.drawable.ic_camera_on);
+            remoteViews.setOnClickPendingIntent(R.id.iv_camera, returnToApp(CAMERA_OFF));
+        } else {
+            remoteViews.setImageViewResource(R.id.iv_camera, R.drawable.ic_camera_off);
+            remoteViews.setOnClickPendingIntent(R.id.iv_camera, returnToApp(CAMERA_ON));
         }
 
         remoteViews.setOnClickPendingIntent(R.id.iv_stop, returnToApp(STOP));
