@@ -1,12 +1,7 @@
 package com.boom.android.service;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.hardware.Camera;
@@ -26,22 +21,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.boom.android.MainActivity;
 import com.boom.android.R;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.adapter.repo.RecordParams;
+import com.boom.android.ui.view.FloatingWindowFrameLayout;
 import com.boom.android.util.BoomHelper;
 import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.DataUtils;
 import com.boom.android.util.FilesDirUtil;
 import com.boom.android.util.NotificationUtils;
-import com.boom.android.util.Prefs;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.RecordHelper;
-import com.boom.android.util.WindowUtils;
 import com.boom.camera.CameraHelper;
 import com.boom.camera.CameraListener;
 import com.boom.camera.RoundBorderView;
@@ -58,7 +50,9 @@ import java.util.TimerTask;
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
         , CameraListener
         , IRecordModel.RecordEvtListener
-        , View.OnClickListener{
+        , View.OnClickListener
+        , FloatingWindowFrameLayout.OnTouchDownListener
+        , View.OnTouchListener{
     private Handler mHandler;
     private MediaProjection mediaProjection;
     private MediaRecorder mediaRecorder;
@@ -69,6 +63,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private WindowManager windowManager;
     private WindowManager.LayoutParams layoutParams;
     private View rootView;
+    private FloatingWindowFrameLayout viewContainer;
     private TextView counterView;
     private Timer mCounterTimer;
     private int mCounter;
@@ -79,6 +74,10 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private Camera.Size previewSize;
     private GestureDetector mGestureDetector;
     private boolean isAddedRootView;
+    private int initialX;
+    private int initialY;
+    private float initialTouchX;
+    private float initialTouchY;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -134,7 +133,9 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         disableLayoutParamsAnimations();
         LayoutInflater layoutInflater = LayoutInflater.from(this);
         rootView = layoutInflater.inflate(R.layout.floating_display, null);
-        rootView.setOnTouchListener(new FloatingOnTouchListener());
+        viewContainer = rootView.findViewById(R.id.view_container);
+        viewContainer.setOnTouchDownListener(this);
+        viewContainer.setOnTouchListener(this);
         counterView = rootView.findViewById(R.id.iv_counter);
         cameraView = rootView.findViewById(R.id.texture_preview);
         cameraView.setOnClickListener(this);
@@ -297,22 +298,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        if(view == null){
-            return;
-        }
-        if(view.getId() == R.id.texture_preview){
-            Dogger.i(Dogger.BOOM, "click camera view", "MediaRecordService", "onClick");
-            if(ConfigUtil.getInstance().hasMoreCamera){
-                ConfigUtil.getInstance().switchCamera(this);
-                switchCamera();
-            } else {
-                Dogger.i(Dogger.BOOM, "no more camera", "MediaRecordService", "onClick");
-            }
-        }
-    }
-    
     private void switchCamera(){
         Dogger.i(Dogger.BOOM, "", "MediaRecordService", "switchCamera");
         if(cameraHelper != null){
@@ -422,8 +407,12 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     private void updateLayoutParamsToCounterView(){
         layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        layoutParams.x = (recordParams.getWidth() >> 1) - WindowUtils.dp2px(this, 75);
-        layoutParams.y = (recordParams.getHeight() >> 1) - WindowUtils.dp2px(this, 75);
+
+        int counterRadius = (int) getResources().getDimension(R.dimen.counter_diameter) >> 1;
+//        layoutParams.x = (recordParams.getWidth() >> 1) - WindowUtils.dp2px(this, 60);
+//        layoutParams.y = (recordParams.getHeight() >> 1) - WindowUtils.dp2px(this, 60);
+        layoutParams.x = (recordParams.getWidth() >> 1) - counterRadius;
+        layoutParams.y = (recordParams.getHeight() >> 1) - counterRadius;
         layoutParams.gravity = Gravity.LEFT | Gravity.TOP;
     }
 
@@ -439,47 +428,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         if (BoomHelper.ensureDrawOverlayPermission(this)) {
             cameraView.getViewTreeObserver().addOnGlobalLayoutListener(this);
             mGestureDetector = new GestureDetector(this, new MyOnGestureListener());
-        }
-    }
-
-    private class FloatingOnTouchListener implements View.OnTouchListener {
-        private int initialX;
-        private int initialY;
-        private float initialTouchX;
-        private float initialTouchY;
-
-        @Override
-        public boolean onTouch(View view, MotionEvent event) {
-            if(!RecordHelper.isRecording() || cameraView.getVisibility() != View.VISIBLE) {
-                return true;
-            }
-
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    addRoundBorder();
-                    initialX = layoutParams.x;
-                    initialY = layoutParams.y;
-
-                    initialTouchX = event.getRawX();
-                    initialTouchY = event.getRawY();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    layoutParams.x = initialX + (int) (event.getRawX() - initialTouchX);
-                    layoutParams.y = initialY + (int) (event.getRawY() - initialTouchY);
-                    windowManager.updateViewLayout(view, MediaRecordService.this.layoutParams);
-                    break;
-                case MotionEvent.ACTION_UP:
-                    removeRoundBorder();
-//                    if(Math.abs(mStartX - mStopX) >= 1 || Math.abs(mStartY - mStopY) >= 1){
-//                        isMove = true;
-//                    }
-//                    int Xdiff = (int) (event.getRawX() - initialTouchX);
-//                    int Ydiff = (int) (event.getRawY() - initialTouchY);
-                    break;
-                default:
-                    break;
-            }
-            return true;
         }
     }
 
@@ -505,7 +453,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         public boolean onSingleTapConfirmed(MotionEvent e) {
             Dogger.i(Dogger.BOOM, "e: " + e.getAction(), "MyOnGestureListener", "onSingleTapConfirmed");
             return super.onSingleTapConfirmed(e);
-
         }
     }
 
@@ -609,4 +556,63 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             Dogger.e(Dogger.BOOM, "", "MediaRecordService", "disableAnimations", e);
         }
     }
+
+    @Override
+    public void onTouchDown(MotionEvent event) {
+        addRoundBorder();
+        initialX = layoutParams.x;
+        initialY = layoutParams.y;
+        initialTouchX = event.getRawX();
+        initialTouchY = event.getRawY();
+//        Dogger.i(Dogger.BOOM, "1111111111111 onTouch   initialTouchX: " + initialTouchX + " initialTouchY: " + initialTouchY, "FloatingOnTouchListener", "onTouchListener");
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        if(!RecordHelper.isRecording() || cameraView.getVisibility() != View.VISIBLE) {
+            return false;
+        }
+
+//        Dogger.i(Dogger.BOOM, "1111111111111 onTouch event: " + event.getAction(), "FloatingOnTouchListener", "onTouch");
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                addRoundBorder();
+                initialX = layoutParams.x;
+                initialY = layoutParams.y;
+
+                initialTouchX = event.getRawX();
+                initialTouchY = event.getRawY();
+//                Dogger.i(Dogger.BOOM, "1111111111111 onTouch   initialTouchX: " + initialTouchX + " initialTouchY: " + initialTouchY, "FloatingOnTouchListener", "onTouchListener");
+                break;
+            case MotionEvent.ACTION_MOVE:
+                layoutParams.x = initialX + (int) (event.getRawX() - initialTouchX);
+                layoutParams.y = initialY + (int) (event.getRawY() - initialTouchY);
+                windowManager.updateViewLayout(view, MediaRecordService.this.layoutParams);
+                break;
+            case MotionEvent.ACTION_UP:
+                removeRoundBorder();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view == null){
+            return;
+        }
+        if(view.getId() == R.id.texture_preview){
+            removeRoundBorder();
+            Dogger.i(Dogger.BOOM, "click camera view", "MediaRecordService", "onClick");
+            if(ConfigUtil.getInstance().hasMoreCamera){
+                ConfigUtil.getInstance().switchCamera(this);
+                switchCamera();
+            } else {
+                Dogger.i(Dogger.BOOM, "no more camera", "MediaRecordService", "onClick");
+            }
+        }
+    }
+
 }

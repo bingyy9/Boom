@@ -36,8 +36,7 @@
     <dimen name="video_preview_width">112dp</dimen>
     <dimen name="video_preview_height">112dp</dimen>
 
-    <dimen name="counter_width">150dp</dimen>
-    <dimen name="counter_height">150dp</dimen>
+    <dimen name="counter_diameter">120dp</dimen>
     <dimen name="common_dialog_min_width">320dp</dimen>
     <dimen name="dlg_single_list_max_height">450dp</dimen>
 </resources>
