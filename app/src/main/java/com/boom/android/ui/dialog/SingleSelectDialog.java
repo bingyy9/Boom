@@ -104,6 +104,9 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
             case TYPE_AUDIO_CHANNEL:
                 tvTitle.setText(getResources().getString(R.string.audio_channel));
                 break;
+            case TYPE_CAMERA_ID:
+                tvTitle.setText(getResources().getString(R.string.record_camera));
+                break;
         }
     }
 
@@ -160,6 +163,9 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
             case TYPE_AUDIO_CHANNEL:
                 buildAudioChannelData(beans);
                 break;
+            case TYPE_CAMERA_ID:
+                buildCameraIdData(beans);
+                break;
         }
         return beans;
     }
@@ -171,7 +177,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.fileNameFormats.size(); i++) {
             boolean checked = StringUtils.contentEquals(ConfigUtil.fileNameFormats.get(i), PrefsUtil.getFileNameFormat(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.fileNameFormats.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.fileNameFormats.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -185,7 +191,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.bitRates.size(); i++) {
             boolean checked = (ConfigUtil.bitRates.get(i) == PrefsUtil.getVideoBitrate(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.bitRates.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.bitRates.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -199,7 +205,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.frameRates.size(); i++) {
             boolean checked = (ConfigUtil.frameRates.get(i) == PrefsUtil.getVideoFrameRate(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.frameRates.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.frameRates.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -213,7 +219,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.resolutions.size(); i++) {
             boolean checked = (ConfigUtil.resolutions.get(i).equals(PrefsUtil.getResolution(getActivity())));
-            beans.add(new SingleSelectBean(ConfigUtil.resolutions.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.resolutions.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -227,7 +233,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.audioBitrates.size(); i++) {
             boolean checked = (ConfigUtil.audioBitrates.get(i) == PrefsUtil.getAudioBitrate(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.audioBitrates.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.audioBitrates.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -241,7 +247,7 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.audioSampleRates.size(); i++) {
             boolean checked = (ConfigUtil.audioSampleRates.get(i) == PrefsUtil.getAudioSampleRate(getActivity()));
-            beans.add(new SingleSelectBean(ConfigUtil.audioSampleRates.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.audioSampleRates.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -255,7 +261,21 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
 
         for (int i = 0; i < ConfigUtil.audioChannels.size(); i++) {
             boolean checked = (ConfigUtil.audioChannels.get(i).equals(PrefsUtil.getAudioChannel(getActivity())));
-            beans.add(new SingleSelectBean(ConfigUtil.audioChannels.get(i), checked));
+            beans.add(new SingleSelectBean(ConfigUtil.audioChannels.get(i), checked, type));
+            if (checked) {
+                checkedIndex = i;
+            }
+        }
+    }
+
+    private void buildCameraIdData(List<SingleSelectBean> beans){
+        if (ConfigUtil.getInstance().mCameraIds == null || ConfigUtil.getInstance().mCameraIds.size() == 0) {
+            return;
+        }
+
+        for (int i = 0; i < ConfigUtil.getInstance().mCameraIds.size(); i++) {
+            boolean checked = (ConfigUtil.getInstance().mCameraIds.get(i).equals(PrefsUtil.getCameraId(getActivity())));
+            beans.add(new SingleSelectBean(ConfigUtil.getInstance().mCameraIds.get(i), checked, type));
             if (checked) {
                 checkedIndex = i;
             }
@@ -308,6 +328,10 @@ public class SingleSelectDialog extends AppDialogFragment implements SingleSelec
             case TYPE_AUDIO_CHANNEL:
                 PrefsUtil.setAudioChannel(BoomApplication.getInstance().getApplicationContext(), (String) bean.getValue());
                 postType = SettingsViewModel.PostType.AUDIO_CHANNEL;
+                break;
+            case TYPE_CAMERA_ID:
+                PrefsUtil.setCameraId(BoomApplication.getInstance().getApplicationContext(), (String) bean.getValue());
+                postType = SettingsViewModel.PostType.CAMERA_ID;
                 break;
         }
         if(settingsViewModel != null){

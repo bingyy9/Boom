@@ -2,6 +2,7 @@ package com.boom.android.util;
 
 import android.content.Context;
 
+import com.boom.android.R;
 import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.utils.StringUtils;
 
@@ -109,12 +110,34 @@ public class PrefsUtil {
         return Prefs.with(context).read(CAMERA_ID, ConfigUtil.getInstance().defaultCameraId);
     }
 
+    public static String getCameraIdWording(Context context){
+        if(context == null){
+            return null;
+        }
+        if(StringUtils.contentEquals(PrefsUtil.getCameraId(context), ConfigUtil.FRONT_CAMERA)){
+            return context.getResources().getString(R.string.front_camera);
+        } else {
+            return context.getResources().getString(R.string.rear_camera);
+        }
+    }
+
+    public static String getCameraIdWording(Context context, String cameraId){
+        if(context == null){
+            return null;
+        }
+        if(StringUtils.contentEquals(cameraId, ConfigUtil.FRONT_CAMERA)){
+            return context.getResources().getString(R.string.front_camera);
+        } else {
+            return context.getResources().getString(R.string.rear_camera);
+        }
+    }
+
     public static int getCameraIInt(Context context){
         String cameraId = Prefs.with(context).read(CAMERA_ID, ConfigUtil.getInstance().defaultCameraId);
-        if(StringUtils.contentEquals(cameraId, "1")){
-            return 1;  //front
+        if(StringUtils.contentEquals(cameraId, ConfigUtil.REAR_CAMERA)){
+            return Integer.valueOf(ConfigUtil.REAR_CAMERA);  //rear
         } else {
-            return 0; //rear camera
+            return Integer.valueOf(ConfigUtil.FRONT_CAMERA); //front camera
         }
     }
 

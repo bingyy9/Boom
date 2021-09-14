@@ -11,11 +11,12 @@ import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.dialog.AppDialogFragment;
 import com.boom.android.ui.dialog.InputDialog;
 import com.boom.android.ui.dialog.SingleSelectDialog;
+import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.FilesDirUtil;
-import com.boom.android.util.Prefs;
 import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
+import com.boom.utils.StringUtils;
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,6 +47,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     View layoutAudioSampleRate;
     @BindView(R.id.layout_record_audio)
     View layoutRecordAudio;
+    @BindView(R.id.layout_record_camera)
+    View layoutRecordCamera;
 
     @BindView(R.id.tv_current_delay_recording)
     TextView tvDelayRecording;
@@ -67,6 +70,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     TextView tvAudioChannel;
     @BindView(R.id.sc_record_audio)
     SwitchCompat scRecordAudio;
+    @BindView(R.id.tv_record_camera_value)
+    TextView tvRecordCamera;
 
 
     SettingsViewModel settingsViewModel;
@@ -101,6 +106,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         layoutAudioSampleRate.setOnClickListener(this);
         layoutAudioChannel.setOnClickListener(this);
         layoutRecordAudio.setOnClickListener(this);
+        layoutRecordCamera.setOnClickListener(this);
         settingsViewModel.getTimeDelayBeforeRecording().observe(this, (Boolean b)-> updateDelayRecording());
         settingsViewModel.getFileNameFormatUpdated().observe(this, (Boolean b)-> updateFileFormate());
         settingsViewModel.getBitrateUpdated().observe(this, (Boolean b)-> updateBitRate());
@@ -109,6 +115,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         settingsViewModel.getAudioBitrateUpdated().observe(this, (Boolean b)-> updateAudioBitrate());
         settingsViewModel.getAudioSampleRateUpdated().observe(this, (Boolean b)-> updateAudioSampleRate());
         settingsViewModel.getAudioChannelUpdated().observe(this, (Boolean b)-> updateAudioChannel());
+        settingsViewModel.getCameraIdUpdated().observe(this, (Boolean b)-> updateRecordCameraId());
 
         scRecordAudio.setOnCheckedChangeListener((buttonView, isChecked) -> {
             PrefsUtil.setRecordAudio(this, isChecked);
@@ -126,6 +133,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         updateAudioSampleRate();
         updateAudioChannel();
         updateRecordAudio();
+        updateRecordCameraId();
     }
 
     private void updateDelayRecording(){
@@ -158,6 +166,16 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             }
         }
     }
+
+    private void updateRecordCameraId(){
+        if(!ConfigUtil.getInstance().hasMoreCamera){
+            layoutRecordCamera.setVisibility(View.GONE);
+            return;
+        }
+
+        tvRecordCamera.setText(PrefsUtil.getCameraIdWording(this));
+    }
+
 
     private void updateStorage(){
         tvStorageLocation.setText(FilesDirUtil.getRecordFileWriteDir(this));
@@ -220,6 +238,9 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 PrefsUtil.setRecordAudio(this, !PrefsUtil.isRecordAudio(this));
                 updateRecordAudio();
                 break;
+            case R.id.layout_record_camera:
+                displayDialog(AppDialogFragment.TYPE_CAMERA_ID);
+                break;
         }
     }
 
@@ -244,6 +265,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             case AppDialogFragment.TYPE_AUDIO_BITRATE:
             case AppDialogFragment.TYPE_AUDIO_CHANNEL:
             case AppDialogFragment.TYPE_AUDIO_SAMPLE_RATE:
+            case AppDialogFragment.TYPE_CAMERA_ID:
                 SingleSelectDialog.newInstance(type).show(fragmentManager.beginTransaction(), AppDialogFragment.TAG);
                 break;
 

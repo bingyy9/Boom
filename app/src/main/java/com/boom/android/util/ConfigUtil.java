@@ -28,7 +28,6 @@ public class ConfigUtil {
     private ConfigUtil(){}
 
     private CameraManager cameraManager;
-    private String[] mCameraIds;
     public static final int defaultTimeDelayBeforeRecording = 3;
     public static final int MAX_DELAY_BEFORE_RECORD_SECONDS = 20;
 
@@ -108,11 +107,13 @@ public class ConfigUtil {
     public static final boolean defaultRecordAudio = true;
 
 
+    public static final String FRONT_CAMERA = "1";
+    public static final String REAR_CAMERA = "0";
     public boolean hasMoreCamera = false;
 //    String[] cameraIdList = CameraManager.getCameraIdList();
     //1: Front camera, 0: Rear camera
     public String defaultCameraId;
-    public List<String> cameraIds;
+    public List<String> mCameraIds;
 
     public void initCameraIds(Context context){
         if(context == null){
@@ -125,18 +126,18 @@ public class ConfigUtil {
         }
 
         try {
-            mCameraIds = cameraManager.getCameraIdList();
-            if(mCameraIds != null && mCameraIds.length > 1){
+            String[] cameraIds = cameraManager.getCameraIdList();
+            if(cameraIds != null && cameraIds.length > 1){
                 hasMoreCamera = true;
                 defaultCameraId = cameraManager.getCameraIdList()[1];
-                List<String> cameraIds = new ArrayList<>(Arrays.asList(
-                        mCameraIds
+                mCameraIds = new ArrayList<>(Arrays.asList(
+                        cameraIds
                 ));
             } else {
                 hasMoreCamera = false;
                 defaultCameraId = cameraManager.getCameraIdList()[0];
-                List<String> cameraIds = new ArrayList<>(Arrays.asList(
-                        mCameraIds
+                mCameraIds = new ArrayList<>(Arrays.asList(
+                        cameraIds
                 ));
             }
         } catch (CameraAccessException e) {

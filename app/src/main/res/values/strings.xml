@@ -42,6 +42,11 @@
     <string name="delay_value_in_seconds">Delay value in seconds</string>
     <string name="current_time">Current time: %1$s</string>
 
+    <string name="record_camera">Record camera</string>
+    <string name="front_camera">Front camera</string>
+    <string name="rear_camera">Rear camera</string>
+
+
     <string name="video_settings">Video Settings</string>
     <string name="file_name_format">File name format</string>
 

@@ -22,6 +22,7 @@ class SettingsViewModel : ViewModel(){
     val audioBitrateUpdated: MutableLiveData<Boolean> = MutableLiveData()
     val audioSampleRateUpdated: MutableLiveData<Boolean> = MutableLiveData()
     val audioChannelUpdated: MutableLiveData<Boolean> = MutableLiveData()
+    val cameraIdUpdated: MutableLiveData<Boolean> = MutableLiveData()
 
     enum class PostType{
         NONE
@@ -33,6 +34,7 @@ class SettingsViewModel : ViewModel(){
         , AUDIO_BITRATE
         , AUDIO_SAMPLE_RATE
         , AUDIO_CHANNEL
+        , CAMERA_ID
     }
 
 
@@ -50,6 +52,7 @@ class SettingsViewModel : ViewModel(){
             PostType.AUDIO_BITRATE -> audioBitrateUpdated.postValue(true)
             PostType.AUDIO_SAMPLE_RATE -> audioSampleRateUpdated.postValue(true)
             PostType.AUDIO_CHANNEL -> audioChannelUpdated.postValue(true)
+            PostType.CAMERA_ID -> cameraIdUpdated.postValue(true)
         }
 
     }

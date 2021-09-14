@@ -1,6 +1,7 @@
 package com.boom.android.ui.adapter;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,11 @@ import com.boom.android.SettingsActivity;
 import com.boom.android.log.Dogger;
 import com.boom.android.ui.adapter.repo.Resolution;
 import com.boom.android.ui.adapter.repo.SingleSelectBean;
+import com.boom.android.ui.dialog.AppDialogFragment;
+import com.boom.android.util.PrefsUtil;
 import com.boom.android.util.WindowUtils;
 import com.boom.android.viewmodel.SettingsViewModel;
+import com.boom.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +81,14 @@ public class SingleSelectRecycleAdapter extends RecyclerView.Adapter<RecyclerVie
                             , String.valueOf(WindowUtils.getScreenWidth(mContext))
                             , String.valueOf(WindowUtils.getScreenHeight(mContext))));
         } else {
-            userHolder.tvValue.setText(String.valueOf(bean.getValue()));
+            switch (bean.getType()){
+                case AppDialogFragment.TYPE_CAMERA_ID:
+                    userHolder.tvValue.setText(PrefsUtil.getCameraIdWording(mContext, (String) bean.getValue()));
+                    break;
+                default:
+                    userHolder.tvValue.setText(String.valueOf(bean.getValue()));
+                    break;
+            }
         }
 
         userHolder.ivChecked.setVisibility(bean.getChecked()? View.VISIBLE :View.GONE);

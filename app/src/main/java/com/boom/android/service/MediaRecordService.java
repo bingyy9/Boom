@@ -432,6 +432,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     private void addRoundBorder(){
+        removeRoundBorder();
         if(RecordHelper.isRecording() && cameraView.getVisibility() == View.VISIBLE) {
             if (roundBorderView == null) {
                 roundBorderView = new RoundBorderView(MediaRecordService.this);
@@ -457,6 +458,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
     }
 
     void initCamera() {
+        Dogger.i(Dogger.BOOM, "1cameraId: " + PrefsUtil.getCameraIInt(this), "MediaRecordService", "initCamera");
         cameraHelper = new CameraHelper.Builder()
                 .cameraListener(this)
                 .specificCameraId(PrefsUtil.getCameraIInt(this))
