@@ -23,7 +23,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import android.widget.LinearLayout;
 
+import com.boom.android.featuretoggle.ToggleMgr;
 import com.boom.android.log.Dogger;
 import com.boom.android.service.RecordingForegroundService;
 import com.boom.android.ui.adapter.repo.RecordParams;
@@ -41,6 +43,10 @@ import com.boom.model.repo.RecordEvent;
 import com.boom.utils.StringUtils;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.tabs.TabLayout;
 import com.qw.soul.permission.SoulPermission;
 import com.qw.soul.permission.bean.Permission;
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     FloatingActionButton recordScreenOnly;
     FloatingActionButton recordScreenWithCamera;
     FloatingActionButton stopRecord;
+    LinearLayout adsContainer;
 
     private String[] tabs;
     private List<Fragment> tabFragmentList = new ArrayList<>();
@@ -114,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         recordScreenOnly = this.findViewById(R.id.record_screen);
         recordScreenWithCamera = this.findViewById(R.id.record_screen_with_camera);
         stopRecord = this.findViewById(R.id.fab_stop_record);
+        adsContainer = this.findViewById(R.id.ll_ads_container);
 
         tabs = new String[]{this.getResources().getString(R.string.my_videos)};
         for (int i = 0; i < tabs.length; i++) {
@@ -151,6 +159,38 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         recordScreenWithCamera.setOnClickListener(clickListener);
         stopRecord.setOnClickListener(clickListener);
         createCustomAnimation4FloatingMenu();
+        initAdView();
+    }
+
+    //refer https://developers.google.com/admob/android/quick-start?hl=zh-cn
+    private void initAdView(){
+        if(adsContainer == null){
+            return;
+        }
+        adsContainer.post(()->{
+            if(adsContainer == null){
+                return;
+            }
+
+            if(ToggleMgr.getInstance().isGoogleAdMobEnabled() && BoomHelper.enableGoogleService()){
+                MobileAds.initialize(this);
+                AdView adView = new AdView(MainActivity.this);
+                adView.setVisibility(View.VISIBLE);
+                adView.setAdSize(AdSize.BANNER);
+                if(BuildConfig.DEBUG){
+                    adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+                } else {
+                    adView.setAdUnitId("ca-app-pub-3664539758219508/1762960739");
+                }
+                AdRequest adRequest = new AdRequest.Builder().build();
+                adView.loadAd(adRequest);
+                adsContainer.setVisibility(View.VISIBLE);
+                adsContainer.addView(adView);
+                floatingMenu.invalidate();
+            } else {
+                adsContainer.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void createCustomAnimation4FloatingMenu() {

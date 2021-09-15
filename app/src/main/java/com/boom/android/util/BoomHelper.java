@@ -1,10 +1,8 @@
 package com.boom.android.util;
 
-import android.app.AppOpsManager;
 import android.content.Context;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.provider.Settings;
 
 import com.boom.android.BoomApplication;
@@ -13,11 +11,8 @@ import com.boom.android.log.Dogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.logging.Logger;
 
 public class BoomHelper {
     public static final String filePostfix = ".mp4";

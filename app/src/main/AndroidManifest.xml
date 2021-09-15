@@ -26,6 +26,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3664539758219508~8519940772"/>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.boom.android.fileprovider"
@@ -46,7 +51,7 @@
             android:enabled="true"
             android:foregroundServiceType="mediaProjection" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" android:hardwareAccelerated="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

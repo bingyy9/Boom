@@ -18,6 +18,7 @@ import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
 import com.boom.model.interf.impl.ModelBuilderImpl;
 import com.boom.model.interf.impl.ModelBuilderManager;
+import com.google.android.gms.ads.MobileAds;
 
 public class BoomApplication extends Application {
 
