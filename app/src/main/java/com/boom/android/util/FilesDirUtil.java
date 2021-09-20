@@ -13,12 +13,14 @@ import androidx.annotation.RequiresApi;
 
 public class FilesDirUtil {
 
+    public static final String fileProvider = ".fileProvider";
     public static final String logFileName = "boom_record_logs.txt";
     public static final String backLogFileName = "lastLog.txt";
     public static final String cacheDir = "snapshot";
     public static final String logDir = "log";
     public static final String recordDir = "record";
     private static boolean debugHasSDCard = true;
+
 
     public static File getLogFile(Context context){
         if(context == null){

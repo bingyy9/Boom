@@ -52,6 +52,7 @@ import com.qw.soul.permission.SoulPermission;
 import com.qw.soul.permission.bean.Permission;
 import com.qw.soul.permission.bean.Permissions;
 import com.qw.soul.permission.callbcak.CheckRequestPermissionsListener;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -392,8 +393,12 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private void onClickRecordScreenWithCamera(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
+        CrashReport.testJavaCrash();
+        Resolution resolution = null;
+        Dogger.i(Dogger.BOOM, "re" + resolution.getWidth(), "MainActivity", "onClickRecordScreenWithCamera");
         RecordHelper.setRecordCamera(true);
         startRecording();
+
     }
 
     private void onClickStopRecord(){
@@ -432,7 +437,8 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     private void initPermission(){
         SoulPermission.getInstance().checkAndRequestPermissions(
                 Permissions.build(Manifest.permission.READ_EXTERNAL_STORAGE
-                    , Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    , Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    , Manifest.permission.READ_LOGS),
                     //if you want do noting or no need all the callbacks you may use SimplePermissionsAdapter instead
                 new CheckRequestPermissionsListener() {
                     @Override

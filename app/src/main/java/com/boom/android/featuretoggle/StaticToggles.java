@@ -5,7 +5,7 @@ public class StaticToggles {
     public static final java.util.Map<String, Boolean> toggles = new java.util.HashMap<String, Boolean>();
 
     static {
-        toggles.put(ADMOB_BANNER, true);
+        toggles.put(ADMOB_BANNER, false);
     }
 
 }

@@ -7,20 +7,30 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
+import android.os.Debug;
 import android.os.IBinder;
 
+import com.boom.android.crash.CrashHandler;
 import com.boom.android.log.Dogger;
 import com.boom.android.log.FactoryMgr;
 import com.boom.android.service.MediaRecordService;
 import com.boom.android.util.AndroidFactory;
+import com.boom.android.util.AndroidMemoryMonitor;
 import com.boom.android.util.ConfigUtil;
 import com.boom.android.util.LogToFileUtils;
 import com.boom.android.util.NotificationUtils;
 import com.boom.model.interf.impl.ModelBuilderImpl;
 import com.boom.model.interf.impl.ModelBuilderManager;
+import com.boom.utils.StringUtils;
 import com.google.android.gms.ads.MobileAds;
+import com.tencent.bugly.crashreport.CrashReport;
 
-public class BoomApplication extends Application {
+import java.util.concurrent.ThreadPoolExecutor;
+
+import androidx.annotation.NonNull;
+import androidx.multidex.MultiDexApplication;
+
+public class BoomApplication extends MultiDexApplication{
 
     private static BoomApplication application;
     private MediaRecordService mediaRecordService;
@@ -31,12 +41,21 @@ public class BoomApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         application = this;
+//        Multidex.install(this);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        if(!BuildConfig.DEBUG){
+            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", false);
+        } else {
+            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", true);
+        }
+
         LogToFileUtils.init(this);
+        CrashHandler crashHandler = CrashHandler.getInstance();
+        crashHandler.init(getApplicationContext());
         configUtil = ConfigUtil.getInstance();
         configUtil.initCameraIds(this);
         ModelBuilderManager.setModelBuilder(new ModelBuilderImpl());

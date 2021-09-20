@@ -123,7 +123,7 @@ public class AboutActivity extends AppCompatActivity {
 
             out.close();
 
-            return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileProvider", new File(outputPath));
+            return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + FilesDirUtil.fileProvider, new File(outputPath));
         } catch (Exception e) {
             Dogger.e(Dogger.BOOM, "Cannot gather zip log: ", "AboutActivity", "gatherZipLog", e);
             return null;

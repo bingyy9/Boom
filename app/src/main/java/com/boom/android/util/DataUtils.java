@@ -11,6 +11,11 @@ public class DataUtils {
         return formatter == null? null: formatter.format(time);
     }
 
+    public static String formatDate2(long time){
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        return formatter == null? null: formatter.format(time);
+    }
+
     public static String formatDate4RecordDefaultName(Context context, long time){
         String fileNameFormat = PrefsUtil.getFileNameFormat(context);
         SimpleDateFormat formatter = new SimpleDateFormat(fileNameFormat);

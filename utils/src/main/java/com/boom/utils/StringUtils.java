@@ -24,4 +24,12 @@ public class StringUtils {
         }
     }
 
+    public static void appendFormattedNumber(final StringBuilder sb, final long number, final int step) {  //Change 1200 to 1200.00(step is 1), 1024 bytes to 1.00 KB(step is 1024)  //OK
+        if (sb == null || number < 0 || step < 1) {
+            return;
+        }
+        long temp1 = number * 100 / step, temp2 = temp1 % 100;
+        sb.append(temp1 / 100).append('.').append(temp2 < 10 ? "0" : "").append(temp2);
+    }
+
 }

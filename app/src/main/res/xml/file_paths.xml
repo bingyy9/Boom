@@ -13,4 +13,11 @@
     <cache-path
         name="cache"
         path="." />
+
+<!--    <external-path-->
+<!--        name="beta_external_path"-->
+<!--        path="Downloads" />-->
+<!--    <external-path-->
+<!--        name="beta_external_files_path"-->
+<!--        path="Android/data/" />-->
 </paths>
