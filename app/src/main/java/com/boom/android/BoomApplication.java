@@ -23,7 +23,7 @@ import com.boom.model.interf.impl.ModelBuilderImpl;
 import com.boom.model.interf.impl.ModelBuilderManager;
 import com.boom.utils.StringUtils;
 import com.google.android.gms.ads.MobileAds;
-import com.tencent.bugly.crashreport.CrashReport;
+//import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -47,11 +47,11 @@ public class BoomApplication extends MultiDexApplication{
     @Override
     public void onCreate() {
         super.onCreate();
-        if(!BuildConfig.DEBUG){
-            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", false);
-        } else {
-            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", true);
-        }
+//        if(!BuildConfig.DEBUG){
+//            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", false);
+//        } else {
+//            CrashReport.initCrashReport(getApplicationContext(), "46d8f339e6", true);
+//        }
 
         LogToFileUtils.init(this);
         CrashHandler crashHandler = CrashHandler.getInstance();

@@ -52,7 +52,6 @@ import com.qw.soul.permission.SoulPermission;
 import com.qw.soul.permission.bean.Permission;
 import com.qw.soul.permission.bean.Permissions;
 import com.qw.soul.permission.callbcak.CheckRequestPermissionsListener;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -393,9 +392,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
 
     private void onClickRecordScreenWithCamera(){
         Dogger.i(Dogger.BOOM, "", "MainActivity", "onClickRecordScreenWithCamera");
-        CrashReport.testJavaCrash();
-        Resolution resolution = null;
-        Dogger.i(Dogger.BOOM, "re" + resolution.getWidth(), "MainActivity", "onClickRecordScreenWithCamera");
+//        CrashReport.testJavaCrash();
         RecordHelper.setRecordCamera(true);
         startRecording();
 

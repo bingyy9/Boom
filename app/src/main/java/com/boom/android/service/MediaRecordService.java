@@ -13,6 +13,7 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -46,13 +47,19 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+
 
 public class MediaRecordService extends Service implements ViewTreeObserver.OnGlobalLayoutListener
         , CameraListener
         , IRecordModel.RecordEvtListener
         , View.OnClickListener
         , FloatingWindowFrameLayout.OnTouchDownListener
-        , View.OnTouchListener{
+        , View.OnTouchListener
+        , MediaRecorder.OnErrorListener{
     private Handler mHandler;
     private MediaProjection mediaProjection;
     private MediaRecorder mediaRecorder;
@@ -120,7 +127,6 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         RecordHelper.registerRecordEventListner(this);
 //        serviceThread.start();
         RecordHelper.setRecording(false);
-        mediaRecorder = new MediaRecorder();
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
         layoutParams = new WindowManager.LayoutParams();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -164,15 +170,15 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         }
         RecordHelper.setRecording(true);
 
-        //updateView
-        updateView();
         if(RecordHelper.isRecordCamera()){
             showCameraFloatingWindow();
         }
 
         initRecorder();
         createVirtualDisplay();
-        mediaRecorder.start();
+        if(mediaRecorder != null) {
+            mediaRecorder.start();
+        }
         return true;
     }
 
@@ -234,13 +240,23 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         if (!RecordHelper.isRecording()) {
             return;
         }
+        if (mediaRecorder != null) {
+            //设置后不会崩
+            mediaRecorder.setOnErrorListener(null);
+            mediaRecorder.setPreviewDisplay(null);
+            try {
+                mediaRecorder.stop();
+                mediaRecorder.reset();
+                mediaRecorder.release();
+                mediaRecorder = null;
+            }  catch (Exception e) {
+                Dogger.e(Dogger.BOOM, "", "MediaRecordService", "stopRecord", e);
+            }
+        }
         RecordHelper.setRecording(false);
-        mediaRecorder.stop();
-        mediaRecorder.reset();
         virtualDisplay.release();
         mediaProjection.stop();
         clearWindow();
-
         NotificationUtils.removeRecordingNotification(this);
     }
 
@@ -267,7 +283,12 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
             //TODO: pending to address below exception based on referer other github record screen
 //            java.lang.RuntimeException: setAudioSource failed.
 //            at android.media.MediaRecorder.setAudioSource(Native Method)
-            mediaRecorder.reset();
+            if(mediaRecorder == null) {
+                mediaRecorder = new MediaRecorder();
+                mediaRecorder.setOnErrorListener(this);
+            } else {
+                mediaRecorder.reset();
+            }
 
             mediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
             if(PrefsUtil.isRecordAudio(this)){
@@ -305,6 +326,12 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
         }
 
         initCamera();
+    }
+
+    @Override
+    public void onError(MediaRecorder mediaRecorder, int what, int extra) {
+        Dogger.i(Dogger.BOOM, "", "MediaRecordService", "onError");
+        stopRecord();
     }
 
     public class RecordBinder extends Binder {
@@ -350,6 +377,7 @@ public class MediaRecordService extends Service implements ViewTreeObserver.OnGl
                     updateView();
                     startRecord();
                 });
+
             }
         }
     }

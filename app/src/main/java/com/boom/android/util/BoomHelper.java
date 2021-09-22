@@ -11,8 +11,12 @@ import com.boom.android.log.Dogger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 public class BoomHelper {
     public static final String filePostfix = ".mp4";
@@ -79,5 +83,34 @@ public class BoomHelper {
             return true;
         }
     }
+
+    public static String getDeviceInfo() {
+        return new StringBuilder().append("Application version = ").append(AndroidVersionManager.getVersion())
+                .append("; Application build no. = ").append(AndroidVersionManager.getBuildNumber())
+                .append("; Build.BOARD = ").append(Build.BOARD)
+                .append("; Build.CPU_ABI = ").append(Build.CPU_ABI)
+                .append("; Build.DISPLAY = ").append(Build.DISPLAY)
+                .append("; Build.FINGERPRINT = ").append(Build.FINGERPRINT)
+                .append("; Build.HOST = ").append(Build.HOST)
+                .append("; Build.ID = ").append(Build.ID)
+                .append("; Build.TAGS = ").append(Build.TAGS)
+                .append("; Build.TIME = ").append(Build.TIME)
+                .append("; Build.TYPE = ").append(Build.TYPE)
+                .append("; Build.USER = ").append(Build.USER)
+                .append("; Build.MODEL = ").append(Build.MODEL)
+                .append("; Build.DEVICE = ").append(Build.DEVICE)
+                .append("; Build.PRODUCT = ").append(Build.PRODUCT)
+                .append("; Build.BRAND = ").append(Build.BRAND)
+                .append("; Build.MANUFACTURER = ").append(Build.MANUFACTURER)
+                .append("; Build.VERSION.SDK = ").append(Build.VERSION.SDK)
+                .append("; Build.VERSION.RELEASE = ").append(Build.VERSION.RELEASE)
+                .append("; Build.VERSION.CODENAME = ").append(Build.VERSION.CODENAME)
+                .append("; PID = ").append(android.os.Process.myPid())
+                .append("; TIMEZONE.ID = ").append(TimeZone.getDefault().getID())
+                .append("; CPU.COUNT= ").append(AndroidHardwareUtils.getDeviceCpuCount())
+                .append("; DEVICE.TOTALMEM =").append(AndroidHardwareUtils.getDeviceTotalMem(BoomApplication.getInstance()))
+                .toString();
+    }
+
 
 }

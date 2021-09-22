@@ -6,12 +6,15 @@ import android.os.Environment;
 import android.text.format.Formatter;
 import android.util.Log;
 
+import com.boom.android.BoomApplication;
 import com.boom.android.log.Dogger;
+import com.boom.utils.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 
 public class LogToFileUtils {
@@ -132,9 +135,27 @@ public class LogToFileUtils {
         // 新建日志文件
         try {
             logFile.createNewFile();
+            writeHeader();
         } catch (Exception e) {
             if(toggleFileLog) {
                 Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
+            }
+        }
+    }
+
+    private static void writeHeader(){
+        String deviceInfo = BoomHelper.getDeviceInfo();
+        if(StringUtils.isEmpty(deviceInfo)){
+            return;
+        }
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true));
+            bw.write(deviceInfo);
+            bw.write("\r\n");
+            bw.flush();
+        } catch (Exception e) {
+            if(toggleFileLog) {
+                Log.e(tag, "Write failure !!! " + e.toString());
             }
         }
     }
@@ -176,6 +197,7 @@ public class LogToFileUtils {
         if (!logFile.exists()) {
             try {
                 logFile.createNewFile();
+                writeHeader();
             } catch (Exception e) {
                 if(toggleFileLog) {
                     Log.e(MY_TAG, "Create log file failure !!! " + e.toString());
@@ -212,5 +234,4 @@ public class LogToFileUtils {
         }
         return null;
     }
-
 }
