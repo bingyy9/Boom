@@ -1,8 +1,6 @@
 package com.boom.android.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.boom.deprecated.FloatingCameraService
-import com.boom.deprecated.FloatingCounterService
 import com.boom.android.service.MediaRecordService
 import com.boom.model.interf.IRecordModel
 import com.boom.model.interf.impl.ModelBuilderManager
@@ -16,8 +14,6 @@ class RecordViewModel : ViewModel()
     var recordRepo: RecordRepo? = null
 
     private val recordService: MediaRecordService? = null
-    private val floatingCameraService: FloatingCameraService? = null
-    private val floatingCounterService: FloatingCounterService? = null
 
     init {
         registerListener()

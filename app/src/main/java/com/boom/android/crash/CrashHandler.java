@@ -104,6 +104,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
+                Dogger.e(Dogger.BOOM, "", "CrashHandler", "run", ex);
                 Toast.makeText(mContext, mContext.getResources().getString(R.string.app_crashed_tip), Toast.LENGTH_LONG).show();
                 Looper.loop();
             }

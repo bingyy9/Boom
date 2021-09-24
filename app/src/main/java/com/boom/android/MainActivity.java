@@ -16,7 +16,12 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     FloatingActionButton recordScreenWithCamera;
     FloatingActionButton stopRecord;
     LinearLayout adsContainer;
+    Handler mHandler;
 
     private String[] tabs;
     private List<Fragment> tabFragmentList = new ArrayList<>();
@@ -84,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mHandler = new Handler(Looper.getMainLooper());
         projectionManager = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
         initPermission();
         initView();
@@ -293,9 +300,17 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
         if (requestCode == RECORD_REQUEST_CODE && resultCode == RESULT_OK) {
             mediaProjection = projectionManager.getMediaProjection(resultCode, data);
             configMediaRecordService(mediaProjection);
-            showCounterFloatingWindow();
+            if (!BoomHelper.ensureDrawOverlayPermission(this)) {
+                requestDrawOverlay();
+            } else {
+                showCounterFloatingWindow();
+            }
         } else if(requestCode == OVERLAY_REQUEST_CODE){
-            showCounterFloatingWindow();
+            if(mHandler != null) {
+                mHandler.postDelayed(() -> {
+                    showCounterFloatingWindow();
+                }, 500);
+            }
         }
     }
 
@@ -335,6 +350,16 @@ public class MainActivity extends AppCompatActivity implements IRecordModel.Reco
                 Dogger.i(Dogger.BOOM, "mediaRecordService is null.", "MainActivity", "showCounterFloatingWindow");
             }
         }
+    }
+
+    private void requestDrawOverlay(){
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        Intent i = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+        i.setData(Uri.parse("package:" + getPackageName()));
+        if (i.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(i, OVERLAY_REQUEST_CODE);
+        }
+//        }
     }
 
     public native String stringFromJNI();
